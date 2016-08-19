@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  var p = document.createElement('p');
-  p.textContent = 'hello world!';
-  document.body.appendChild(p);
+  var container = document.getElementById('container');
+  var engine = new Engine(container);
+  engine.init();
 });
 
