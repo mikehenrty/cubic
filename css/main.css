@@ -2,7 +2,7 @@ body {
   background-color: blue;
 }
 
-#container {
+#screen {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,6 +15,7 @@ body {
 }
 
 #board {
+  position: relative;
   background-color: black;
   width: 90vmin;
   height: 90vmin;
@@ -28,4 +29,14 @@ body {
   height: 9vmin;
   width: 9vmin;
   border: 1px solid green;
+}
+
+.piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: red;
+  height: 9vmin;
+  width: 9vmin;
+  transition-duration: 0.2s;
 }
