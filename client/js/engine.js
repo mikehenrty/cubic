@@ -39,5 +39,9 @@ window.Engine = (function() {
     }
   };
 
+  Engine.prototype.reset = function() {
+    this.player.reset();
+  };
+
   return Engine;
 })();

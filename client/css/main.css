@@ -1,0 +1,76 @@
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Press Start 2P'), local('PressStart2P-Regular'),
+       url('./fonts/press-start-2p-v4-latin-regular.woff2') format('woff2');
+}
+
+:root {
+  --console-green: #2ff20e;
+  --board-height: 80vmin;
+  --square-height: calc(var(--board-height) / 10);
+  --ui-height: calc( (100vmin - var(--board-height) ) / 2);
+}
+
+body {
+  background-color: black;
+  font-family: 'Press Start 2P';
+  font-size: calc(var(--ui-height) / 3);
+  color: var(--console-green);
+}
+
+p {
+  margin: 0;
+}
+
+#screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: var(--ui-height);
+  bottom: var(--ui-height);
+  left: 0;
+  right: 0;
+}
+
+#ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--ui-height);
+}
+
+#status {
+  text-align: center;
+  padding-top: calc(var(--ui-height) / 3);
+}
+
+#board {
+  position: relative;
+  background-color: black;
+  width: var(--board-height);
+  height: var(--board-height);
+  line-height: 0;
+  border: 1px solid var(--console-green);
+}
+
+.square {
+  display: inline-block;
+  box-sizing: border-box;
+  height: var(--square-height);
+  width: var(--square-height);
+  border: 1px solid var(--console-green);
+}
+
+.piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: red;
+  height: var(--square-height);
+  width: var(--square-height);
+  transition-duration: 0.2s;
+}

@@ -1,0 +1,143 @@
+window.Utility = (function() {
+  'use strict';
+
+  function Queue() {
+    this.tasks = [];
+    this.running = false;
+    this.errorHandler = null;
+    this.handleDone = this.handleDone.bind(this);
+  }
+
+  Queue.prototype.handleDone = function(err) {
+    if (err) {
+      console.log('queue callback error', err);
+      // Only stop executing queue if error handler attached.
+      if (this.errorHandler) {
+        return this.errorHandler(err);
+      }
+    }
+
+    this.running = false;
+    if (this.tasks.length > 0) {
+      this.runNextTask();
+    }
+  };
+
+  Queue.prototype.runNextTask = function() {
+    this.running = true;
+    var task = this.tasks.shift();
+    if (task.length === 1) {
+      task(this.handleDone);
+    } else {
+      task();
+      this.handleDone();
+    }
+  };
+
+  Queue.prototype.add = function() {
+    for (var i = 0; i < arguments.length; i++) {
+      this.tasks.push(arguments[i]);
+    }
+    if (!this.running) {
+      this.runNextTask();
+    }
+    return this;
+  };
+
+  Queue.prototype.catch = function(cb) {
+    this.errorHandler = cb;
+  };
+
+  var peerCount = 0;
+  var peerNames = {};
+  function niceId(guid) {
+    if (window.clientId && window.clientId === guid) {
+      return 'Me';
+    }
+    if (peerNames[guid]) {
+      return peerNames[guid]
+    }
+    peerNames[guid] = 'peer_' + ++peerCount;
+    return peerNames[guid];
+  }
+
+  var rootStyle;
+  function getCssVar(name) {
+    if (!rootStyle) {
+      rootStyle = window.getComputedStyle(document.querySelector(':root'));
+    }
+    return rootStyle.getPropertyValue(name);
+  }
+
+  return {
+    guid: function() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    },
+
+    sum: function(data) {
+      return data.reduce((prev, cur) => prev + cur, 0);
+    },
+
+    mean: function(data) {
+      if (data.length === 0) {
+        return 0;
+      }
+      return Utility.sum(data) / data.length;
+    },
+
+    stddev: function(data) {
+      if (data.length === 0) {
+        return 0;
+      }
+      var mean = Utility.mean(data);
+      var sumOfDistances = Utility.sum(data.map(result => {
+        return Math.pow(mean - result, 2);
+      }));
+      return Math.sqrt(sumOfDistances / data.length);
+    },
+
+    roundDecimals: function(num) {
+      return parseFloat(num.toFixed(3));
+    },
+
+    once: function(fn) {
+      var called = false;
+      return function() {
+        if (!called) {
+          called = true;
+          return fn.apply(null, arguments);
+        }
+      };
+    },
+
+    getPeerLink: function(id) {
+      var url = new URL(window.location.href);
+      return `${url.protocol}\/\/${url.host}${url.pathname}?peer=${id}`;
+    },
+
+    getPeerId: function() {
+      var url = new URL(window.location.href);
+      return url.searchParams.get('peer');
+    },
+
+    getClientId: function() {
+      if (!window.clientId) {
+        window.clientId = Utility.guid();
+        console.log('client id', window.clientId);
+      }
+      return window.clientId;
+    },
+
+    getPixelHeight: function(query) {
+      var style = window.getComputedStyle(document.querySelector(query));
+      return parseFloat(style.height.slice(0, -2));
+    },
+
+    getCssVar: getCssVar,
+    niceId: niceId,
+    Queue: Queue
+  };
+})();

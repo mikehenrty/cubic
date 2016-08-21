@@ -12,11 +12,13 @@ window.Player = (function() {
 
   Player.prototype.init = function() {
     this.container.appendChild(this.el);
+    this.squareHeight = Utility.getPixelHeight('.square');
   };
 
   Player.prototype.update = function() {
-    this.el.style.transform = 'translateY(' + this.y * 9 + 'vmin) ' +
-                              'translateX(' + this.x * 9 + 'vmin)';
+    this.el.style.transform =
+      'translateY(' + this.y * this.squareHeight + 'px) ' +
+      'translateX(' + this.x * this.squareHeight + 'px)';
   };
 
   Player.prototype.moveUp = function() {
@@ -45,6 +47,12 @@ window.Player = (function() {
       ++this.x;
       this.update();
     }
+  };
+
+  Player.prototype.reset = function() {
+    this.x = 0;
+    this.y = 0;
+    this.update();
   };
 
   return Player;
