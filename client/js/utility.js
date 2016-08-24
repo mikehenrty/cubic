@@ -61,46 +61,12 @@ window.Utility = (function() {
     return peerNames[guid];
   }
 
-  var rootStyle;
-  function getCssVar(name) {
-    if (!rootStyle) {
-      rootStyle = window.getComputedStyle(document.querySelector(':root'));
-    }
-    return rootStyle.getPropertyValue(name);
-  }
-
   return {
     guid: function() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
         return v.toString(16);
       });
-    },
-
-    sum: function(data) {
-      return data.reduce((prev, cur) => prev + cur, 0);
-    },
-
-    mean: function(data) {
-      if (data.length === 0) {
-        return 0;
-      }
-      return Utility.sum(data) / data.length;
-    },
-
-    stddev: function(data) {
-      if (data.length === 0) {
-        return 0;
-      }
-      var mean = Utility.mean(data);
-      var sumOfDistances = Utility.sum(data.map(result => {
-        return Math.pow(mean - result, 2);
-      }));
-      return Math.sqrt(sumOfDistances / data.length);
-    },
-
-    roundDecimals: function(num) {
-      return parseFloat(num.toFixed(3));
     },
 
     once: function(fn) {
@@ -136,7 +102,6 @@ window.Utility = (function() {
       return parseFloat(style.height.slice(0, -2));
     },
 
-    getCssVar: getCssVar,
     niceId: niceId,
     Queue: Queue
   };
