@@ -17,7 +17,7 @@ window.Connection = (function() {
 
   Connection.prototype.connect = function(peerId) {
     return new Promise((res, rej) => {
-      return this.webRTC.connect(peerId, err => {
+      this.webRTC.connect(peerId, err => {
         if (err) {
           rej(err);
         } else {

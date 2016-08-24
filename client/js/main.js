@@ -13,18 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
     var peerId = Utility.getPeerId();
     if (!peerId) {
       ui.setStatus(Utility.getPeerLink(clientId));
-      connection.listen().then(peerId => {
+      return connection.listen().then(peerId => {
         ui.setStatus('Got a connection!');
       });
     } else {
       ui.setStatus('Connecting to peer...');
-      connection.connect(peerId).then(() => {
+      return connection.connect(peerId).then(() => {
         ui.setStatus('Connected!!!!!!');
       });
     }
-  }, (err) => {
+  }).catch(err => {
     console.log('connection error', err);
-    ui.Server('Connection error');
+    ui.setStatus('Connection error');
   });
 });
 
