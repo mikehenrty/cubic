@@ -10,18 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var connection = new Connection();
   connection.init().then(clientId => {
+    ui.setStatus(Utility.getPeerLink(clientId));
+
+    connection.onPeerConnect(peerId => {
+      ui.setStatus('Got a connection!');
+    });
+
     var peerId = Utility.getPeerId();
-    if (!peerId) {
-      ui.setStatus(Utility.getPeerLink(clientId));
-      return connection.listen().then(peerId => {
-        ui.setStatus('Got a connection!');
-      });
-    } else {
+    if (peerId) {
       ui.setStatus('Connecting to peer...');
-      return connection.connect(peerId).then(() => {
-        ui.setStatus('Connected!!!!!!');
-      });
+      connection.connect(peerId);
     }
+
   }).catch(err => {
     console.log('connection error', err);
     ui.setStatus('Connection error');

@@ -48,6 +48,22 @@ window.Utility = (function() {
     this.errorHandler = cb;
   };
 
+  function Handlers() {
+    this.handlers = [];
+  }
+
+  Handlers.prototype.add = function(handler) {
+    this.handlers.push(handler);
+  };
+
+  Handlers.prototype.succeed = function(value) {
+    this.handlers.forEach(handler => { handler(null, value); });
+  };
+
+  Handlers.prototype.fail = function(err) {
+    this.handlers.forEach(handler => { handler(err); });
+  };
+
   var peerCount = 0;
   var peerNames = {};
   function niceId(guid) {
@@ -102,7 +118,15 @@ window.Utility = (function() {
       return parseFloat(style.height.slice(0, -2));
     },
 
+    copyToClipboard: function(text) {
+      document.dispatchEvent(new ClipboardEvent('paste', {
+        dataType: 'text/plain',
+        data: text
+      }));
+    },
+
     niceId: niceId,
-    Queue: Queue
+    Queue: Queue,
+    Handlers: Handlers
   };
 })();

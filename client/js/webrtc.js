@@ -11,9 +11,9 @@ window.WebRTC = (function() {
     this.socket = socket;
     this.peerId = null;
     this.dataChannel = null;
-    this.connectHandler = null;
     this.handlers = {};
     this.queue = new Utility.Queue();
+    this.connectHandlers = new Utility.Handlers();
 
     this.socket.registerHandler('signaling',
       this.signalHandler.bind(this));
@@ -48,17 +48,17 @@ window.WebRTC = (function() {
       this.dataChannelStateChange.bind(this);
     this.dataChannel.onmessage = this.onMessage.bind(this);
 
-    this.connectHandler = Utility.once(cb);
+    this.connectHandlers.add(Utility.once(cb));
     this.peerConnection.createOffer().then(offer => {
       this.peerConnection.setLocalDescription(offer);
       this.sendSignal('offer', offer);
     }).catch(err => {
-      this.connectHandler && this.connectHandler(err);
+      this.connectHandlers.fail(err);
     });
   };
 
   WebRTC.prototype.onConnnection = function(cb) {
-    this.connectHandler = cb;
+    this.connectHandlers.add(cb);
   };
 
   WebRTC.prototype.registerHandler = function(type, cb) {
@@ -105,7 +105,7 @@ window.WebRTC = (function() {
       console.log('signaling error', err, peerId, message);
       // If signaling failed while connecting, call handler with error.
       if (peerId === this.peerId) {
-        this.connectHandler && this.connectHandler(err);
+        this.connectHandlers.fail(err);
       }
       return;
     }
@@ -206,7 +206,7 @@ window.WebRTC = (function() {
   WebRTC.prototype.dataChannelStateChange = function(evt) {
     console.log('data channel state change', this.dataChannel.readyState);
     if (this.dataChannel.readyState === 'open') {
-      this.connectHandler && this.connectHandler(null, this.peerId);
+      this.connectHandlers.succeed(this.peerId);
     }
   };
 

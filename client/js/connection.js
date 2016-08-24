@@ -7,6 +7,14 @@ window.Connection = (function() {
     this.webRTC = null;
   }
 
+  Connection.prototype.onPeerConnect = function(cb) {
+    this.webRTC.onConnnection((err, peerId) => {
+      if (!err) {
+        cb(peerId);
+      }
+    });
+  };
+
   Connection.prototype.init = function() {
     return this.socket.init().then((clientId) => {
       this.clientId = clientId;
@@ -22,18 +30,6 @@ window.Connection = (function() {
           rej(err);
         } else {
           res();
-        }
-      });
-    });
-  };
-
-  Connection.prototype.listen = function() {
-    return new Promise((res, rej) => {
-      this.webRTC.onConnnection((err, peerId) => {
-        if (err) {
-          rej(err);
-        } else {
-          res(peerId);
         }
       });
     });
