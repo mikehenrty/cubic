@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var connection = new Connection();
   connection.init().then(clientId => {
-    ui.setStatus(Utility.getPeerLink(clientId));
+    ui.showPeerLink(clientId);
 
     connection.onPeerConnect(peerId => {
       ui.setStatus('Got a connection!');

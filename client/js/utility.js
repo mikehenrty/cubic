@@ -118,13 +118,6 @@ window.Utility = (function() {
       return parseFloat(style.height.slice(0, -2));
     },
 
-    copyToClipboard: function(text) {
-      document.dispatchEvent(new ClipboardEvent('paste', {
-        dataType: 'text/plain',
-        data: text
-      }));
-    },
-
     niceId: niceId,
     Queue: Queue,
     Handlers: Handlers

@@ -48,6 +48,16 @@ p {
   padding-top: calc(var(--ui-height) / 3);
 }
 
+.peer-link {
+  display: inline-block;
+  width: 75%;
+}
+
+.link-button {
+  display: inline-block;
+  width: 20%;
+}
+
 #board {
   position: relative;
   background-color: black;
