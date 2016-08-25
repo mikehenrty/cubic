@@ -1,13 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  var ui = new UI(document.body);
-  ui.init();
-
-  var engine = new Engine(document.body);
-  engine.init();
-
   var connection = new Connection();
+  var ui = new UI(document.body);
+  var engine = new Engine(document.body);
 
   var clientId = 0;
   var player = 0;
@@ -30,14 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function handleJoin(peerId) {
+  connection.onPeerConnect((peerId) => {
     engine.setPlayer(player);
     ui.setStatus(`You are Player ${player}`);
-  }
+  });
 
   connection.init().then(id => {
     clientId = id;
-    connection.onPeerConnect(handleJoin);
+    ui.init();
+    engine.init(connection);
 
     if (peerAlreadyExists()) {
       weArePlayerTwo();

@@ -11,39 +11,66 @@ window.Engine = (function() {
     this.board = new Board(this, COLS, ROWS);
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
-    this.me = this.player1; // use player1 as default, but this could change.
+    this.playerNumber = 1;
+    this.me = this.player1;
+    this.opponentNumber = 2;
     this.opponent = null;
   }
 
-  Engine.prototype.init = function() {
+  Engine.prototype.init = function(connection) {
+    this.connection = connection;
+    this.connection.registerHandler('keydown',
+                                   this.handleKeyForOpponent.bind(this));
     this.container.appendChild(this.el);
     this.board.init();
     this.player1.init();
     this.player2.init();
-    document.addEventListener('keydown', this.handleKeydown.bind(this));
+    document.addEventListener('keydown', this.handleKeyForMe.bind(this));
   };
 
   Engine.prototype.setPlayer = function(playerNumber) {
-    this.me = playerNumber === 1 ? this.player1 : this.player2;
+    if (playerNumber === 1) {
+      this.playerNumber = 1;
+      this.me = this.player1;
+      this.opponentNumber = 2;
+      this.opponent = this.player2;
+    } else {
+      this.playerNumber = 2;
+      this.me = this.player2;
+      this.opponentNumber = 1;
+      this.opponent = this.player1;
+    }
   }
 
+  Engine.prototype.handleKeyForOpponent = function(type, payload) {
+    console.log(type, payload);
+    if (type === 'keydown') {
+      this.handleKeyforPlayer(this.opponentNumber, payload);
+    }
+  };
 
-  Engine.prototype.handleKeydown = function(evt) {
-    switch (evt.key) {
+  Engine.prototype.handleKeyForMe = function(evt) {
+    this.connection.send('keydown', evt.key);
+    this.handleKeyforPlayer(this.playerNumber, evt.key);
+  };
+
+  Engine.prototype.handleKeyforPlayer = function(playerNumber, key) {
+    var player = playerNumber === 1 ? this.player1 : this.player2;
+    switch (key) {
       case 'a':
-        this.me.moveLeft();
+        player.moveLeft();
         break;
 
       case 'w':
-        this.me.moveUp();
+        player.moveUp();
         break;
 
       case 'd':
-        this.me.moveRight();
+        player.moveRight();
         break;
 
       case 's':
-        this.me.moveDown();
+        player.moveDown();
         break;
     }
   };

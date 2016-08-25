@@ -5,20 +5,22 @@ window.Connection = (function() {
     this.clientId = null;
     this.socket = new Socket();
     this.webRTC = null;
+    this.connectionHandler = null;
   }
 
   Connection.prototype.onPeerConnect = function(cb) {
-    this.webRTC.onConnnection((err, peerId) => {
-      if (!err) {
-        cb(peerId);
-      }
-    });
+    this.connectionHandler = cb;
   };
 
   Connection.prototype.init = function() {
     return this.socket.init().then((clientId) => {
       this.clientId = clientId;
       this.webRTC = new WebRTC(this.clientId, this.socket);
+      this.webRTC.onConnnection((err, peerId) => {
+        if (!err) {
+          this.connectionHandler && this.connectionHandler(peerId);
+        }
+      });
       return clientId;
     });
   };
@@ -33,6 +35,18 @@ window.Connection = (function() {
         }
       });
     });
+  };
+
+  Connection.prototype.registerHandler = function(type, cb) {
+    this.webRTC.registerHandler(type, cb);
+  };
+
+  Connection.prototype.send = function(type, payload) {
+    if (!this.webRTC.isConnected()) {
+      console.log('cannot send message, p2p not connected');
+      return;
+    }
+    this.webRTC.send(type, payload);
   };
 
   return Connection;

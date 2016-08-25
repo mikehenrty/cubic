@@ -68,12 +68,10 @@ window.WebRTC = (function() {
     this.handlers[type].push(cb);
   };
 
-  WebRTC.prototype.send = function(type, peerId, payload, cb) {
+  WebRTC.prototype.send = function(type, payload) {
     if (!this.dataChannel) {
-      return cb && cb(`cannot send without data channel`);
-    }
-    if (peerId !== this.peerId) {
-      return cb && cb(`cannot send to ${peerId}, connected to ${this.peerId}`);
+      console.log('error, tried to call send when data channel null');
+      return;
     }
     this.dataChannel.send(`${type} ${payload}`);
   };
@@ -82,9 +80,8 @@ window.WebRTC = (function() {
     var parts = evt.data.split(' ');
     var type = parts.shift();
     var payload = parts.join(' ');
-    var args = [null, this.peerId, payload];
     this.handlers[type] && this.handlers[type].forEach(handler => {
-      handler.apply(null, args);
+      handler(type, payload);
     });
   };
 
