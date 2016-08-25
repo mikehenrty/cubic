@@ -79,8 +79,15 @@ p {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: red;
   height: var(--square-height);
   width: var(--square-height);
   transition-duration: 0.2s;
+}
+
+.player-1 {
+  background-color: red;
+}
+
+.player-2 {
+  background-color: blue;
 }

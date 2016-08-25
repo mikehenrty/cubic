@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleJoin(peerId) {
+    engine.setPlayer(player);
     ui.setStatus(`You are Player ${player}`);
   }
 

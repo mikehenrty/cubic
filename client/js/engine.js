@@ -9,38 +9,48 @@ window.Engine = (function() {
     this.el = document.createElement('div');
     this.el.id = 'screen';
     this.board = new Board(this, COLS, ROWS);
-    this.player = new Player(this.board);
+    this.player1 = new Player(1, this.board);
+    this.player2 = new Player(2, this.board);
+    this.me = this.player1; // use player1 as default, but this could change.
+    this.opponent = null;
   }
 
   Engine.prototype.init = function() {
     this.container.appendChild(this.el);
     this.board.init();
-    this.player.init();
+    this.player1.init();
+    this.player2.init();
     document.addEventListener('keydown', this.handleKeydown.bind(this));
   };
+
+  Engine.prototype.setPlayer = function(playerNumber) {
+    this.me = playerNumber === 1 ? this.player1 : this.player2;
+  }
+
 
   Engine.prototype.handleKeydown = function(evt) {
     switch (evt.key) {
       case 'a':
-        this.player.moveLeft();
+        this.me.moveLeft();
         break;
 
       case 'w':
-        this.player.moveUp();
+        this.me.moveUp();
         break;
 
       case 'd':
-        this.player.moveRight();
+        this.me.moveRight();
         break;
 
       case 's':
-        this.player.moveDown();
+        this.me.moveDown();
         break;
     }
   };
 
   Engine.prototype.reset = function() {
-    this.player.reset();
+    this.player1.reset();
+    this.player2.reset();
   };
 
   return Engine;

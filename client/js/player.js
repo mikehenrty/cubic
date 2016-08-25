@@ -1,18 +1,18 @@
 window.Player = (function() {
   'use strict';
 
-  function Player(board) {
+  function Player(playerNumber, board) {
+    this.playerNumber = playerNumber;
     this.board = board;
     this.container = board.el;
     this.el = document.createElement('div');
-    this.el.className = 'piece';
-    this.x = 0;
-    this.y = 0;
+    this.el.className = `piece player-${playerNumber}`;
   }
 
   Player.prototype.init = function() {
     this.container.appendChild(this.el);
     this.squareHeight = Utility.getPixelHeight('.square');
+    this.reset();
   };
 
   Player.prototype.update = function() {
@@ -50,8 +50,13 @@ window.Player = (function() {
   };
 
   Player.prototype.reset = function() {
-    this.x = 0;
-    this.y = 0;
+    if (this.playerNumber === 1) {
+      this.x = 0;
+      this.y = 0;
+    } else {
+      this.x = this.board.rows - 1;
+      this.y = this.board.cols - 1;
+    }
     this.update();
   };
 
