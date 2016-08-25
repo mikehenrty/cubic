@@ -3,23 +3,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var ui = new UI(document.body);
   ui.init();
-  ui.setStatus('Initializing...');
 
   var engine = new Engine(document.body);
   engine.init();
 
   var connection = new Connection();
-  connection.init().then(clientId => {
+
+  var clientId = 0;
+  var player = 0;
+
+  function peerAlreadyExists() {
+    return !!Utility.getPeerId();
+  }
+
+  function weArePlayerOne() {
+    player = 1;
     ui.showPeerLink(clientId);
+  }
 
-    connection.onPeerConnect(peerId => {
-      ui.setStatus('Got a connection!');
-    });
-
+  function weArePlayerTwo() {
+    player = 2;
     var peerId = Utility.getPeerId();
-    if (peerId) {
-      ui.setStatus('Connecting to peer...');
-      connection.connect(peerId);
+    ui.setStatus('Connecting to peer...');
+    connection.connect(peerId).catch(err => {
+      ui.setStatus(`Error connecting to peer!`);
+    });
+  }
+
+  function handleJoin(peerId) {
+    ui.setStatus(`You are Player ${player}`);
+  }
+
+  connection.init().then(id => {
+    clientId = id;
+    connection.onPeerConnect(handleJoin);
+
+    if (peerAlreadyExists()) {
+      weArePlayerTwo();
+    } else {
+      weArePlayerOne();
     }
 
   }).catch(err => {
