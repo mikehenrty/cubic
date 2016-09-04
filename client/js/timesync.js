@@ -1,7 +1,7 @@
 window.TimeSync = (function () {
   'use strict';
 
-  const NUM_SAMPLES = 10;
+  const NUM_SAMPLES = 5;
 
   function getOffset(sentTime, serverTime, currentTime) {
     var ping = currentTime - sentTime;
@@ -43,8 +43,7 @@ window.TimeSync = (function () {
 
         // Finished timesync samples, calculate results
         this.samples = Utility.trimOutliers(this.samples);
-        this.offset = Math.floor(Utility.mean(this.samples));
-        this.samples = null;
+        this.offset += Math.round(Utility.mean(this.samples));
         res();
       });
 

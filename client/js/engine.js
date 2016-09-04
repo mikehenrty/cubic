@@ -82,33 +82,37 @@ window.Engine = (function() {
   }
 
   Engine.prototype.handleKeyForOpponent = function(type, payload) {
-    if (type === 'keydown') {
-      this.handleKeyforPlayer(this.opponentNumber, payload);
-    }
+    var key, id, timestamp;
+    [id, key, timestamp] = payload.split(' ');
+    var now = this.time.now();
+    var duration = (parseInt(timestamp, 10) + Player.MoveDuration) - now;
+    this.handleKeyforPlayer(this.opponentNumber, key, duration);
+    this.connection.send('keydown_ack', id);
   };
 
   Engine.prototype.handleKeyForMe = function(evt) {
-    this.connection.send('keydown', evt.key);
+    this.connection.send('keydown',
+                         `${Utility.guid()} ${evt.key} ${this.time.now()}`);
     this.handleKeyforPlayer(this.playerNumber, evt.key);
   };
 
-  Engine.prototype.handleKeyforPlayer = function(playerNumber, key) {
+  Engine.prototype.handleKeyforPlayer = function(playerNumber, key, duration) {
     var player = playerNumber === 1 ? this.player1 : this.player2;
     switch (key) {
       case 'a':
-        player.moveLeft();
+        player.moveLeft(duration);
         break;
 
       case 'w':
-        player.moveUp();
+        player.moveUp(duration);
         break;
 
       case 'd':
-        player.moveRight();
+        player.moveRight(duration);
         break;
 
       case 's':
-        player.moveDown();
+        player.moveDown(duration);
         break;
     }
   };

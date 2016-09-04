@@ -81,7 +81,6 @@ p {
   left: 0;
   height: var(--square-height);
   width: var(--square-height);
-  transition-duration: 0.2s;
 }
 
 .player-1 {
