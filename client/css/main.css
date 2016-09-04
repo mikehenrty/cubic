@@ -9,7 +9,8 @@
 :root {
   --console-green: #2ff20e;
   --board-height: 80vmin;
-  --square-height: calc(var(--board-height) / 10);
+  --square-height: 8vmin;
+  --border-width: 1.5vmin;
   --ui-height: calc( (100vmin - var(--board-height) ) / 2);
 }
 
@@ -76,6 +77,9 @@ p {
 }
 
 .piece {
+  box-sizing: border-box;
+  border-width: var(--border-width);
+  border-style: solid;
   position: absolute;
   top: 0;
   left: 0;
@@ -84,13 +88,20 @@ p {
 }
 
 .piece.moving {
-  background-color: green;
 }
 
 .player-1 {
   background-color: red;
+  border-top-color: blue;
+  border-bottom-color: yellow;
+  border-right-color: pink;
+  border-left-color: orange;
 }
 
 .player-2 {
   background-color: blue;
+  border-top-color: red;
+  border-bottom-color: yellow;
+  border-right-color: pink;
+  border-left-color: orange;
 }

@@ -10,6 +10,7 @@ window.Player = (function() {
     this.container = board.el;
     this.el = document.createElement('div');
     this.el.className = `piece player-${playerNumber}`;
+    this.cube = new Cube(this.el);
     this.moving = false;
   }
 
@@ -60,6 +61,7 @@ window.Player = (function() {
     if (this.y > 0) {
       --this.y;
       this.update(duration);
+      this.cube.moveUp();
     }
   };
 
@@ -67,6 +69,7 @@ window.Player = (function() {
     if (this.y + 1 < this.board.cols) {
       ++this.y;
       this.update(duration);
+      this.cube.moveDown();
     }
   };
 
@@ -74,6 +77,7 @@ window.Player = (function() {
     if (this.x > 0) {
       --this.x;
       this.update(duration);
+      this.cube.moveLeft();
     }
   };
 
@@ -81,6 +85,7 @@ window.Player = (function() {
     if (this.x + 1 < this.board.rows) {
       ++this.x;
       this.update(duration);
+      this.cube.moveRight();
     }
   };
 
