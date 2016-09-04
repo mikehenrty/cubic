@@ -1,50 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  var connection = new Connection();
   var ui = new UI(document.body);
   var engine = new Engine(document.body);
 
-  var clientId = 0;
-  var player = 0;
+  function handleErr(message, err) {
+    console.log(message, err);
+    ui.setStatus(message);
+  }
 
   function peerAlreadyExists() {
     return !!Utility.getPeerId();
   }
 
-  function weArePlayerOne() {
-    player = 1;
-    ui.showPeerLink(clientId);
-  }
-
-  function weArePlayerTwo() {
-    player = 2;
-    var peerId = Utility.getPeerId();
-    ui.setStatus('Connecting to peer...');
-    connection.connect(peerId).catch(err => {
-      ui.setStatus(`Error connecting to peer!`);
-    });
-  }
-
-  connection.onPeerConnect((peerId) => {
-    engine.setPlayer(player);
-    ui.setStatus(`You are Player ${player}`);
+  engine.onReady(() => {
+    ui.setStatus(`You are ${engine.getPlayerColor()}`);
   });
 
-  connection.init().then(id => {
-    clientId = id;
+  engine.init().then(clientId => {
     ui.init();
-    engine.init(connection);
 
     if (peerAlreadyExists()) {
-      weArePlayerTwo();
+      ui.setStatus('Connecting to peer...');
+      engine.connectToPeer(Utility.getPeerId()).catch(err => {
+        handleErr('Peer connect error', err);
+        ui.showPeerLink(clientId);
+      });
     } else {
-      weArePlayerOne();
+      ui.showPeerLink(clientId);
     }
-
   }).catch(err => {
-    console.log('connection error', err);
-    ui.setStatus('Connection error');
+    handleErr('Engine init error', err);
   });
 });
 

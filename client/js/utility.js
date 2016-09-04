@@ -105,14 +105,6 @@ window.Utility = (function() {
       return url.searchParams.get('peer');
     },
 
-    getClientId: function() {
-      if (!window.clientId) {
-        window.clientId = Utility.guid();
-        console.log('client id', window.clientId);
-      }
-      return window.clientId;
-    },
-
     getPixelHeight: function(query) {
       var style = window.getComputedStyle(document.querySelector(query));
       return parseFloat(style.height.slice(0, -2));

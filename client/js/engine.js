@@ -8,24 +8,48 @@ window.Engine = (function() {
     this.container = container;
     this.el = document.createElement('div');
     this.el.id = 'screen';
+    this.connection = new Connection();
     this.board = new Board(this, COLS, ROWS);
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
-    this.playerNumber = 1;
-    this.me = this.player1;
-    this.opponentNumber = 2;
-    this.opponent = null;
+    this.setPlayer(1);
+    this.readyHandler = null;
   }
 
-  Engine.prototype.init = function(connection) {
-    this.connection = connection;
-    this.connection.registerHandler('keydown',
-                                   this.handleKeyForOpponent.bind(this));
-    this.container.appendChild(this.el);
-    this.board.init();
-    this.player1.init();
-    this.player2.init();
-    document.addEventListener('keydown', this.handleKeyForMe.bind(this));
+  Engine.prototype.init = function() {
+    return this.connection.init().then(id => {
+      this.connection.registerHandler('keydown',
+                                     this.handleKeyForOpponent.bind(this));
+      this.connection.onPeerConnect(peerId => {
+        this.readyHandler && this.readyHandler();
+      });
+      this.container.appendChild(this.el);
+      this.board.init();
+      this.player1.init();
+      this.player2.init();
+      document.addEventListener('keydown', this.handleKeyForMe.bind(this));
+      return id;
+    });
+  };
+
+  Engine.prototype.connectToPeer = function(peerId) {
+    this.setPlayer(2);
+    return this.connection.connect(peerId).catch(err => {
+      this.setPlayer(1);
+      throw err;
+    });
+  };
+
+  Engine.prototype.onReady = function(cb) {
+    this.readyHandler = cb;
+  };
+
+  Engine.prototype.getPlayerColor = function() {
+    return this.playerNumber === 1 ? 'Red' : 'Blue';
+  };
+
+  Engine.prototype.getPlayerNumber = function() {
+    return this.playerNumber;
   };
 
   Engine.prototype.setPlayer = function(playerNumber) {
@@ -43,7 +67,6 @@ window.Engine = (function() {
   }
 
   Engine.prototype.handleKeyForOpponent = function(type, payload) {
-    console.log(type, payload);
     if (type === 'keydown') {
       this.handleKeyforPlayer(this.opponentNumber, payload);
     }
