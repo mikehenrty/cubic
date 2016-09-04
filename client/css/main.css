@@ -83,6 +83,10 @@ p {
   width: var(--square-height);
 }
 
+.piece.moving {
+  background-color: green;
+}
+
 .player-1 {
   background-color: red;
 }

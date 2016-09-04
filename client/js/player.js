@@ -10,6 +10,7 @@ window.Player = (function() {
     this.container = board.el;
     this.el = document.createElement('div');
     this.el.className = `piece player-${playerNumber}`;
+    this.moving = false;
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -20,11 +21,39 @@ window.Player = (function() {
     this.reset();
   };
 
+  Player.prototype.startMove = function() {
+    this.moving = true;
+    this.el.classList.add('moving');
+  };
+
+  Player.prototype.endMove = function() {
+    this.moving = false;
+    this.el.classList.remove('moving');
+  };
+
+  Player.prototype.isMoving = function() {
+    return this.moving;
+  };
+
   Player.prototype.update = function(duration) {
-    this.el.style.transitionDuration = (duration || MOVE_DURATION) + 'ms';
+    duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
+    this.el.style.transitionDuration = duration + 'ms';
     this.el.style.transform =
       'translateY(' + this.y * this.squareHeight + 'px) ' +
       'translateX(' + this.x * this.squareHeight + 'px)';
+  };
+
+  Player.prototype.getPosition = function() {
+    return {
+      x: this.x,
+      y: this.y
+    };
+  };
+
+  Player.prototype.setPosition = function(x, y, duration) {
+    this.x = x;
+    this.y = y;
+    this.update(duration);
   };
 
   Player.prototype.moveUp = function(duration) {
