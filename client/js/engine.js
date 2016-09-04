@@ -24,12 +24,15 @@ window.Engine = (function() {
     this.ready = false;
     this.readyHandler = null;
     this.pendingMoves = {};
+    this.nextMove = null;
   }
 
   Engine.prototype.init = function() {
     return this.connection.init().then(id => {
       this.container.appendChild(this.el);
-      document.addEventListener('keydown', this.handleKeyForMe.bind(this));
+      document.addEventListener('keydown', evt => {
+        this.handleKeyForMe(evt.key);
+      });
       this.connection.registerHandler('keydown',
                                       this.handleKeyForOpponent.bind(this));
       this.connection.registerHandler('keydown_ack',
@@ -91,6 +94,16 @@ window.Engine = (function() {
     }
   };
 
+  Engine.prototype.finishPendingMove = function(id) {
+    this.me.endMove();
+    delete this.pendingMoves[id];
+    if (this.nextMove) {
+      var key = this.nextMove;
+      this.nextMove = null;
+      this.handleKeyForMe(key);
+    }
+  };
+
   Engine.prototype.addPendingMove = function(id, position) {
     this.pendingMoves[id] = {
       acked: false,
@@ -108,8 +121,7 @@ window.Engine = (function() {
 
       // Move must be both acked and animated before completion.
       if (move.acked) {
-        this.me.endMove();
-        delete this.pendingMoves[id];
+        this.finishPendingMove(id);
       } else {
         move.animated = true;
       }
@@ -137,8 +149,7 @@ window.Engine = (function() {
 
     // Move must be both acked and animated before completion.
     if (move.animated) {
-      this.me.endMove();
-      delete this.pendingMoves[id];
+      this.finishPendingMove(id);
     } else {
       move.acked = true;
     }
@@ -160,17 +171,17 @@ window.Engine = (function() {
       this.connection.send('keydown_ack', `${id} 0`);
     } else {
       this.connection.send('keydown_ack', `${id} 1`);
-      this.handleKeyforPlayer(this.opponentNumber, key, duration);
+      this.processKey(this.opponentNumber, key, duration);
     }
   };
 
-  Engine.prototype.handleKeyForMe = function(evt) {
+  Engine.prototype.handleKeyForMe = function(key) {
     // Only process one move at a time.
     if (this.me.isMoving()) {
+      this.nextMove = key;
       return;
     }
 
-    var key = evt.key;
     if (!this.isValidKey(key)) {
       return;
     }
@@ -180,14 +191,14 @@ window.Engine = (function() {
     this.addPendingMove(id, this.me.getPosition());
 
     this.connection.send('keydown', `${id} ${key} ${this.time.now()}`);
-    this.handleKeyforPlayer(this.playerNumber, key);
+    this.processKey(this.playerNumber, key);
   };
 
   Engine.prototype.isValidKey = function(key) {
     return !!KEY_MAP[key];
   };
 
-  Engine.prototype.handleKeyforPlayer = function(playerNumber, key, duration) {
+  Engine.prototype.processKey = function(playerNumber, key, duration) {
     var player = playerNumber === 1 ? this.player1 : this.player2;
     if (this.isValidKey(key)) {
       player[KEY_MAP[key]](duration);
