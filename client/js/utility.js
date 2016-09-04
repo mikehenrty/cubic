@@ -85,6 +85,47 @@ window.Utility = (function() {
       });
     },
 
+    sum: function(data) {
+      return data.reduce((prev, cur) => prev + cur, 0);
+    },
+
+    mean: function(data) {
+      if (data.length === 0) {
+        return 0;
+      }
+      return Utility.sum(data) / data.length;
+    },
+
+    median: function(data) {
+      data.sort( function(a,b) {return a - b;} );
+      var half = Math.floor(data.length / 2);
+      if(data.length % 2) {
+        return data[half];
+      } else {
+        return (data[half-1] + data[half]) / 2.0;
+      }
+    },
+
+    stddev: function(data) {
+      if (data.length === 0) {
+        return 0;
+      }
+      var mean = Utility.mean(data);
+      var sumOfDistances = Utility.sum(data.map(result => {
+        return Math.pow(mean - result, 2);
+      }));
+      return Math.sqrt(sumOfDistances / data.length);
+    },
+
+    trimOutliers: function(data) {
+      var median = Utility.median(data)
+      var stddev = Utility.stddev(data);
+      return data.filter(val => {
+        return Math.abs(median - val) <= (stddev * 1.5);
+      });
+    },
+
+
     once: function(fn) {
       var called = false;
       return function() {

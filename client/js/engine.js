@@ -9,39 +9,54 @@ window.Engine = (function() {
     this.el = document.createElement('div');
     this.el.id = 'screen';
     this.connection = new Connection();
+    this.time = new TimeSync();
     this.board = new Board(this, COLS, ROWS);
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
     this.setPlayer(1);
+    this.ready = false;
     this.readyHandler = null;
   }
 
   Engine.prototype.init = function() {
     return this.connection.init().then(id => {
+      this.container.appendChild(this.el);
+      document.addEventListener('keydown', this.handleKeyForMe.bind(this));
       this.connection.registerHandler('keydown',
                                      this.handleKeyForOpponent.bind(this));
-      this.connection.onPeerConnect(peerId => {
-        this.readyHandler && this.readyHandler();
-      });
-      this.container.appendChild(this.el);
+      this.connection.registerHandler('ready', this.handleReady.bind(this));
+      this.time.init(this.connection);
       this.board.init();
       this.player1.init();
       this.player2.init();
-      document.addEventListener('keydown', this.handleKeyForMe.bind(this));
       return id;
     });
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
     this.setPlayer(2);
-    return this.connection.connect(peerId).catch(err => {
+    return this.connection.connect(peerId).then(() => {
+      return this.time.sync();
+    }).then(() => {
+      this.connection.send('ready');
+      this.handleReady();
+    }).catch(err => {
       this.setPlayer(1);
       throw err;
     });
   };
 
   Engine.prototype.onReady = function(cb) {
+    if (this.ready) {
+      return cb && cb();
+    }
     this.readyHandler = cb;
+  };
+
+  Engine.prototype.handleReady = function() {
+    this.reset();
+    this.ready = true;
+    this.readyHandler && this.readyHandler();
   };
 
   Engine.prototype.getPlayerColor = function() {
