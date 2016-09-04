@@ -1,6 +1,8 @@
 window.Connection = (function() {
   'use strict';
 
+  const FAKE_LATENCY = 0;
+
   function Connection() {
     this.clientId = null;
     this.socket = new Socket();
@@ -44,6 +46,11 @@ window.Connection = (function() {
   Connection.prototype.send = function(type, payload) {
     if (!this.webRTC.isConnected()) {
       console.log('cannot send message, p2p not connected');
+      return;
+    }
+    if (FAKE_LATENCY) {
+      setTimeout(this.webRTC.send.bind(this.webRTC, type, payload),
+                 FAKE_LATENCY);
       return;
     }
     this.webRTC.send(type, payload);
