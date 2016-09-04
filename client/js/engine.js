@@ -24,7 +24,8 @@ window.Engine = (function() {
     this.ready = false;
     this.readyHandler = null;
     this.pendingMoves = {};
-    this.nextMove = null;
+    this.nextMoveKey = null;
+    this.lastMove = null;
   }
 
   Engine.prototype.init = function() {
@@ -97,19 +98,30 @@ window.Engine = (function() {
   Engine.prototype.finishPendingMove = function(id) {
     this.me.endMove();
     delete this.pendingMoves[id];
-    if (this.nextMove) {
-      var key = this.nextMove;
-      this.nextMove = null;
+    if (this.nextMoveKey) {
+      var key = this.nextMoveKey;
+      this.nextMoveKey = null;
       this.handleKeyForMe(key);
     }
   };
 
-  Engine.prototype.addPendingMove = function(id, position) {
-    this.pendingMoves[id] = {
+  Engine.prototype.rollbackPendingMove = function(id) {
+    var move = this.pendingMoves[id];
+    this.me.setPosition(move.position.x,
+                        move.position.y, 10);
+    this.me.endMove();
+    delete this.pendingMoves[id];
+  };
+
+  Engine.prototype.addPendingMove = function(id, position, timestamp) {
+    this.lastMove = {
+      id: id,
+      timestamp: timestamp,
       acked: false,
       animated: false,
       position: position
     };
+    this.pendingMoves[id] = this.lastMove;
 
     // To be run approximately when animation completes.
     setTimeout(() => {
@@ -139,11 +151,7 @@ window.Engine = (function() {
     }
 
     if (result !== '1') {
-      console.log('peer says no, rolling back');
-      this.me.setPosition(move.position.x,
-                          move.position.y, 10);
-      this.me.endMove();
-      delete this.pendingMoves[id];
+      this.rollbackPendingMove(id);
       return;
     }
 
@@ -162,23 +170,39 @@ window.Engine = (function() {
       return;
     }
 
+    timestamp = parseInt(timestamp, 10);
     var now = this.time.now();
-    var duration = (parseInt(timestamp, 10) + Player.MoveDuration) - now;
+    var duration = (timestamp + Player.MoveDuration) - now;
 
     // Make sure we have enough time for animation to complete,
     // otherwise we reject the move.
     if (duration < 0) {
       this.connection.send('keydown_ack', `${id} 0`);
-    } else {
-      this.connection.send('keydown_ack', `${id} 1`);
-      this.processKey(this.opponentNumber, key, duration);
+      return;
     }
+
+    var oldPos = this.opponent.getPosition();
+    this.processKey(this.opponentNumber, key, duration);
+
+    // Move causes conflict, figure out who gets the contested sqaure.
+    if (this.arePositionsConflicting()) {
+      if (!this.me.isMoving() || timestamp > this.lastMove.timestamp) {
+        this.connection.send('keydown_ack', `${id} 0`);
+        this.opponent.setPosition(oldPos.x, oldPos.y, 0);
+        return;
+      }
+
+      // Here we rollback our pending move, but ack peer's.
+      this.rollbackPendingMove(this.lastMove.id);
+    }
+
+    this.connection.send('keydown_ack', `${id} 1`);
   };
 
   Engine.prototype.handleKeyForMe = function(key) {
     // Only process one move at a time.
     if (this.me.isMoving()) {
-      this.nextMove = key;
+      this.nextMoveKey = key;
       return;
     }
 
@@ -187,10 +211,11 @@ window.Engine = (function() {
     }
 
     this.me.startMove();
+    var now = this.time.now();
     var id = Utility.guid();
-    this.addPendingMove(id, this.me.getPosition());
+    this.addPendingMove(id, this.me.getPosition(), now);
 
-    this.connection.send('keydown', `${id} ${key} ${this.time.now()}`);
+    this.connection.send('keydown', `${id} ${key} ${now}`);
     this.processKey(this.playerNumber, key);
   };
 
@@ -203,6 +228,10 @@ window.Engine = (function() {
     if (this.isValidKey(key)) {
       player[KEY_MAP[key]](duration);
     }
+  };
+
+  Engine.prototype.arePositionsConflicting = function() {
+    return this.me.x === this.opponent.x && this.me.y === this.opponent.y;
   };
 
   Engine.prototype.reset = function() {
