@@ -2,7 +2,7 @@ window.Player = (function() {
   'use strict';
 
   // miliseconds of piece movement.
-  const MOVE_DURATION = 250;
+  const MOVE_DURATION = 1000;
 
   function Player(playerNumber, board) {
     this.playerNumber = playerNumber;
@@ -11,7 +11,7 @@ window.Player = (function() {
     this.el = document.createElement('div');
     this.el.className = `piece player-${playerNumber}`;
     this.cube = new Cube(this.el);
-    this.moving = false;
+    this.direction = null;
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -22,18 +22,20 @@ window.Player = (function() {
     this.reset();
   };
 
-  Player.prototype.startMove = function() {
-    this.moving = true;
-    this.el.classList.add('moving');
+  Player.prototype.startMove = function(direction) {
+    this.el.classList.add('moving', direction);
+    this.direction = direction;
   };
 
   Player.prototype.endMove = function() {
-    this.moving = false;
-    this.el.classList.remove('moving');
+    this.el.classList.remove('moving', this.direction);
+    this.el.style.transitionDuration = '0ms';
+    this.cube[this.direction]();
+    this.direction = null;
   };
 
   Player.prototype.isMoving = function() {
-    return this.moving;
+    return !!this.direction;
   };
 
   Player.prototype.update = function(duration) {
@@ -61,7 +63,6 @@ window.Player = (function() {
     if (this.y > 0) {
       --this.y;
       this.update(duration);
-      this.cube.moveUp();
     }
   };
 
@@ -69,7 +70,6 @@ window.Player = (function() {
     if (this.y + 1 < this.board.cols) {
       ++this.y;
       this.update(duration);
-      this.cube.moveDown();
     }
   };
 
@@ -77,7 +77,6 @@ window.Player = (function() {
     if (this.x > 0) {
       --this.x;
       this.update(duration);
-      this.cube.moveLeft();
     }
   };
 
@@ -85,7 +84,6 @@ window.Player = (function() {
     if (this.x + 1 < this.board.rows) {
       ++this.x;
       this.update(duration);
-      this.cube.moveRight();
     }
   };
 

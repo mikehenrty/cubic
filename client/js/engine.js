@@ -101,7 +101,7 @@ window.Engine = (function() {
     if (this.nextMoveKey) {
       var key = this.nextMoveKey;
       this.nextMoveKey = null;
-      this.handleKeyForMe(key);
+      setTimeout(this.handleKeyForMe.bind(this, key), 0);
     }
   };
 
@@ -210,7 +210,6 @@ window.Engine = (function() {
       return;
     }
 
-    this.me.startMove();
     var now = this.time.now();
     var id = Utility.guid();
     this.addPendingMove(id, this.me.getPosition(), now);
@@ -226,7 +225,9 @@ window.Engine = (function() {
   Engine.prototype.processKey = function(playerNumber, key, duration) {
     var player = playerNumber === 1 ? this.player1 : this.player2;
     if (this.isValidKey(key)) {
-      player[KEY_MAP[key]](duration);
+      var direction = KEY_MAP[key];
+      this.me.startMove(direction);
+      player[direction](duration);
     }
   };
 
