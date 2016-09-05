@@ -1,7 +1,7 @@
 window.Connection = (function() {
   'use strict';
 
-  const FAKE_LATENCY = 0;
+  const FAKE_LATENCY = CONST.FAKE_LATENCY;
 
   function Connection() {
     this.clientId = null;

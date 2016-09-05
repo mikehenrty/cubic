@@ -1,7 +1,7 @@
 window.Cube = (function() {
   'use strict';
 
-  const DEBUG = false;
+  const DEBUG = CONST.DEBUG;
 
   // Positions on the cube.
   const TOP    = 0;

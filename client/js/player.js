@@ -2,7 +2,7 @@ window.Player = (function() {
   'use strict';
 
   // miliseconds of piece movement.
-  const MOVE_DURATION = 200;
+  const MOVE_DURATION = CONST.MOVE_DURATION;
 
   function Player(playerNumber, board) {
     this.playerNumber = playerNumber;
