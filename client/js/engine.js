@@ -101,7 +101,7 @@ window.Engine = (function() {
     if (this.nextMoveKey) {
       var key = this.nextMoveKey;
       this.nextMoveKey = null;
-      this.handleKeyForMe(key);
+      setTimeout(this.handleKeyForMe.bind(this, key), 0);
     }
   };
 
@@ -125,6 +125,12 @@ window.Engine = (function() {
 
     // To be run approximately when animation completes.
     setTimeout(() => {
+      // If we don't have a connection, we can just finish moves immediately.
+      if (!this.connection.isConnected()) {
+        this.finishPendingMove(id);
+        return;
+      }
+
       var move = this.pendingMoves[id];
       if (!this.pendingMoves[id]) {
         console.log('timeout, pending move not found');
@@ -187,6 +193,7 @@ window.Engine = (function() {
     // Move causes conflict, figure out who gets the contested sqaure.
     if (this.arePositionsConflicting()) {
       if (!this.me.isMoving() || timestamp > this.lastMove.timestamp) {
+        // We moved first, tell peer to rollback.
         this.connection.send('keydown_ack', `${id} 0`);
         this.opponent.setPosition(oldPos.x, oldPos.y, 0);
         return;
@@ -195,6 +202,10 @@ window.Engine = (function() {
       // Here we rollback our pending move, but ack peer's.
       this.rollbackPendingMove(this.lastMove.id);
     }
+
+    setTimeout(() => {
+      this.opponent.endMove();
+    }, duration);
 
     this.connection.send('keydown_ack', `${id} 1`);
   };
@@ -210,13 +221,14 @@ window.Engine = (function() {
       return;
     }
 
-    this.me.startMove();
     var now = this.time.now();
     var id = Utility.guid();
-    this.addPendingMove(id, this.me.getPosition(), now);
 
-    this.connection.send('keydown', `${id} ${key} ${now}`);
-    this.processKey(this.playerNumber, key);
+    if (this.me.isValidMove(KEY_MAP[key], this.opponent)) {
+      this.addPendingMove(id, this.me.getPosition(), now);
+      this.connection.send('keydown', `${id} ${key} ${now}`);
+      this.processKey(this.playerNumber, key);
+    }
   };
 
   Engine.prototype.isValidKey = function(key) {
@@ -226,7 +238,9 @@ window.Engine = (function() {
   Engine.prototype.processKey = function(playerNumber, key, duration) {
     var player = playerNumber === 1 ? this.player1 : this.player2;
     if (this.isValidKey(key)) {
-      player[KEY_MAP[key]](duration);
+      var direction = KEY_MAP[key];
+      player.startMove(direction);
+      player[direction](duration);
     }
   };
 

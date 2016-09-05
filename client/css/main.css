@@ -85,9 +85,27 @@ p {
   left: 0;
   height: var(--square-height);
   width: var(--square-height);
+  transition-property: border-width, transform;
 }
 
-.piece.moving {
+.piece.moving.moveLeft {
+  border-left-width: 0vmin;
+  border-right-width: calc(var(--square-height) - var(--border-width));
+}
+
+.piece.moving.moveRight {
+  border-right-width: 0vmin;
+  border-left-width: calc(var(--square-height) - var(--border-width));
+}
+
+.piece.moving.moveUp {
+  border-top-width: 0vmin;
+  border-bottom-width: calc(var(--square-height) - var(--border-width));
+}
+
+.piece.moving.moveDown {
+  border-bottom-width: 0vmin;
+  border-top-width: calc(var(--square-height) - var(--border-width));
 }
 
 .player-1 {

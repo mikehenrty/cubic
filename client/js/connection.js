@@ -14,6 +14,10 @@ window.Connection = (function() {
     this.connectionHandler = cb;
   };
 
+  Connection.prototype.isConnected = function() {
+    return this.webRTC && this.webRTC.isConnected();
+  };
+
   Connection.prototype.init = function() {
     return this.socket.init().then((clientId) => {
       this.clientId = clientId;
