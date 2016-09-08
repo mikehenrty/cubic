@@ -8,7 +8,11 @@ window.Engine = (function() {
     'a': 'moveLeft',
     'w': 'moveUp',
     'd': 'moveRight',
-    's': 'moveDown'
+    's': 'moveDown',
+    'ArrowLeft': 'moveLeft',
+    'ArrowUp': 'moveUp',
+    'ArrowRight': 'moveRight',
+    'ArrowDown': 'moveDown'
   };
 
   function Engine(container) {
