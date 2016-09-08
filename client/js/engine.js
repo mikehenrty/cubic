@@ -14,6 +14,7 @@ window.Engine = (function() {
   function Engine(container) {
     this.container = container;
     this.el = document.createElement('div');
+    this.ui = new UI(container);
     this.el.id = 'screen';
     this.connection = new Connection();
     this.time = new TimeSync();
@@ -40,6 +41,7 @@ window.Engine = (function() {
                                       this.handleKeyAck.bind(this));
       this.connection.registerHandler('ready', this.handleReady.bind(this));
       this.time.init(this.connection);
+      this.ui.init();
       this.board.init();
       this.player1.init();
       this.player2.init();
@@ -48,6 +50,7 @@ window.Engine = (function() {
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
+    this.ui.setStatus('Connecting to peer...');
     this.setPlayer(2);
     return this.connection.connect(peerId).then(() => {
       return this.time.sync();
@@ -69,12 +72,9 @@ window.Engine = (function() {
 
   Engine.prototype.handleReady = function() {
     this.reset();
+    this.ui.setStatus('Go!');
     this.ready = true;
     this.readyHandler && this.readyHandler();
-  };
-
-  Engine.prototype.getPlayerColor = function() {
-    return this.playerNumber === 1 ? 'Red' : 'Blue';
   };
 
   Engine.prototype.getPlayerNumber = function() {
