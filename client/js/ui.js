@@ -19,6 +19,10 @@ window.UI = (function() {
     this.status.textContent = text;
   };
 
+  UI.prototype.setStatusPing = function(ping) {
+    this.setStatus(`ping ${ping}ms`);
+  };
+
   UI.prototype.showPeerLink = function(clientId) {
     this.status.innerHTML = '';
     var linkInput = document.createElement('input');

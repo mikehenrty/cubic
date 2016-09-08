@@ -54,9 +54,9 @@ window.Engine = (function() {
     this.setPlayer(2);
     return this.connection.connect(peerId).then(() => {
       return this.time.sync();
-    }).then(() => {
-      this.connection.send('ready');
-      this.handleReady();
+    }).then(ping => {
+      this.connection.send('ready', ping);
+      this.handleReady('ready', ping);
     }).catch(err => {
       this.setPlayer(1);
       throw err;
@@ -70,9 +70,9 @@ window.Engine = (function() {
     this.readyHandler = cb;
   };
 
-  Engine.prototype.handleReady = function() {
+  Engine.prototype.handleReady = function(type, ping) {
     this.reset();
-    this.ui.setStatus('Go!');
+    this.ui.setStatusPing(ping);
     this.ready = true;
     this.readyHandler && this.readyHandler();
   };
@@ -147,8 +147,10 @@ window.Engine = (function() {
   };
 
   Engine.prototype.handleKeyAck = function(type, payload) {
-    var id, result;
-    [id, result] = payload.split(' ');
+    var id, result, timestamp;
+    [id, result, timestamp] = payload.split(' ');
+
+    this.ui.setStatusPing(this.time.now() - timestamp);
 
     var move = this.pendingMoves[id];
     if (!move) {
@@ -207,7 +209,7 @@ window.Engine = (function() {
       this.opponent.endMove();
     }, duration);
 
-    this.connection.send('keydown_ack', `${id} 1`);
+    this.connection.send('keydown_ack', `${id} 1 ${timestamp}`);
   };
 
   Engine.prototype.handleKeyForMe = function(key) {

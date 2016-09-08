@@ -25,8 +25,9 @@ window.TimeSync = (function () {
     return new Promise((res, rej) => {
       this.connection.registerHandler('timesync_ack', (type, payload) => {
         var sentTime, serverTime;
+        var now = this.now();
         [sentTime, serverTime] = payload.split(' ');
-        var offset = getOffset(sentTime, serverTime, this.now());
+        var offset = getOffset(sentTime, serverTime, now);
 
         if (!this.samples) {
           this.samples = [];
@@ -44,7 +45,9 @@ window.TimeSync = (function () {
         // Finished timesync samples, calculate results
         this.samples = Utility.trimOutliers(this.samples);
         this.offset += Math.round(Utility.mean(this.samples));
-        res();
+
+        // Return the initial latency value
+        res(now - sentTime);
       });
 
       this.connection.send('timesync', this.now());
