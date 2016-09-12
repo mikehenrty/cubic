@@ -178,7 +178,9 @@ window.Engine = (function() {
   Engine.prototype.handleKeyForOpponent = function(type, payload) {
     var key, id, timestamp;
     [id, key, timestamp] = payload.split(' ');
-    if (!this.isValidKey(key)) {
+
+    var move = this.getMove(key);
+    if (!move) {
       return;
     }
 
@@ -194,7 +196,7 @@ window.Engine = (function() {
     }
 
     var oldPos = this.opponent.getPosition();
-    this.processKey(this.opponentNumber, key, duration);
+    this.opponent.startMove(move, duration);
 
     // Move causes conflict, figure out who gets the contested sqaure.
     if (this.arePositionsConflicting()) {
@@ -223,31 +225,20 @@ window.Engine = (function() {
       return;
     }
 
-    if (!this.isValidKey(key)) {
+    var move = this.getMove(key);
+    if (!move || !this.me.isValidMove(move, this.opponent)) {
       return;
     }
 
     var now = this.time.now();
     var id = Utility.guid();
-
-    if (this.me.isValidMove(KEY_MAP[key], this.opponent)) {
-      this.addPendingMove(id, this.me.getPosition(), now);
-      this.connection.send('keydown', `${id} ${key} ${now}`);
-      this.processKey(this.playerNumber, key);
-    }
+    this.addPendingMove(id, this.me.getPosition(), now);
+    this.connection.send('keydown', `${id} ${key} ${now}`);
+    this.me.startMove(move);
   };
 
-  Engine.prototype.isValidKey = function(key) {
-    return !!KEY_MAP[key];
-  };
-
-  Engine.prototype.processKey = function(playerNumber, key, duration) {
-    var player = playerNumber === 1 ? this.player1 : this.player2;
-    if (this.isValidKey(key)) {
-      var direction = KEY_MAP[key];
-      player.startMove(direction);
-      player[direction](duration);
-    }
+  Engine.prototype.getMove = function(key) {
+    return KEY_MAP[key];
   };
 
   Engine.prototype.arePositionsConflicting = function() {

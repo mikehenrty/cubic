@@ -21,9 +21,10 @@ window.Player = (function() {
     this.reset();
   };
 
-  Player.prototype.startMove = function(direction) {
+  Player.prototype.startMove = function(direction, duration) {
     this.el.classList.add('moving', direction);
     this.direction = direction;
+    this[direction](duration);
   };
 
   Player.prototype.endMove = function() {
