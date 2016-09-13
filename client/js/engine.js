@@ -70,6 +70,10 @@ window.Engine = (function() {
     this.ui.setStatusPing(ping);
   };
 
+  Engine.prototype.getClientId = function() {
+    return this.connection.clientId;
+  };
+
   Engine.prototype.getPlayerNumber = function() {
     return this.playerNumber;
   };

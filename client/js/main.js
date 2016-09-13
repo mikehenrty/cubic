@@ -3,18 +3,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var engine = new Engine(document.body);
 
+  function showPeerLink() {
+    // TODO: move peer link outside of engine ui.
+    engine.ui.showPeerLink(engine.getClientId());
+  }
+
   engine.init().then(clientId => {
     var peerId = Utility.getPeerId();
     if (!peerId) {
-      // TODO: move peer link outside of engine ui.
-      engine.ui.showPeerLink(clientId);
+      showPeerLink();
       return;
     }
     return engine.connectToPeer(peerId);
   }).catch(err => {
     // TODO: move peer link outside of engine ui.
     console.log('Engine init error', err);
-    engine.ui.showPeerLink(clientId);
+    showPeerLink();
   });
 });
 
