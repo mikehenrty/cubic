@@ -18,20 +18,20 @@ window.Board = (function() {
 
     // Add sqaures to the board.
     for (var r = 0; r < this.rows; r++) {
-      this.squares.push([]);
       for (var c = 0; c < this.cols; c++) {
+        this.squares[c] || this.squares.push([]);
         var square = document.createElement('div');
         square.className = 'square';
-        this.squares[r].push(square);
+        this.squares[c].push(square);
         this.el.appendChild(square);
       }
     }
   };
 
   Board.prototype.reset = function() {
-    for (var r = 0; r < this.rows; r++) {
-      for (var c = 0; c < this.cols; c++) {
-        var square = this.squares[r][c];
+    for (var c = 0; c < this.cols; c++) {
+      for (var r = 0; r < this.rows; r++) {
+        var square = this.squares[c][r];
         square.style.backgroundColor = '';
       }
     }
@@ -53,6 +53,10 @@ window.Board = (function() {
     tiles.forEach(tile => {
       this.squares[tile[0]][tile[1]].style.backgroundColor = tile[2];
     });
+  };
+
+  Board.prototype.getColor = function(x, y) {
+    return this.squares[x][y].style.backgroundColor;
   };
 
   return Board;

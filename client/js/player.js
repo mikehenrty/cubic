@@ -3,6 +3,8 @@ window.Player = (function() {
 
   const MOVE_DURATION = CONST.MOVE_DURATION;
 
+  const CUBE_SIDES = CONST.CUBE_SIDES;
+
   const KEY_MAP = {
     'a': 'moveLeft',
     'w': 'moveUp',
@@ -21,6 +23,7 @@ window.Player = (function() {
     this.el = document.createElement('div');
     this.el.className = `piece player-${playerNumber}`;
     this.cube = new Cube(this.el);
+    this.opponent = null;
     this.moves = [];
   }
 
@@ -37,14 +40,14 @@ window.Player = (function() {
   Player.prototype.startMove = function(move, duration) {
     this.moves.push(move);
     this.el.classList.add('moving', move);
-    this[move](duration);
+    this.setMovePosition(move, duration);
   };
 
   Player.prototype.endMove = function() {
     var move = this.moves.shift();
     this.el.classList.remove('moving', move);
-    this.el.style.transitionDuration = '0ms';
     this.cube[move]();
+    this.el.style.transitionDuration = '0ms';
   };
 
   Player.prototype.isMoving = function() {
@@ -72,52 +75,63 @@ window.Player = (function() {
     this.update(duration);
   };
 
-  Player.prototype.isValidMove = function(move, opponent) {
+  Player.prototype.getMovePosition = function(move) {
+    var x = this.x;
+    var y = this.y;
+    var topColor;
+
     switch (move) {
       case 'moveUp':
-        return this.y > 0 &&
-          (this.x !== opponent.x || this.y - 1 !== opponent.y);
+        topColor = this.cube.sides[CUBE_SIDES.SOUTH];
+        --y;
+        if (y < 0) {
+          return false;
+        }
+        break;
       case 'moveDown':
-        return this.y + 1 < this.board.cols &&
-          (this.x !== opponent.x || this.y + 1 !== opponent.y);
+        topColor = this.cube.sides[CUBE_SIDES.NORTH];
+        ++y;
+        if (y >= this.board.cols) {
+          return false;
+        }
+        break;
       case 'moveLeft':
-        return this.x > 0 &&
-          (this.y !== opponent.y || this.x - 1 !== opponent.x);
+        topColor = this.cube.sides[CUBE_SIDES.EAST];
+        --x;
+        if (x < 0) {
+          return false;
+        }
+        break;
       case 'moveRight':
-        return this.x + 1 < this.board.rows &&
-          (this.y !== opponent.y || this.x + 1 !== opponent.x);
+        topColor = this.cube.sides[CUBE_SIDES.WEST];
+        ++x;
+        if (x >= this.board.rows) {
+          return false;
+        }
+        break;
       default:
         console.log('unrecognized move', move);
-        return false;
+        break;
     }
+
+    if (x === this.opponent.x && y === this.opponent.y) {
+      return false;
+    }
+
+    var color = this.board.getColor(x, y);
+    if (color && color !== topColor) {
+      return false;
+    }
+
+    return { x: x, y: y };
   };
 
-  Player.prototype.moveUp = function(duration) {
-    if (this.y > 0) {
-      --this.y;
-      this.update(duration);
+  Player.prototype.setMovePosition = function(move, duration) {
+    var position = this.getMovePosition(move);
+    if (!position) {
+      return false;
     }
-  };
-
-  Player.prototype.moveDown = function(duration) {
-    if (this.y + 1 < this.board.cols) {
-      ++this.y;
-      this.update(duration);
-    }
-  };
-
-  Player.prototype.moveLeft = function(duration) {
-    if (this.x > 0) {
-      --this.x;
-      this.update(duration);
-    }
-  };
-
-  Player.prototype.moveRight = function(duration) {
-    if (this.x + 1 < this.board.rows) {
-      ++this.x;
-      this.update(duration);
-    }
+    this.setPosition(position.x, position.y, duration);
   };
 
   Player.prototype.reset = function() {

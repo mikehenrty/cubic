@@ -93,14 +93,14 @@ window.Engine = (function() {
   Engine.prototype.setPlayer = function(playerNumber) {
     if (playerNumber === 1) {
       this.playerNumber = 1;
-      this.me = this.player1;
+      this.me = this.player2.opponent = this.player1;
       this.opponentNumber = 2;
-      this.opponent = this.player2;
+      this.opponent = this.me.opponent = this.player2;
     } else {
       this.playerNumber = 2;
-      this.me = this.player2;
+      this.me = this.player1.opponent = this.player2;
       this.opponentNumber = 1;
-      this.opponent = this.player1;
+      this.opponent = this.me.opponent = this.player1;
     }
   };
 
@@ -231,8 +231,13 @@ window.Engine = (function() {
     }
 
     var move = this.getMove(key);
-    if (!move || !this.me.isValidMove(move, this.opponent)) {
+    if (!move) {
       return;
+    }
+
+    var position = this.me.getMovePosition(move);
+    if (!position) {
+      return false;
     }
 
     var now = this.time.now();

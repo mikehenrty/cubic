@@ -4,12 +4,12 @@ window.Cube = (function() {
   const DEBUG = CONST.DEBUG;
 
   // Positions on the cube.
-  const TOP    = 0;
-  const NORTH  = 1;
-  const EAST   = 2;
-  const SOUTH  = 3;
-  const WEST   = 4;
-  const BOTTOM = 5;
+  const TOP    = CONST.CUBE_SIDES.TOP;
+  const NORTH  = CONST.CUBE_SIDES.NORTH;
+  const EAST   = CONST.CUBE_SIDES.EAST;
+  const SOUTH  = CONST.CUBE_SIDES.SOUTH;
+  const WEST   = CONST.CUBE_SIDES.WEST;
+  const BOTTOM = CONST.CUBE_SIDES.BOTTOM;
 
   const COLORS = CONST.CUBE_COLORS;
 
