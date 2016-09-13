@@ -10,7 +10,7 @@ window.Player = (function() {
     this.el = document.createElement('div');
     this.el.className = `piece player-${playerNumber}`;
     this.cube = new Cube(this.el);
-    this.direction = null;
+    this.moves = [];
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -21,21 +21,21 @@ window.Player = (function() {
     this.reset();
   };
 
-  Player.prototype.startMove = function(direction, duration) {
-    this.el.classList.add('moving', direction);
-    this.direction = direction;
-    this[direction](duration);
+  Player.prototype.startMove = function(move, duration) {
+    this.moves.push(move);
+    this.el.classList.add('moving', move);
+    this[move](duration);
   };
 
   Player.prototype.endMove = function() {
-    this.el.classList.remove('moving', this.direction);
+    var move = this.moves.shift();
+    this.el.classList.remove('moving', move);
     this.el.style.transitionDuration = '0ms';
-    this.cube[this.direction]();
-    this.direction = null;
+    this.cube[move]();
   };
 
   Player.prototype.isMoving = function() {
-    return !!this.direction;
+    return this.moves.length > 0;
   };
 
   Player.prototype.update = function(duration) {
