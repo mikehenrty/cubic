@@ -36,7 +36,8 @@ window.UI = (function() {
       linkButton.textContent = 'Copied!!!!';
       setTimeout(() => {
         linkButton.textContent = 'Copy Link';
-      }, 2000);
+        linkInput.blur();
+      }, 1000);
     });
     this.status.appendChild(linkInput);
     this.status.appendChild(linkButton);
