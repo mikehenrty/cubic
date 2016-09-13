@@ -128,6 +128,7 @@ window.Player = (function() {
       this.x = this.board.rows - 1;
       this.y = this.board.cols - 1;
     }
+    this.cube.reset();
     this.update();
   };
 

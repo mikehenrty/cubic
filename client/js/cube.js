@@ -22,8 +22,7 @@ window.Cube = (function() {
 
   function Cube(el) {
     this.el = el;
-    this.sides = COLORS.slice(0); // Clone.
-    this.update();
+    this.reset();
   }
 
   Cube.prototype.update = function() {
@@ -34,6 +33,11 @@ window.Cube = (function() {
     style.borderLeftColor = this.sides[WEST];
     style.borderRightColor = this.sides[EAST];
     DEBUG && this.logColors();
+  };
+
+  Cube.prototype.reset = function() {
+    this.sides = COLORS.slice(0); // Clone.
+    this.update();
   };
 
   Cube.prototype.cpSide = function(src, dest) {
