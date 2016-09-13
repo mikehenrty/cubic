@@ -1,6 +1,8 @@
 window.Board = (function() {
   'use strict';
 
+  const STARTING_TILES = 13;
+
   function Board(engine, cols, rows) {
     this.engine = engine;
     this.container = engine.el;
@@ -15,14 +17,30 @@ window.Board = (function() {
     this.container.appendChild(this.el);
 
     // Add sqaures to the board.
-    for (var c = 0; c < this.cols; c++) {
-      for (var r = 0; r < this.rows; r++) {
+    for (var r = 0; r < this.rows; r++) {
+      this.squares.push([]);
+      for (var c = 0; c < this.cols; c++) {
         var square = document.createElement('div');
         square.className = 'square';
-        this.squares.push(square);
+        this.squares[r].push(square);
         this.el.appendChild(square);
       }
     }
+  };
+
+  Board.prototype.generateTiles = function() {
+    var tiles = [];
+    for (var i = 0; i < STARTING_TILES; i++) {
+      tiles.push([Utility.random(0, this.cols - 1),
+                  Utility.random(0, this.rows - 1)]);
+    }
+    return tiles;
+  };
+
+  Board.prototype.displayTiles = function(tiles) {
+    tiles.forEach(tile => {
+      this.squares[tile[0]][tile[1]].style.backgroundColor = 'white';
+    });
   };
 
   return Board;

@@ -117,6 +117,10 @@ window.Utility = (function() {
       return Math.sqrt(sumOfDistances / data.length);
     },
 
+    random: function(min, max) {
+      return min + Math.round(Math.random() * (max - min));
+    },
+
     trimOutliers: function(data) {
       var median = Utility.median(data)
       var stddev = Utility.stddev(data);

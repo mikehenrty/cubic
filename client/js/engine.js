@@ -4,6 +4,8 @@ window.Engine = (function() {
   const COLS = 10;
   const ROWS = 10;
 
+  const START_DELAY = 1000;
+
   const KEY_MAP = {
     'a': 'moveLeft',
     'w': 'moveUp',
@@ -42,6 +44,7 @@ window.Engine = (function() {
       this.connection.registerHandler('keydown_ack',
                                       this.handleKeyAck.bind(this));
       this.connection.registerHandler('ready', this.handleReady.bind(this));
+      this.connection.registerHandler('start', this.handleStart.bind(this));
       this.time.init(this.connection);
       this.ui.init();
       this.board.init();
@@ -57,17 +60,36 @@ window.Engine = (function() {
     return this.connection.connect(peerId).then(() => {
       return this.time.sync();
     }).then(ping => {
+      this.setReadyStatus(ping);
       this.connection.send('ready', ping);
-      this.handleReady('ready', ping);
     }).catch(err => {
       this.setPlayer(1);
       throw err;
     });
   };
 
+  Engine.prototype.setReadyStatus = function(ping) {
+    this.ui.setStatus(`Ready... ping ${ping}ms`);
+  };
+
+  Engine.prototype.handleStart = function(type, payload) {
+    var startTime, tiles
+    [startTime, tiles] = payload.split(' ');
+    tiles = JSON.parse(tiles);
+    setTimeout(this.start.bind(this, tiles), startTime - this.time.now());
+  };
+
   Engine.prototype.handleReady = function(type, ping) {
+    this.setReadyStatus(ping);
+    var tiles = this.board.generateTiles();
+    var startTime = this.time.now() + START_DELAY;
+    this.connection.send('start', `${startTime} ${JSON.stringify(tiles)}`);
+    setTimeout(this.start.bind(this, tiles), START_DELAY);
+  };
+
+  Engine.prototype.start = function(tiles) {
     this.reset();
-    this.ui.setStatusPing(ping);
+    this.board.displayTiles(tiles);
   };
 
   Engine.prototype.getClientId = function() {
@@ -147,7 +169,7 @@ window.Engine = (function() {
     var id, result, timestamp;
     [id, result, timestamp] = payload.split(' ');
 
-    this.ui.setStatusPing(this.time.now() - timestamp);
+    this.ui.setStatus(`Go!!! ping ${this.time.now() - timestamp}ms`);
 
     var move = this.pendingMoves[id];
     if (!move) {
