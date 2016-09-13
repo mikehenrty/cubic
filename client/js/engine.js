@@ -26,8 +26,6 @@ window.Engine = (function() {
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
     this.setPlayer(1);
-    this.ready = false;
-    this.readyHandler = null;
     this.pendingMoves = {};
     this.nextMoveKey = null;
     this.lastMove = null;
@@ -67,18 +65,9 @@ window.Engine = (function() {
     });
   };
 
-  Engine.prototype.onReady = function(cb) {
-    if (this.ready) {
-      return cb && cb();
-    }
-    this.readyHandler = cb;
-  };
-
   Engine.prototype.handleReady = function(type, ping) {
     this.reset();
     this.ui.setStatusPing(ping);
-    this.ready = true;
-    this.readyHandler && this.readyHandler();
   };
 
   Engine.prototype.getPlayerNumber = function() {
