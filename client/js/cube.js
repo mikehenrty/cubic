@@ -15,8 +15,17 @@ window.Cube = (function() {
 
   function Cube(el) {
     this.el = el;
+    this.sides = null;
     this.reset();
   }
+
+  Cube.prototype.move = function(move) {
+    if (!this[move]) {
+      console.log('unrecognized cube direction', move);
+      return;
+    }
+    this[move]();
+  };
 
   Cube.prototype.update = function() {
     var style = this.el.style;

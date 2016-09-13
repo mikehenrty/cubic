@@ -25,6 +25,11 @@ window.Player = (function() {
     this.cube = new Cube(this.el);
     this.opponent = null;
     this.moves = [];
+    this.points = 0;
+    this.scoreEl = document.createElement('div');
+    this.scoreEl.className = 'score';
+    this.scoreEl.id = `player-${this.playerNumber}`;
+    this.scoreEl.textContent = this.points;
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -33,6 +38,7 @@ window.Player = (function() {
 
   Player.prototype.init = function() {
     this.container.appendChild(this.el);
+    this.container.appendChild(this.scoreEl);
     this.squareHeight = Utility.getPixelHeight('.square');
     this.reset();
   };
@@ -46,8 +52,18 @@ window.Player = (function() {
   Player.prototype.endMove = function() {
     var move = this.moves.shift();
     this.el.classList.remove('moving', move);
-    this.cube[move]();
     this.el.style.transitionDuration = '0ms';
+    this.cube.move(move);
+    if (this.cube.sides[CONST.CUBE_SIDES.TOP] ===
+        this.board.getColor(this.x, this.y)) {
+      this.board.pickUpTile(this.x, this.y)
+      this.addPoint();
+    }
+  };
+
+  Player.prototype.addPoint = function() {
+    ++this.points;
+    this.scoreEl.textContent = this.points;
   };
 
   Player.prototype.isMoving = function() {
@@ -142,6 +158,7 @@ window.Player = (function() {
       this.x = this.board.rows - 1;
       this.y = this.board.cols - 1;
     }
+    this.points = 0;
     this.cube.reset();
     this.update();
   };

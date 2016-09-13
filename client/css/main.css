@@ -8,10 +8,11 @@
 
 :root {
   --console-green: #2ff20e;
-  --board-height: 80vmin;
-  --square-height: 8vmin;
+  --board-dimension: 80vmin;
+  --square-dimension: 8vmin;
+  --score-dimension: 8vmin;
   --border-width: 1.5vmin;
-  --ui-height: calc( (100vmin - var(--board-height) ) / 2);
+  --ui-height: calc( (100vmin - var(--board-dimension) ) / 2);
 }
 
 body {
@@ -62,17 +63,36 @@ p {
 #board {
   position: relative;
   background-color: black;
-  width: var(--board-height);
-  height: var(--board-height);
+  width: var(--board-dimension);
+  height: var(--board-dimension);
   line-height: 0;
   border: 1px solid var(--console-green);
+}
+
+.score {
+  position: absolute;
+  width: var(--score-dimension);
+  height: var(--score-dimension);
+  text-align: center;
+  line-height: var(--score-dimension);
+  vertical-align: middle;
+}
+
+#player-1.score {
+  top: calc(0vmin - var(--score-dimension));
+  left: calc(0vmin - var(--score-dimension));
+}
+
+#player-2.score {
+  bottom: calc(0vmin - var(--score-dimension));
+  right: calc(0vmin - var(--score-dimension));
 }
 
 .square {
   display: inline-block;
   box-sizing: border-box;
-  height: var(--square-height);
-  width: var(--square-height);
+  height: var(--square-dimension);
+  width: var(--square-dimension);
   border: 1px solid var(--console-green);
 }
 
@@ -83,29 +103,29 @@ p {
   position: absolute;
   top: 0;
   left: 0;
-  height: var(--square-height);
-  width: var(--square-height);
+  height: var(--square-dimension);
+  width: var(--square-dimension);
   transition-property: border-width, transform;
 }
 
 .piece.moving.moveLeft {
   border-left-width: 0vmin;
-  border-right-width: calc(var(--square-height) - var(--border-width));
+  border-right-width: calc(var(--square-dimension) - var(--border-width));
 }
 
 .piece.moving.moveRight {
   border-right-width: 0vmin;
-  border-left-width: calc(var(--square-height) - var(--border-width));
+  border-left-width: calc(var(--square-dimension) - var(--border-width));
 }
 
 .piece.moving.moveUp {
   border-top-width: 0vmin;
-  border-bottom-width: calc(var(--square-height) - var(--border-width));
+  border-bottom-width: calc(var(--square-dimension) - var(--border-width));
 }
 
 .piece.moving.moveDown {
   border-bottom-width: 0vmin;
-  border-top-width: calc(var(--square-height) - var(--border-width));
+  border-top-width: calc(var(--square-dimension) - var(--border-width));
 }
 
 .player-1 {
