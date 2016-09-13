@@ -24,12 +24,11 @@ window.Player = (function() {
     this.el.className = `piece player-${playerNumber}`;
     this.cube = new Cube(this.el);
     this.opponent = null;
-    this.moves = [];
-    this.points = 0;
     this.scoreEl = document.createElement('div');
     this.scoreEl.className = 'score';
     this.scoreEl.id = `player-${this.playerNumber}`;
     this.scoreEl.textContent = this.points;
+    this.reset();
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -158,8 +157,10 @@ window.Player = (function() {
       this.x = this.board.rows - 1;
       this.y = this.board.cols - 1;
     }
+    this.moves = [];
     this.points = 0;
     this.cube.reset();
+    this.el.classList.remove('moving');
     this.update();
   };
 

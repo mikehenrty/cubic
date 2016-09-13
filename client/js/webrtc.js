@@ -14,6 +14,7 @@ window.WebRTC = (function() {
     this.handlers = {};
     this.queue = new Utility.Queue();
     this.connectHandlers = new Utility.Handlers();
+    this.disconnectHandler = null;
 
     this.socket.registerHandler('signaling',
       this.signalHandler.bind(this));
@@ -76,13 +77,17 @@ window.WebRTC = (function() {
     this.dataChannel.send(`${type} ${payload}`);
   };
 
+  WebRTC.prototype.trigger = function(type, payload) {
+    this.handlers[type] && this.handlers[type].forEach(handler => {
+      handler(type, payload);
+    });
+  };
+
   WebRTC.prototype.onMessage = function(evt) {
     var parts = evt.data.split(' ');
     var type = parts.shift();
     var payload = parts.join(' ');
-    this.handlers[type] && this.handlers[type].forEach(handler => {
-      handler(type, payload);
-    });
+    this.trigger(type, payload);
   };
 
 
@@ -187,8 +192,13 @@ window.WebRTC = (function() {
       case 'disconnected':
       case 'failed':
       case 'closed':
-      default:
         console.log('new webrtc state',
+          this.peerConnection.iceConnectionState);
+        this.trigger('disconnect');
+        break;
+
+      default:
+        console.log('unknown webrtc state',
           this.peerConnection.iceConnectionState);
     };
   };

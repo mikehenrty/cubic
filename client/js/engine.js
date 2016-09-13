@@ -20,6 +20,7 @@ window.Engine = (function() {
     this.pendingMoves = {};
     this.nextMoveKey = null;
     this.lastMove = null;
+    this.disconnectHandler = null;
   }
 
   Engine.prototype.init = function() {
@@ -32,6 +33,8 @@ window.Engine = (function() {
                                       this.handleKeyForOpponent.bind(this));
       this.connection.registerHandler('keydown_ack',
                                       this.handleKeyAck.bind(this));
+      this.connection.registerHandler('disconnect',
+                                      this.handleDisconnect.bind(this));
       this.connection.registerHandler('ready', this.handleReady.bind(this));
       this.connection.registerHandler('start', this.handleStart.bind(this));
       this.time.init(this.connection);
@@ -41,6 +44,10 @@ window.Engine = (function() {
       this.player2.init();
       return id;
     });
+  };
+
+  Engine.prototype.onDisconnect = function(cb) {
+    this.disconnectHandler = cb;
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
@@ -178,6 +185,11 @@ window.Engine = (function() {
     } else {
       move.acked = true;
     }
+  };
+
+  Engine.prototype.handleDisconnect = function() {
+    this.reset();
+    this.disconnectHandler && this.disconnectHandler();
   };
 
   Engine.prototype.handleKeyForOpponent = function(type, payload) {

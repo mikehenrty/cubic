@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     engine.ui.showPeerLink(engine.getClientId());
   }
 
+  engine.onDisconnect(() => {
+    showPeerLink();
+  });
+
   engine.init().then(clientId => {
     var peerId = Utility.getPeerId();
     if (!peerId) {
