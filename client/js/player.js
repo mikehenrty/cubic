@@ -27,7 +27,6 @@ window.Player = (function() {
     this.scoreEl = document.createElement('div');
     this.scoreEl.className = 'score';
     this.scoreEl.id = `player-${this.playerNumber}`;
-    this.scoreEl.textContent = this.points;
     this.reset();
   }
 
@@ -159,6 +158,7 @@ window.Player = (function() {
     }
     this.moves = [];
     this.points = 0;
+    this.scoreEl.textContent = this.points;
     this.cube.reset();
     this.el.classList.remove('moving');
     this.update();
