@@ -8,6 +8,15 @@ window.CONST = (function() {
     FAKE_LATENCY: 0,
 
     // miliseconds of piece movement.
-    MOVE_DURATION: 200
+    MOVE_DURATION: 200,
+
+    CUBE_COLORS: [
+      'red',
+      'blue',
+      'yellow',
+      'orange',
+      'white',
+      'green'
+    ]
   };
 })();

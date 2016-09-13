@@ -41,14 +41,17 @@ window.Board = (function() {
     var tiles = [];
     for (var i = 0; i < STARTING_TILES; i++) {
       tiles.push([Utility.random(0, this.cols - 1),
-                  Utility.random(0, this.rows - 1)]);
+                  Utility.random(0, this.rows - 1),
+                  CONST.CUBE_COLORS[
+                    Utility.random(0, CONST.CUBE_COLORS.length - 1)
+                  ]]);
     }
     return tiles;
   };
 
   Board.prototype.displayTiles = function(tiles) {
     tiles.forEach(tile => {
-      this.squares[tile[0]][tile[1]].style.backgroundColor = 'white';
+      this.squares[tile[0]][tile[1]].style.backgroundColor = tile[2];
     });
   };
 

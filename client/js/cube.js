@@ -11,14 +11,7 @@ window.Cube = (function() {
   const WEST   = 4;
   const BOTTOM = 5;
 
-  const COLORS = [
-    'red',
-    'blue',
-    'yellow',
-    'orange',
-    'white',
-    'green'
-  ];
+  const COLORS = CONST.CUBE_COLORS;
 
   function Cube(el) {
     this.el = el;
