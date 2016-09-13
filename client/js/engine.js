@@ -6,17 +6,6 @@ window.Engine = (function() {
 
   const START_DELAY = 1000;
 
-  const KEY_MAP = {
-    'a': 'moveLeft',
-    'w': 'moveUp',
-    'd': 'moveRight',
-    's': 'moveDown',
-    'ArrowLeft': 'moveLeft',
-    'ArrowUp': 'moveUp',
-    'ArrowRight': 'moveRight',
-    'ArrowDown': 'moveDown'
-  };
-
   function Engine(container) {
     this.container = container;
     this.el = document.createElement('div');
@@ -88,6 +77,7 @@ window.Engine = (function() {
   };
 
   Engine.prototype.start = function(tiles) {
+    this.ui.setStatus('Go!!!');
     this.reset();
     this.board.displayTiles(tiles);
   };
@@ -253,7 +243,7 @@ window.Engine = (function() {
   };
 
   Engine.prototype.getMove = function(key) {
-    return KEY_MAP[key];
+    return Player.KEY_MAP[key];
   };
 
   Engine.prototype.arePositionsConflicting = function() {
@@ -261,6 +251,7 @@ window.Engine = (function() {
   };
 
   Engine.prototype.reset = function() {
+    this.board.reset();
     this.player1.reset();
     this.player2.reset();
   };

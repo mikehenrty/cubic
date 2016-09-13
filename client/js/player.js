@@ -3,6 +3,17 @@ window.Player = (function() {
 
   const MOVE_DURATION = CONST.MOVE_DURATION;
 
+  const KEY_MAP = {
+    'a': 'moveLeft',
+    'w': 'moveUp',
+    'd': 'moveRight',
+    's': 'moveDown',
+    'ArrowLeft': 'moveLeft',
+    'ArrowUp': 'moveUp',
+    'ArrowRight': 'moveRight',
+    'ArrowDown': 'moveDown'
+  };
+
   function Player(playerNumber, board) {
     this.playerNumber = playerNumber;
     this.board = board;
@@ -14,6 +25,8 @@ window.Player = (function() {
   }
 
   Player.MoveDuration = MOVE_DURATION;
+
+  Player.KEY_MAP = KEY_MAP;
 
   Player.prototype.init = function() {
     this.container.appendChild(this.el);

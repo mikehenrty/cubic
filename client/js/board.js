@@ -28,6 +28,15 @@ window.Board = (function() {
     }
   };
 
+  Board.prototype.reset = function() {
+    for (var r = 0; r < this.rows; r++) {
+      for (var c = 0; c < this.cols; c++) {
+        var square = this.squares[r][c];
+        square.style.backgroundColor = '';
+      }
+    }
+  };
+
   Board.prototype.generateTiles = function() {
     var tiles = [];
     for (var i = 0; i < STARTING_TILES; i++) {
