@@ -37,7 +37,8 @@ window.Player = (function() {
   Player.prototype.init = function() {
     this.container.appendChild(this.el);
     this.container.appendChild(this.scoreEl);
-    this.squareHeight = Utility.getPixelHeight('.square');
+    this.squareHeight = Utility.getCssVar('--square-dimension');
+    console.log('height', document.querySelector('.square').style.height);
     this.reset();
   };
 
@@ -52,7 +53,7 @@ window.Player = (function() {
     this.el.classList.remove('moving', move);
     this.el.style.transitionDuration = '0ms';
     this.cube.move(move);
-    if (this.cube.sides[CONST.CUBE_SIDES.TOP] ===
+    if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
         this.board.getColor(this.x, this.y)) {
       this.board.pickUpTile(this.x, this.y)
       this.addPoint();
@@ -72,8 +73,8 @@ window.Player = (function() {
     duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
     this.el.style.transitionDuration = duration + 'ms';
     this.el.style.transform =
-      'translateY(' + this.y * this.squareHeight + 'px) ' +
-      'translateX(' + this.x * this.squareHeight + 'px)';
+      `translateY(calc(${this.y} * ${this.squareHeight}))` +
+      `translateX(calc(${this.x} * ${this.squareHeight}))`;
   };
 
   Player.prototype.getPosition = function() {
@@ -92,32 +93,32 @@ window.Player = (function() {
   Player.prototype.getMovePosition = function(move) {
     var x = this.x;
     var y = this.y;
-    var topColor;
+    var bottomColor;
 
     switch (move) {
       case 'moveUp':
-        topColor = this.cube.sides[CUBE_SIDES.SOUTH];
+        bottomColor = this.cube.sides[CUBE_SIDES.NORTH];
         --y;
         if (y < 0) {
           return false;
         }
         break;
       case 'moveDown':
-        topColor = this.cube.sides[CUBE_SIDES.NORTH];
+        bottomColor = this.cube.sides[CUBE_SIDES.SOUTH];
         ++y;
         if (y >= this.board.cols) {
           return false;
         }
         break;
       case 'moveLeft':
-        topColor = this.cube.sides[CUBE_SIDES.EAST];
+        bottomColor = this.cube.sides[CUBE_SIDES.WEST];
         --x;
         if (x < 0) {
           return false;
         }
         break;
       case 'moveRight':
-        topColor = this.cube.sides[CUBE_SIDES.WEST];
+        bottomColor = this.cube.sides[CUBE_SIDES.EAST];
         ++x;
         if (x >= this.board.rows) {
           return false;
@@ -133,7 +134,7 @@ window.Player = (function() {
     }
 
     var color = this.board.getColor(x, y);
-    if (color && color !== topColor) {
+    if (color && color !== bottomColor) {
       return false;
     }
 

@@ -150,9 +150,8 @@ window.Utility = (function() {
       return url.searchParams.get('peer');
     },
 
-    getPixelHeight: function(query) {
-      var style = window.getComputedStyle(document.querySelector(query));
-      return parseFloat(style.height.slice(0, -2));
+    getCssVar: function(prop) {
+      return window.getComputedStyle(document.body).getPropertyValue(prop);
     },
 
     niceId: niceId,
