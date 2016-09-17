@@ -121,11 +121,14 @@ window.Engine = (function() {
     }
   };
 
+  Engine.prototype.rollbackMoveForPlayer = function(player, position) {
+    player.setPosition(position.x, position.y, 10);
+    player.endMove(true);
+  };
+
   Engine.prototype.rollbackPendingMove = function(id) {
     var move = this.pendingMoves[id];
-    this.me.setPosition(move.position.x,
-                        move.position.y, 10);
-    this.me.endMove(true);
+    this.rollbackMoveForPlayer(this.me, move.position);
     delete this.pendingMoves[id];
   };
 
@@ -220,7 +223,7 @@ window.Engine = (function() {
       if (!this.me.isMoving() || timestamp > this.lastMove.timestamp) {
         // We moved first, tell peer to rollback.
         this.connection.send('keydown_ack', `${id} 0 ${timestamp}`);
-        this.opponent.setPosition(oldPos.x, oldPos.y, 0);
+        this.rollbackMoveForPlayer(this.opponent, oldPos);
         return;
       }
 
