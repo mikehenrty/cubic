@@ -53,6 +53,7 @@ websockets.on('connection', socket => {
   });
 
   socket.on('close', () => {
+    console.debug(`disconnect ${socket.clientId}`);
     delete clients[socket.clientId];
   });
 });
