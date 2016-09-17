@@ -125,7 +125,7 @@ window.Engine = (function() {
     var move = this.pendingMoves[id];
     this.me.setPosition(move.position.x,
                         move.position.y, 10);
-    this.me.endMove();
+    this.me.endMove(true);
     delete this.pendingMoves[id];
   };
 

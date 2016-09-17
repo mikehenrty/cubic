@@ -47,15 +47,17 @@ window.Player = (function() {
     this.setMovePosition(move, duration);
   };
 
-  Player.prototype.endMove = function() {
+  Player.prototype.endMove = function(isRollback) {
     var move = this.moves.shift();
     this.el.classList.remove('moving', move);
     this.el.style.transitionDuration = '0ms';
-    this.cube.move(move);
-    if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
-        this.board.getColor(this.x, this.y)) {
-      this.board.pickUpTile(this.x, this.y)
-      this.addPoint();
+    if (!isRollback) {
+      this.cube.move(move);
+      if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
+          this.board.getColor(this.x, this.y)) {
+        this.board.pickUpTile(this.x, this.y)
+        this.addPoint();
+      }
     }
   };
 
