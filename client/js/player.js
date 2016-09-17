@@ -38,7 +38,6 @@ window.Player = (function() {
     this.container.appendChild(this.el);
     this.container.appendChild(this.scoreEl);
     this.squareHeight = Utility.getCssVar('--square-dimension');
-    console.log('height', document.querySelector('.square').style.height);
     this.reset();
   };
 
