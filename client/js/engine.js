@@ -208,7 +208,7 @@ window.Engine = (function() {
     // Make sure we have enough time for animation to complete,
     // otherwise we reject the move.
     if (duration < 0) {
-      this.connection.send('keydown_ack', `${id} 0`);
+      this.connection.send('keydown_ack', `${id} 0 ${timestamp}`);
       return;
     }
 
@@ -219,7 +219,7 @@ window.Engine = (function() {
     if (this.arePositionsConflicting()) {
       if (!this.me.isMoving() || timestamp > this.lastMove.timestamp) {
         // We moved first, tell peer to rollback.
-        this.connection.send('keydown_ack', `${id} 0`);
+        this.connection.send('keydown_ack', `${id} 0 ${timestamp}`);
         this.opponent.setPosition(oldPos.x, oldPos.y, 0);
         return;
       }
