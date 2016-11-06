@@ -65,6 +65,7 @@ window.Engine = (function() {
       this.setReadyStatus(ping);
       this.connection.send('ready', ping);
     }).catch(err => {
+      this.status.setStatus('');
       this.setPlayer(1);
       throw err;
     });
