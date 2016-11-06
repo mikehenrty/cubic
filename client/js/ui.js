@@ -26,11 +26,17 @@ window.UI = (function() {
         this.linkInput.blur();
       }, 1000);
     });
+
+    this.offlineButton = document.createElement('button');
+    this.offlineButton.id = 'offline';
+    this.offlineButton.textContent = 'Play Offline';
+    this.offlineButton.onclick = this.hide.bind(this);
   }
 
   UI.prototype.init = function() {
     this.content.appendChild(this.linkInput);
     this.content.appendChild(this.linkButton);
+    this.content.appendChild(this.offlineButton);
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
   };
