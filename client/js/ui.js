@@ -5,42 +5,47 @@ window.UI = (function() {
     this.container = container;
     this.el = document.createElement('div');
     this.el.id = 'ui';
-    this.status = document.createElement('p');
-    this.status.id = 'status';
+    this.content = document.createElement('div');
+    this.content.id = 'content';
+    this.linkInput = document.createElement('input');
+    this.linkInput.className = 'peer-link';
+    this.linkButton = document.createElement('button');
+    this.linkButton.className = 'link-button';
+    this.linkButton.textContent = 'Copy Link';
+
+    this.linkButton.onclick = evt => {
+      this.linkInput.focus();
+      this.linkInput.select();
+      document.execCommand('copy');
+    };
+
+    document.addEventListener('copy', (evt) => {
+      this.linkButton.textContent = 'Copied!!!!';
+      setTimeout(() => {
+        this.linkButton.textContent = 'Copy Link';
+        this.linkInput.blur();
+      }, 1000);
+    });
   }
 
   UI.prototype.init = function() {
-    this.el.appendChild(this.status);
-    document.body.appendChild(this.el);
+    this.content.appendChild(this.linkInput);
+    this.content.appendChild(this.linkButton);
+    this.el.appendChild(this.content);
+    this.container.appendChild(this.el);
   };
 
-  UI.prototype.setStatus = function(text) {
-    this.status.innerHTML = '';
-    this.status.textContent = text;
+  UI.prototype.show = function() {
+    this.el.classList.add('show');
+  };
+
+  UI.prototype.hide = function() {
+    this.el.classList.remove('show');
   };
 
   UI.prototype.showPeerLink = function(clientId) {
-    this.status.innerHTML = '';
-    var linkInput = document.createElement('input');
-    linkInput.className = 'peer-link';
-    linkInput.value = Utility.getPeerLink(clientId);
-    var linkButton = document.createElement('button');
-    linkButton.className = 'link-button';
-    linkButton.textContent = 'Copy Link';
-    linkButton.onclick = evt => {
-      linkInput.focus();
-      linkInput.select();
-      document.execCommand('copy');
-    };
-    document.addEventListener('copy', (evt) => {
-      linkButton.textContent = 'Copied!!!!';
-      setTimeout(() => {
-        linkButton.textContent = 'Copy Link';
-        linkInput.blur();
-      }, 1000);
-    });
-    this.status.appendChild(linkInput);
-    this.status.appendChild(linkButton);
+    this.linkInput.value = Utility.getPeerLink(clientId);
+    this.show();
   }
 
   return UI;

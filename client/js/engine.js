@@ -9,7 +9,7 @@ window.Engine = (function() {
   function Engine(container) {
     this.container = container;
     this.el = document.createElement('div');
-    this.ui = new UI(container);
+    this.status = new Status(container);
     this.el.id = 'screen';
     this.connection = new Connection();
     this.time = new TimeSync();
@@ -20,6 +20,7 @@ window.Engine = (function() {
     this.pendingMoves = {};
     this.nextMoveKey = null;
     this.lastMove = null;
+    this.connectHandler = null;
     this.disconnectHandler = null;
   }
 
@@ -35,10 +36,11 @@ window.Engine = (function() {
                                       this.handleKeyAck.bind(this));
       this.connection.registerHandler('disconnect',
                                       this.handleDisconnect.bind(this));
+      this.connection.onPeerConnect(this.handleConnect.bind(this));
       this.connection.registerHandler('ready', this.handleReady.bind(this));
       this.connection.registerHandler('start', this.handleStart.bind(this));
       this.time.init(this.connection);
-      this.ui.init();
+      this.status.init();
       this.board.init();
       this.player1.init();
       this.player2.init();
@@ -46,12 +48,16 @@ window.Engine = (function() {
     });
   };
 
+  Engine.prototype.onConnect = function(cb) {
+    this.connectHandler = cb;
+  };
+
   Engine.prototype.onDisconnect = function(cb) {
     this.disconnectHandler = cb;
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
-    this.ui.setStatus('Connecting to peer...');
+    this.status.setStatus('Connecting to peer...');
     this.setPlayer(2);
     return this.connection.connect(peerId).then(() => {
       return this.time.sync();
@@ -65,7 +71,7 @@ window.Engine = (function() {
   };
 
   Engine.prototype.setReadyStatus = function(ping) {
-    this.ui.setStatus(`Ready... ping ${ping}ms`);
+    this.status.setStatus(`Ready... ping ${ping}ms`);
   };
 
   Engine.prototype.handleStart = function(type, payload) {
@@ -84,7 +90,7 @@ window.Engine = (function() {
   };
 
   Engine.prototype.start = function(tiles) {
-    this.ui.setStatus('Go!!!');
+    this.status.setStatus('Go!!!');
     this.reset();
     this.board.displayTiles(tiles);
   };
@@ -169,7 +175,7 @@ window.Engine = (function() {
     var id, result, timestamp;
     [id, result, timestamp] = payload.split(' ');
 
-    this.ui.setStatus(`Go!!! ping ${this.time.now() - timestamp}ms`);
+    this.status.setStatus(`Go!!! ping ${this.time.now() - timestamp}ms`);
 
     var move = this.pendingMoves[id];
     if (!move) {
@@ -188,6 +194,10 @@ window.Engine = (function() {
     } else {
       move.acked = true;
     }
+  };
+
+  Engine.prototype.handleConnect = function() {
+    this.connectHandler && this.connectHandler();
   };
 
   Engine.prototype.handleDisconnect = function() {

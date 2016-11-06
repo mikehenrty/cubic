@@ -4,15 +4,18 @@ window.Controller = (function() {
   function Controller(container) {
     this.container = container;
     this.engine = new Engine(container);
+    this.ui = new UI(container);
   }
 
   Controller.prototype.showPeerLink = function() {
     // TODO: move peer link outside of engine ui.
-    this.engine.ui.showPeerLink(this.engine.getClientId());
+    this.ui.showPeerLink(this.engine.getClientId());
   };
 
   Controller.prototype.init = function() {
+    this.ui.init();
     this.engine.onDisconnect(this.showPeerLink.bind(this));
+    this.engine.onConnect(this.ui.hide.bind(this.ui));
 
     return this.engine.init().then(clientId => {
       var peerId = Utility.getPeerId();

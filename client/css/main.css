@@ -12,13 +12,13 @@
   --square-dimension: 8vmin;
   --score-dimension: 8vmin;
   --border-width: 1.5vmin;
-  --ui-height: calc( (100vmin - var(--board-dimension) ) / 2);
+  --status-height: calc( (100vmin - var(--board-dimension) ) / 2);
 }
 
 body {
   background-color: black;
   font-family: 'Press Start 2P';
-  font-size: calc(var(--ui-height) / 3);
+  font-size: calc(var(--status-height) / 3);
   color: var(--console-green);
 }
 
@@ -31,44 +31,46 @@ p {
   justify-content: center;
   align-items: center;
   position: absolute;
-  top: var(--ui-height);
-  bottom: var(--ui-height);
+  top: var(--status-height);
+  bottom: var(--status-height);
   left: 0;
   right: 0;
 }
 
 #ui {
-  position: absolute;
+  position: fixed;
+  padding: 5% 10%;
   top: 0;
   left: 0;
   right: 0;
-  margin: 0 auto;
-  height: var(--ui-height);
-  width: var(--board-dimension);
+  bottom: 0;
+  z-index: 1;
+  display: none;
+}
+
+#ui.show {
+  display: unset;
+}
+
+#ui #content {
+  height: 80%;
+  background-color: white;
+  opacity: .95;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 #ui input, #ui button {
   font-family: 'Press Start 2P';
   color: var(--console-green);
-  height: calc(var(--ui-height) / 2);
-  font-size: calc(var(--ui-height) / 8);
-}
-
-#ui button {
-  font-family: 'Press Start 2P';
-  color: var(--console-green);
-}
-
-
-#status {
-  text-align: center;
-  padding-top: calc(var(--ui-height) / 3);
+  height: var(--status-height);
+  font-size: calc(var(--status-height) / 3);
 }
 
 .peer-link {
   border: none;
   display: inline-block;
-  width: 60%;
+  width: 70%;
   background-color: transparent;
 }
 
@@ -76,8 +78,29 @@ p {
   margin-left: 5%;
   border-radius: 3px;
   display: inline-block;
-  width: 25%;
+  width: 15%;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+#status {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  height: var(--status-height);
+  width: var(--board-dimension);
+}
+
+#status button {
+  font-family: 'Press Start 2P';
+  color: var(--console-green);
+}
+
+
+#status-text {
+  text-align: center;
+  padding-top: calc(var(--status-height) / 3);
 }
 
 #board {
