@@ -3,6 +3,10 @@ window.UI = (function() {
 
   function UI(container) {
     this.container = container;
+    this.handlers = {};
+  }
+
+  UI.prototype.init = function() {
     this.el = document.createElement('div');
     this.el.id = 'ui';
     this.content = document.createElement('div');
@@ -30,15 +34,26 @@ window.UI = (function() {
     this.offlineButton = document.createElement('button');
     this.offlineButton.id = 'offline';
     this.offlineButton.textContent = 'Play Offline';
-    this.offlineButton.onclick = this.hide.bind(this);
-  }
+    this.offlineButton.onclick = this.trigger.bind(this, 'offline');
 
-  UI.prototype.init = function() {
     this.content.appendChild(this.linkInput);
     this.content.appendChild(this.linkButton);
     this.content.appendChild(this.offlineButton);
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
+  };
+
+  UI.prototype.registerHandler = function(type, cb) {
+    if (!this.handlers[type]) {
+      this.handlers[type] = [];
+    }
+    this.handlers[type].push(cb);
+  };
+
+  UI.prototype.trigger = function(type, payload) {
+    this.handlers[type] && this.handlers[type].forEach(handler => {
+      handler(type, payload);
+    });
   };
 
   UI.prototype.show = function() {

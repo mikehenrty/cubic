@@ -18,10 +18,10 @@ window.Engine = (function() {
     this.player2 = new Player(2, this.board);
     this.setPlayer(1);
     this.pendingMoves = {};
-    this.nextMoveKey = null;
     this.lastMove = null;
     this.connectHandler = null;
     this.disconnectHandler = null;
+    this.offlineMode = false;
   }
 
   Engine.prototype.init = function() {
@@ -46,6 +46,10 @@ window.Engine = (function() {
       this.player2.init();
       return id;
     });
+  };
+
+  Engine.prototype.playOffline = function() {
+    this.offlineMode = true;
   };
 
   Engine.prototype.onConnect = function(cb) {
@@ -121,9 +125,9 @@ window.Engine = (function() {
   Engine.prototype.finishPendingMove = function(id) {
     this.me.endMove();
     delete this.pendingMoves[id];
-    if (this.nextMoveKey) {
-      var key = this.nextMoveKey;
-      this.nextMoveKey = null;
+    if (this.me.nextMove) {
+      var key = this.me.nextMove;
+      this.me.nextMove = null;
       setTimeout(this.handleKeyForMe.bind(this, key), 0);
     }
   };
@@ -250,9 +254,14 @@ window.Engine = (function() {
   };
 
   Engine.prototype.handleKeyForMe = function(key) {
+    if (this.offlineMode) {
+      this.handleKeyForOffline(key);
+      return;
+    }
+
     // Only process one move at a time.
     if (this.me.isMoving()) {
-      this.nextMoveKey = key;
+      this.me.nextMove = key;
       return;
     }
 
@@ -271,6 +280,38 @@ window.Engine = (function() {
     this.addPendingMove(id, this.me.getPosition(), now);
     this.connection.send('keydown', `${id} ${key} ${now}`);
     this.me.startMove(move);
+  };
+
+  Engine.prototype.handleKeyForOffline = function(key) {
+    var playerNumber = Player.whichPlayerKey(key);
+    if (playerNumber !== 1 && playerNumber !== 2) {
+      return;
+    }
+
+    var player = playerNumber === 1 ? this.player1 : this.player2;
+    if (player.isMoving()) {
+      player.nextMove = key;
+      return;
+    }
+
+    var move = this.getMove(key);
+    if (!move) {
+      return;
+    }
+
+    if (!player.getMovePosition(move)) {
+      return;
+    }
+
+    player.startMove(move);
+    setTimeout(() => {
+      player.endMove();
+      if (player.nextMove) {
+        var key = player.nextMove;
+        player.nextMove = null;
+        setTimeout(this.handleKeyForOffline.bind(this, key), 0);
+      }
+    }, Player.MoveDuration);
   };
 
   Engine.prototype.getMove = function(key) {

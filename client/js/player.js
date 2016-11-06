@@ -16,6 +16,14 @@ window.Player = (function() {
     'ArrowDown': 'moveDown'
   };
 
+  const PLAYER_1_KEYS = [
+    'a', 'w', 'd', 's'
+  ];
+
+  const PLAYER_2_KEYS = [
+    'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'
+  ];
+
   function Player(playerNumber, board) {
     this.playerNumber = playerNumber;
     this.board = board;
@@ -27,12 +35,23 @@ window.Player = (function() {
     this.scoreEl = document.createElement('div');
     this.scoreEl.className = 'score';
     this.scoreEl.id = `player-${this.playerNumber}`;
+    this.nextMove = null;
     this.reset();
   }
 
   Player.MoveDuration = MOVE_DURATION;
 
   Player.KEY_MAP = KEY_MAP;
+
+  Player.whichPlayerKey = function(key) {
+    if (PLAYER_1_KEYS.indexOf(key) !== -1) {
+      return 1;
+    } else if (PLAYER_2_KEYS.indexOf(key) !== -1) {
+      return 2;
+    } else {
+      return 0;
+    }
+  };
 
   Player.prototype.init = function() {
     this.container.appendChild(this.el);

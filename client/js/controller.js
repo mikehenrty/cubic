@@ -8,11 +8,16 @@ window.Controller = (function() {
   }
 
   Controller.prototype.showPeerLink = function() {
-    // TODO: move peer link outside of engine ui.
     this.ui.showPeerLink(this.engine.getClientId());
   };
 
   Controller.prototype.init = function() {
+    // Play offline.
+    this.ui.registerHandler('offline', () => {
+      this.engine.playOffline();
+      this.ui.hide();
+    });
+
     this.ui.init();
     this.engine.onDisconnect(this.showPeerLink.bind(this));
     this.engine.onConnect(this.ui.hide.bind(this.ui));
@@ -25,7 +30,6 @@ window.Controller = (function() {
       }
       return this.engine.connectToPeer(peerId);
     }).catch(err => {
-      // TODO: move peer link outside of engine ui.
       console.log('Engine init error', err);
       this.showPeerLink();
     });
