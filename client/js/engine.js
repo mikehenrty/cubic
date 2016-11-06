@@ -48,10 +48,6 @@ window.Engine = (function() {
     });
   };
 
-  Engine.prototype.playOffline = function() {
-    this.offlineMode = true;
-  };
-
   Engine.prototype.onConnect = function(cb) {
     this.connectHandler = cb;
   };
@@ -98,6 +94,11 @@ window.Engine = (function() {
     this.status.setStatus('Go!!!');
     this.reset();
     this.board.displayTiles(tiles);
+  };
+
+  Engine.prototype.startOffline = function() {
+    this.offlineMode = true;
+    this.start(this.board.generateTiles());
   };
 
   Engine.prototype.getClientId = function() {

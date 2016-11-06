@@ -14,8 +14,8 @@ window.Controller = (function() {
   Controller.prototype.init = function() {
     // Play offline.
     this.ui.registerHandler('offline', () => {
-      this.engine.playOffline();
       this.ui.hide();
+      this.engine.startOffline();
     });
 
     this.ui.init();
