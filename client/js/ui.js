@@ -11,6 +11,7 @@ window.UI = (function() {
     this.el.id = 'ui';
     this.content = document.createElement('div');
     this.content.id = 'content';
+    this.welcomeContainer = document.createElement('p');
     this.linkInput = document.createElement('input');
     this.linkInput.className = 'peer-link';
     this.linkButton = document.createElement('button');
@@ -36,6 +37,7 @@ window.UI = (function() {
     this.offlineButton.textContent = 'Play Offline';
     this.offlineButton.onclick = this.trigger.bind(this, 'offline');
 
+    this.content.appendChild(this.welcomeContainer);
     this.content.appendChild(this.linkInput);
     this.content.appendChild(this.linkButton);
     this.content.appendChild(this.offlineButton);
@@ -56,18 +58,19 @@ window.UI = (function() {
     });
   };
 
-  UI.prototype.show = function() {
+  UI.prototype.show = function(options) {
+    if (options.clientId) {
+      this.linkInput.value = Utility.getPeerLink(options.clientId);
+    }
+    if (options.clientName) {
+      this.welcomeContainer.textContent = `Hello ${options.clientName}`;
+    }
     this.el.classList.add('show');
   };
 
   UI.prototype.hide = function() {
     this.el.classList.remove('show');
   };
-
-  UI.prototype.showPeerLink = function(clientId) {
-    this.linkInput.value = Utility.getPeerLink(clientId);
-    this.show();
-  }
 
   return UI;
 })();

@@ -7,8 +7,11 @@ window.Controller = (function() {
     this.ui = new UI(container);
   }
 
-  Controller.prototype.showPeerLink = function() {
-    this.ui.showPeerLink(this.engine.getClientId());
+  Controller.prototype.showUI = function() {
+    this.ui.show({
+      clientId: this.engine.getClientId(),
+      clientName: this.engine.getClientName()
+    });
   };
 
   Controller.prototype.init = function() {
@@ -19,19 +22,19 @@ window.Controller = (function() {
     });
 
     this.ui.init();
-    this.engine.onDisconnect(this.showPeerLink.bind(this));
+    this.engine.onDisconnect(this.showUI.bind(this));
     this.engine.onConnect(this.ui.hide.bind(this.ui));
 
     return this.engine.init().then(clientId => {
       var peerId = Utility.getPeerId();
       if (!peerId) {
-        this.showPeerLink();
+        this.showUI();
         return;
       }
       return this.engine.connectToPeer(peerId);
     }).catch(err => {
       console.log('Engine init error', err);
-      this.showPeerLink();
+      this.showUI();
     });
   };
 

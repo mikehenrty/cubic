@@ -19,8 +19,9 @@ window.Connection = (function() {
   };
 
   Connection.prototype.init = function() {
-    return this.socket.init().then((clientId) => {
-      this.clientId = clientId;
+    return this.socket.init().then(clientData => {
+      this.clientId = clientData.clientId;
+      this.clientName = clientData.clientName;
       this.webRTC = new WebRTC(this.clientId, this.socket);
       this.webRTC.onConnnection((err, peerId) => {
         if (!err) {

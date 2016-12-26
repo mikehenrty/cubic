@@ -60,12 +60,16 @@ window.Socket = (function() {
 
   Socket.prototype.sendRegister = function() {
     return new Promise((res, rej) => {
-      this.registerHandler('register_ack', (err, message) => {
+      this.registerHandler('register_ack', (err, message, payload) => {
         if (err) {
           return rej(err);
         }
         this.clientId = message;
-        res(this.clientId);
+        this.clientName = payload;
+        res({
+          clientId: this.clientId,
+          clientName: this.clientName
+        });
       });
       this.send('register');
     });

@@ -28,16 +28,17 @@ websockets.on('connection', socket => {
     var recipient = parts.shift();
     var payload = parts.join(' ');
 
-    console.debug(type, Utility.guidToNiceName(sender),
+    console.debug('\n', type, Utility.guidToNiceName(sender),
                   Utility.guidToNiceName(recipient), payload);
 
     // Register is the only message handled by the server.
     if (type === 'register') {
       var newClientId = Utility.guid();
+      var clientName = Utility.guidToNiceName(newClientId);
       clients[newClientId] = socket;
       socket.clientId = newClientId;
-      console.debug(`${Utility.guidToNiceName(Object.keys(clients))}\n`);
-      socket.send(`register_ack ${newClientId}`);
+      console.debug(`LIST: ${Utility.guidToNiceName(Object.keys(clients))}`);
+      socket.send(`register_ack ${newClientId} ${clientName}`);
       return;
     }
 

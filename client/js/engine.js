@@ -105,6 +105,10 @@ window.Engine = (function() {
     return this.connection.clientId;
   };
 
+  Engine.prototype.getClientName = function() {
+    return this.connection.clientName;
+  };
+
   Engine.prototype.getPlayerNumber = function() {
     return this.playerNumber;
   };
