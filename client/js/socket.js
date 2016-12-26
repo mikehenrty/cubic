@@ -44,9 +44,10 @@ window.Socket = (function() {
 
   Socket.prototype.send = function(type, recipient, payload, cb) {
     return this._ensureSocket().then(() => {
+      var clientId = this.clientId || '';
       recipient = recipient || '';
       payload = payload || '';
-      this.socket.send(`${type} ${this.clientId} ${recipient} ${payload}`);
+      this.socket.send(`${type} ${clientId} ${recipient} ${payload}`);
     });
   };
 
