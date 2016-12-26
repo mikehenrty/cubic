@@ -12,11 +12,18 @@ window.UI = (function() {
     this.content = document.createElement('div');
     this.content.id = 'content';
     this.welcomeContainer = document.createElement('p');
+    this.changeNameButton = document.createElement('button');
+    this.changeNameButton.textContent = 'Change Name';
     this.linkInput = document.createElement('input');
     this.linkInput.className = 'peer-link';
     this.linkButton = document.createElement('button');
     this.linkButton.className = 'link-button';
     this.linkButton.textContent = 'Copy Link';
+
+    this.changeNameButton.onclick = evt => {
+      var newName = prompt('New name?');
+      this.trigger('rename', newName);
+    };
 
     this.linkButton.onclick = evt => {
       this.linkInput.focus();
@@ -38,6 +45,7 @@ window.UI = (function() {
     this.offlineButton.onclick = this.trigger.bind(this, 'offline');
 
     this.content.appendChild(this.welcomeContainer);
+    this.content.appendChild(this.changeNameButton);
     this.content.appendChild(this.linkInput);
     this.content.appendChild(this.linkButton);
     this.content.appendChild(this.offlineButton);
@@ -54,7 +62,7 @@ window.UI = (function() {
 
   UI.prototype.trigger = function(type, payload) {
     this.handlers[type] && this.handlers[type].forEach(handler => {
-      handler(type, payload);
+      handler(payload);
     });
   };
 

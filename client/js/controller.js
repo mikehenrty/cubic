@@ -21,6 +21,17 @@ window.Controller = (function() {
       this.engine.startOffline();
     });
 
+    this.ui.registerHandler('rename', newName => {
+      // Hide name.
+      this.ui.show({ clientName: '...' });
+      this.engine.setName(newName).then(() => {
+        this.showUI();
+      }).catch((err) => {
+        console.log('Name set error', err);
+        this.showUI();
+      });
+    });
+
     this.ui.init();
     this.engine.onDisconnect(this.showUI.bind(this));
     this.engine.onConnect(this.ui.hide.bind(this.ui));

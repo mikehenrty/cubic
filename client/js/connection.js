@@ -28,7 +28,7 @@ window.Connection = (function() {
           this.connectionHandler && this.connectionHandler(peerId);
         }
       });
-      return clientId;
+      return this.clientId;
     });
   };
 
@@ -46,6 +46,13 @@ window.Connection = (function() {
 
   Connection.prototype.registerHandler = function(type, cb) {
     this.webRTC.registerHandler(type, cb);
+  };
+
+  Connection.prototype.setName = function(name) {
+    return this.socket.setName(name).then(() => {
+      this.clientName = name;
+      return name;
+    });
   };
 
   Connection.prototype.send = function(type, payload) {

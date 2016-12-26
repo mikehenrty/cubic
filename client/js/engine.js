@@ -48,6 +48,10 @@ window.Engine = (function() {
     });
   };
 
+  Engine.prototype.setName = function(name) {
+    return this.connection.setName(name);
+  };
+
   Engine.prototype.onConnect = function(cb) {
     this.connectHandler = cb;
   };

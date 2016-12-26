@@ -42,6 +42,24 @@ websockets.on('connection', socket => {
       return;
     }
 
+    // Make sure the client is who she says she is.
+    if (sender !== socket.clientId) {
+      console.debug(`unmatched ${sender} ${socket.clientId}`);
+      socket.send(`error ${type} ${recipient} ${payload}`);
+      return;
+    }
+
+    if (type === 'setname') {
+      if (!Utility.setNiceName(sender, payload)) {
+        console.debug(`name ${sender} ${payload}`);
+        socket.send(`error ${type} ${recipient} ${payload}`);
+        return;
+      }
+
+      socket.send(`setname_ack ${sender} ${recipient} ${payload}`);
+      return;
+    }
+
     // Pass message on to recipient, whatever it may mean.
     if (!clients[recipient]) {
       console.debug(`unrecognized ${recipient} ${Object.keys(clients)}\n`);

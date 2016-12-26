@@ -64,14 +64,27 @@ window.Socket = (function() {
         if (err) {
           return rej(err);
         }
+
         this.clientId = message;
-        this.clientName = payload;
         res({
-          clientId: this.clientId,
-          clientName: this.clientName
+          clientId: message,
+          clientName: payload
         });
       });
       this.send('register');
+    });
+  };
+
+  Socket.prototype.setName = function(name) {
+    return new Promise((res, rej) => {
+      this.registerHandler('setname_ack', Utility.once((err, message) => {
+        if (err) {
+          return rej(err);
+        }
+
+        res(name);
+      }));
+      this.send('setname', null, name);
     });
   };
 
