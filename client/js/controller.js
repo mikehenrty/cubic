@@ -8,9 +8,12 @@ window.Controller = (function() {
   }
 
   Controller.prototype.showUI = function() {
-    this.ui.show({
-      clientId: this.engine.getClientId(),
-      clientName: this.engine.getClientName()
+    this.engine.getList().then(list => {
+      this.ui.show({
+        clientId: this.engine.getClientId(),
+        clientName: this.engine.getClientName(),
+        clientList: list,
+      });
     });
   };
 

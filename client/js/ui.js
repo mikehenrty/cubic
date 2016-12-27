@@ -19,6 +19,8 @@ window.UI = (function() {
     this.linkButton = document.createElement('button');
     this.linkButton.className = 'link-button';
     this.linkButton.textContent = 'Copy Link';
+    this.listContainer = document.createElement('div');
+    this.listContainer.id = 'list-container';
 
     this.changeNameButton.onclick = evt => {
       var newName = prompt('New name?');
@@ -49,6 +51,7 @@ window.UI = (function() {
     this.content.appendChild(this.linkInput);
     this.content.appendChild(this.linkButton);
     this.content.appendChild(this.offlineButton);
+    this.content.appendChild(this.listContainer);
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
   };
@@ -73,6 +76,28 @@ window.UI = (function() {
     if (options.clientName) {
       this.welcomeContainer.textContent = `Hello ${options.clientName}`;
     }
+    if (options.clientList) {
+      if (options.clientList.length > 1) {
+        this.listContainer.innerHTML = '';
+        options.clientList.forEach(clientInfo => {
+          if (clientInfo.clientId === options.clientId) {
+            return;
+          }
+          var clientRow = document.createElement('p');
+          clientRow.textContent = clientInfo.clientName;
+          var joinButton = document.createElement('a');
+          joinButton.textContent = 'Join';
+          joinButton.href = Utility.getPeerLink(clientInfo.clientId);
+          clientRow.appendChild(joinButton);
+          this.listContainer.appendChild(clientRow);
+        });
+      } else {
+        var emptyRow = document.createElement('p');
+        emptyRow.textContent = 'No one else is currently online';
+        this.listContainer.appendChild(emptyRow);
+      }
+    }
+
     this.el.classList.add('show');
   };
 

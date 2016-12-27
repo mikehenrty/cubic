@@ -60,6 +60,10 @@ window.Engine = (function() {
     this.disconnectHandler = cb;
   };
 
+  Engine.prototype.getList = function() {
+    return this.connection.getList();
+  };
+
   Engine.prototype.connectToPeer = function(peerId) {
     this.status.setStatus('Connecting to peer...');
     this.setPlayer(2);

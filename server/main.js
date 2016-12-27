@@ -59,6 +59,17 @@ function handleMessage(socket, message) {
     return;
   }
 
+  if (type === 'list') {
+    var listInfo = Object.keys(clients).map((clientId) => {
+      return {
+        clientId: clientId,
+        clientName: Utility.guidToNiceName(clientId)
+      };
+    });
+    socket.send(`list_ack ${JSON.stringify(listInfo)}`);
+    return;
+  }
+
   if (type === 'setname') {
     if (!Utility.setNiceName(sender, payload)) {
       console.debug(`name ${sender} ${payload}`);

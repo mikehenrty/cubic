@@ -48,6 +48,12 @@ window.Connection = (function() {
     this.webRTC.registerHandler(type, cb);
   };
 
+  Connection.prototype.getList = function() {
+    return this.socket.sendCommand('list').then(listData => {
+      return JSON.parse(listData);
+    });
+  };
+
   Connection.prototype.setName = function(name) {
     return this.socket.setName(name).then(() => {
       this.clientName = name;

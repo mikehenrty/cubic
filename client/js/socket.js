@@ -85,6 +85,15 @@ window.Socket = (function() {
     });
   };
 
+  Socket.prototype.sendCommand = function(command, payload) {
+    return new Promise((res, rej) => {
+      this.registerHandler(`${command}_ack`, Utility.once((err, payload) => {
+        return err ? rej(err) : res(payload);
+      }));
+      this.send(command, null, payload);
+    });
+  };
+
   Socket.prototype.init = function() {
     if (this.initialized) {
       return Promise.resolve();
