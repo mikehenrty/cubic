@@ -55,7 +55,7 @@ window.Connection = (function() {
   };
 
   Connection.prototype.setName = function(name) {
-    return this.socket.setName(name).then(() => {
+    return this.socket.sendCommand('setname', name).then(() => {
       this.clientName = name;
       return name;
     });

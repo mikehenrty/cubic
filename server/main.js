@@ -66,7 +66,7 @@ function handleMessage(socket, message) {
         clientName: Utility.guidToNiceName(clientId)
       };
     });
-    socket.send(`list_ack ${JSON.stringify(listInfo)}`);
+    socket.send(`list_ack ${sender} ${JSON.stringify(listInfo)}`);
     return;
   }
 

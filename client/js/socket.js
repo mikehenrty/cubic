@@ -58,13 +58,13 @@ window.Socket = (function() {
 
   Socket.prototype.sendRegister = function() {
     return new Promise((res, rej) => {
-      this.registerHandler('register_ack', (err, message, payload) => {
+      this.registerHandler('register_ack', (err, sender, payload) => {
         if (err) {
           return rej(err);
         }
 
         res({
-          clientId: message,
+          clientId: sender,
           clientName: payload
         });
       });
@@ -72,24 +72,13 @@ window.Socket = (function() {
     });
   };
 
-  Socket.prototype.setName = function(name) {
-    return new Promise((res, rej) => {
-      this.registerHandler('setname_ack', Utility.once((err, message) => {
-        if (err) {
-          return rej(err);
-        }
-
-        res(name);
-      }));
-      this.send('setname', null, name);
-    });
-  };
-
   Socket.prototype.sendCommand = function(command, payload) {
     return new Promise((res, rej) => {
-      this.registerHandler(`${command}_ack`, Utility.once((err, payload) => {
+      this.registerHandler(`${command}_ack`,
+                           Utility.once((err, sender, payload) => {
         return err ? rej(err) : res(payload);
       }));
+
       this.send(command, null, payload);
     });
   };
