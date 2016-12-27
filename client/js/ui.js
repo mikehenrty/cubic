@@ -77,8 +77,8 @@ window.UI = (function() {
       this.welcomeContainer.textContent = `Hello ${options.clientName}`;
     }
     if (options.clientList) {
+      this.listContainer.innerHTML = '';
       if (options.clientList.length > 1) {
-        this.listContainer.innerHTML = '';
         options.clientList.forEach(clientInfo => {
           if (clientInfo.clientId === options.clientId) {
             return;
