@@ -55,7 +55,7 @@ function handleMessage(socket, message) {
     var clientName = Utility.guidToNiceName(newClientId);
     clients[newClientId] = socket;
     socket.clientId = newClientId;
-    socket.send(`register_ack ${newClientId} ${clientName}`);
+    socket.send(`register_ack ${sender} ${newClientId} ${clientName}`);
     return;
   }
 

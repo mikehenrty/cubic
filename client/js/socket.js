@@ -56,22 +56,6 @@ window.Socket = (function() {
     this.handlers[type].push(cb);
   };
 
-  Socket.prototype.sendRegister = function() {
-    return new Promise((res, rej) => {
-      this.registerHandler('register_ack', (err, sender, payload) => {
-        if (err) {
-          return rej(err);
-        }
-
-        res({
-          clientId: sender,
-          clientName: payload
-        });
-      });
-      this.send('register');
-    });
-  };
-
   Socket.prototype.sendCommand = function(command, payload) {
     return new Promise((res, rej) => {
       this.registerHandler(`${command}_ack`,
@@ -88,9 +72,13 @@ window.Socket = (function() {
       return Promise.resolve();
     }
 
-    return this.sendRegister().then(clientData => {
+    return this.sendCommand('register').then(payload => {
       this.initialized = true;
-      return clientData;
+      var parts = payload.split(' ');
+      return {
+        clientId: parts[0],
+        clientName: parts[1]
+      };
     });
   };
 
