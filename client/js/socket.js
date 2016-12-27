@@ -5,7 +5,6 @@ window.Socket = (function() {
   const WS_HOST = 'ws://' + window.location.hostname + ':' + WS_PORT;
 
   function Socket() {
-    this.clientId = null;
     this.socket = null;
     this.initialized = false;
     this.handlers = {};
@@ -44,10 +43,9 @@ window.Socket = (function() {
 
   Socket.prototype.send = function(type, recipient, payload, cb) {
     return this._ensureSocket().then(() => {
-      var clientId = this.clientId || '';
       recipient = recipient || '';
       payload = payload || '';
-      this.socket.send(`${type} ${clientId} ${recipient} ${payload}`);
+      this.socket.send(`${type} ${recipient} ${payload}`);
     });
   };
 
@@ -65,7 +63,6 @@ window.Socket = (function() {
           return rej(err);
         }
 
-        this.clientId = message;
         res({
           clientId: message,
           clientName: payload
@@ -93,9 +90,9 @@ window.Socket = (function() {
       return Promise.resolve();
     }
 
-    return this.sendRegister().then(clientId => {
+    return this.sendRegister().then(clientData => {
       this.initialized = true;
-      return clientId;
+      return clientData;
     });
   };
 
