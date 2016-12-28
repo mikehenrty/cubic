@@ -98,11 +98,11 @@ window.UI = (function() {
       }
     }
 
-    this.el.classList.add('show');
+    this.el.classList.remove('hide');
   };
 
   UI.prototype.hide = function() {
-    this.el.classList.remove('show');
+    this.el.classList.add('hide');
   };
 
   return UI;

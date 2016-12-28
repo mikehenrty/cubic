@@ -9,6 +9,7 @@ window.Controller = (function() {
 
   Controller.prototype.showUI = function() {
     this.engine.getList().then(list => {
+      this.engine.hideBoard();
       this.ui.show({
         clientId: this.engine.getClientId(),
         clientName: this.engine.getClientName(),
@@ -17,10 +18,15 @@ window.Controller = (function() {
     });
   };
 
+  Controller.prototype.showBoard = function() {
+    this.ui.hide();
+    this.engine.showBoard();
+  };
+
   Controller.prototype.init = function() {
     // Play offline.
     this.ui.registerHandler('offline', () => {
-      this.ui.hide();
+      this.showBoard();
       this.engine.startOffline();
     });
 
@@ -37,7 +43,7 @@ window.Controller = (function() {
 
     this.ui.init();
     this.engine.onDisconnect(this.showUI.bind(this));
-    this.engine.onConnect(this.ui.hide.bind(this.ui));
+    this.engine.onConnect(this.showBoard.bind(this));
 
     return this.engine.init().then(clientId => {
       var peerId = Utility.getPeerId();

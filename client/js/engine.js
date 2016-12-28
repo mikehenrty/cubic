@@ -42,10 +42,19 @@ window.Engine = (function() {
       this.time.init(this.connection);
       this.status.init();
       this.board.init();
+      this.hideBoard();
       this.player1.init();
       this.player2.init();
       return id;
     });
+  };
+
+  Engine.prototype.hideBoard = function() {
+    this.el.classList.add('hide');
+  };
+
+  Engine.prototype.showBoard = function() {
+    this.el.classList.remove('hide');
   };
 
   Engine.prototype.setName = function(name) {

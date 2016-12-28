@@ -33,6 +33,10 @@ p {
   margin: 0;
 }
 
+.hide {
+  visibility: hidden;
+}
+
 #screen {
   display: flex;
   justify-content: center;
@@ -52,11 +56,6 @@ p {
   right: 0;
   bottom: 0;
   z-index: 1;
-  display: none;
-}
-
-#ui.show {
-  display: unset;
 }
 
 #ui #content {
