@@ -49,8 +49,10 @@ p {
 }
 
 #ui {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
-  padding: 5% 10%;
   top: 0;
   left: 0;
   right: 0;
@@ -59,35 +61,46 @@ p {
 }
 
 #ui #content {
-  height: 80%;
-  background-color: white;
-  opacity: .95;
+  width: var(--board-dimension);
+  height: var(--board-dimension);
+  background-color: #18d8e3;
+  color: white;
+  font-size: calc(var(--board-dimension) / 30);
   border-radius: 10px;
   padding: 10px;
 }
 
-#ui input, #ui button {
+#ui #content p {
+  height: calc(var(--board-dimension) / 20);
+}
+
+#ui #content a {
+  float: right;
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+  font-size: calc(var(--board-dimension) / 40);
+}
+
+#action-buttons {
+  border-bottom: calc(var(--board-dimension) / 120) dotted white;
+  text-align: center;
+  margin-bottom: calc(var(--board-dimension) / 50);
+  padding: calc(var(--board-dimension) / 80) 0;
+}
+
+#action-buttons button {
   font-family: 'Press Start 2P';
-  color: var(--console-green);
-  height: var(--status-height);
-  font-size: calc(var(--status-height) / 3);
+  color: white;
+  font-size: calc(var(--board-dimension) / 30);
+  background-color: transparent;
 }
 
-#ui button {
-  border-radius: 3px;
-  display: inline-block;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
+/* Hide the link input. */
 .peer-link {
   border: none;
-  display: inline-block;
-  width: 70%;
-}
-
-.link-button {
-  margin-left: 5%;
-  width: 15%;
+  position: fixed;
+  top: -200%;
 }
 
 #status {

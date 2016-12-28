@@ -12,19 +12,32 @@ window.UI = (function() {
     this.content = document.createElement('div');
     this.content.id = 'content';
     this.welcomeContainer = document.createElement('p');
-    this.changeNameButton = document.createElement('button');
+    this.changeNameButton = document.createElement('a');
     this.changeNameButton.textContent = 'Change Name';
+
+    this.actionButtons = document.createElement('p');
+    this.actionButtons.id = 'action-buttons';
     this.linkInput = document.createElement('input');
     this.linkInput.className = 'peer-link';
     this.linkButton = document.createElement('button');
     this.linkButton.className = 'link-button';
-    this.linkButton.textContent = 'Copy Link';
+    this.linkButton.textContent = 'Invite Friends';
+    this.offlineButton = document.createElement('button');
+    this.offlineButton.id = 'offline';
+    this.offlineButton.textContent = 'Play Offline';
+    this.offlineButton.onclick = this.trigger.bind(this, 'offline');
+    this.actionButtons.appendChild(this.linkInput);
+    this.actionButtons.appendChild(this.linkButton);
+    this.actionButtons.appendChild(this.offlineButton);
+
     this.listContainer = document.createElement('div');
     this.listContainer.id = 'list-container';
 
     this.changeNameButton.onclick = evt => {
       var newName = prompt('New name?');
-      this.trigger('rename', newName);
+      if (newName) {
+        this.trigger('rename', newName);
+      }
     };
 
     this.linkButton.onclick = evt => {
@@ -34,23 +47,17 @@ window.UI = (function() {
     };
 
     document.addEventListener('copy', (evt) => {
+      var buttonText = this.linkButton.textContent;
       this.linkButton.textContent = 'Copied!!!!';
       setTimeout(() => {
-        this.linkButton.textContent = 'Copy Link';
+        this.linkButton.textContent = buttonText;
         this.linkInput.blur();
       }, 1000);
     });
 
-    this.offlineButton = document.createElement('button');
-    this.offlineButton.id = 'offline';
-    this.offlineButton.textContent = 'Play Offline';
-    this.offlineButton.onclick = this.trigger.bind(this, 'offline');
 
     this.content.appendChild(this.welcomeContainer);
-    this.content.appendChild(this.changeNameButton);
-    this.content.appendChild(this.linkInput);
-    this.content.appendChild(this.linkButton);
-    this.content.appendChild(this.offlineButton);
+    this.content.appendChild(this.actionButtons);
     this.content.appendChild(this.listContainer);
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
@@ -74,7 +81,8 @@ window.UI = (function() {
       this.linkInput.value = Utility.getPeerLink(options.clientId);
     }
     if (options.clientName) {
-      this.welcomeContainer.textContent = `Hello ${options.clientName}`;
+      this.welcomeContainer.textContent = `You are: ${options.clientName}`;
+      this.welcomeContainer.appendChild(this.changeNameButton);
     }
     if (options.clientList) {
       this.listContainer.innerHTML = '';

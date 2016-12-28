@@ -10,7 +10,7 @@ function guidToNiceName(guid) {
   if (clientNames[guid]) {
     return clientNames[guid]
   }
-  clientNames[guid] = 'client_' + ++clientCount;
+  clientNames[guid] = 'Player_' + ++clientCount;
   return clientNames[guid];
 }
 
