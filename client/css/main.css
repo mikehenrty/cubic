@@ -13,6 +13,13 @@
   --score-dimension: 8vmin;
   --border-width: 1.5vmin;
   --status-height: calc( (100vmin - var(--board-dimension) ) / 2);
+
+  --cube-color-red: purple;
+  --cube-color-blue: gray;
+  --cube-color-yellow: brown;
+  --cube-color-orange: pink;
+  --cube-color-white: magenta;
+  --cube-color-green: aquamarine;
 }
 
 body {
@@ -114,6 +121,38 @@ p {
   border: 1px solid var(--console-green);
 }
 
+#board span {
+  display: inline-block;
+  box-sizing: border-box;
+  height: var(--square-dimension);
+  width: var(--square-dimension);
+  border: 1px solid var(--console-green);
+}
+
+#board .red {
+  background-color: var(--cube-color-red);
+}
+
+#board .blue {
+  background-color: var(--cube-color-blue);
+}
+
+#board .yellow {
+  background-color: var(--cube-color-yellow);
+}
+
+#board .orange {
+  background-color: var(--cube-color-orange);
+}
+
+#board .white {
+  background-color: var(--cube-color-white);
+}
+
+#board .green {
+  background-color: var(--cube-color-green);
+}
+
 .score {
   position: absolute;
   width: var(--score-dimension);
@@ -131,14 +170,6 @@ p {
 #player-2.score {
   bottom: calc(0vmin - var(--score-dimension));
   right: calc(0vmin - var(--score-dimension));
-}
-
-.square {
-  display: inline-block;
-  box-sizing: border-box;
-  height: var(--square-dimension);
-  width: var(--square-dimension);
-  border: 1px solid var(--console-green);
 }
 
 .piece {
@@ -171,20 +202,4 @@ p {
 .piece.moving.moveDown {
   border-bottom-width: 0vmin;
   border-top-width: calc(var(--square-dimension) - var(--border-width));
-}
-
-.player-1 {
-  background-color: red;
-  border-top-color: blue;
-  border-bottom-color: yellow;
-  border-right-color: pink;
-  border-left-color: orange;
-}
-
-.player-2 {
-  background-color: blue;
-  border-top-color: red;
-  border-bottom-color: yellow;
-  border-right-color: pink;
-  border-left-color: orange;
 }

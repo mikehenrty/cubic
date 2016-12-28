@@ -28,13 +28,16 @@ window.Cube = (function() {
   };
 
   Cube.prototype.update = function() {
-    var style = this.el.style;
-    style.backgroundColor = this.sides[TOP];
-    style.borderTopColor = this.sides[NORTH];
-    style.borderBottomColor = this.sides[SOUTH];
-    style.borderLeftColor = this.sides[WEST];
-    style.borderRightColor = this.sides[EAST];
+    this.setCubeColor('backgroundColor', this.sides[TOP]);
+    this.setCubeColor('borderTopColor', this.sides[NORTH]);
+    this.setCubeColor('borderBottomColor', this.sides[SOUTH]);
+    this.setCubeColor('borderLeftColor', this.sides[WEST]);
+    this.setCubeColor('borderRightColor', this.sides[EAST]);
     DEBUG && this.logColors();
+  };
+
+  Cube.prototype.setCubeColor = function(prop, color) {
+    this.el.style[prop] = `var(--cube-color-${color})`;
   };
 
   Cube.prototype.reset = function() {
