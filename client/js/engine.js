@@ -196,7 +196,7 @@ window.Engine = (function() {
     var id, result, timestamp;
     [id, result, timestamp] = payload.split(' ');
 
-    this.status.setStatus(`Go!!! ping ${this.time.now() - timestamp}ms`);
+    this.status.setStatus(`ping ${this.time.now() - timestamp}ms`);
 
     var move = this.pendingMoves[id];
     if (!move) {
