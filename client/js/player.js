@@ -66,18 +66,23 @@ window.Player = (function() {
     this.setMovePosition(move, duration);
   };
 
+  // Returns true if points were added on this move.
   Player.prototype.endMove = function(isRollback) {
     var move = this.moves.shift();
     this.el.classList.remove('moving', move);
     this.el.style.transitionDuration = '0ms';
-    if (!isRollback) {
-      this.cube.move(move);
-      if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
-          this.board.getColor(this.x, this.y)) {
-        this.board.pickUpTile(this.x, this.y)
-        this.addPoint();
-      }
+    if (isRollback) {
+      return false;
     }
+
+    this.cube.move(move);
+    if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
+        this.board.getColor(this.x, this.y)) {
+      this.board.pickUpTile(this.x, this.y)
+      this.addPoint();
+      return true;
+    }
+    return false;
   };
 
   Player.prototype.addPoint = function() {

@@ -65,5 +65,16 @@ window.Board = (function() {
     return this.squares[x][y].className;
   };
 
+  Board.prototype.isGameOver = function() {
+    for (var r = 0; r < this.rows; r++) {
+      for (var c = 0; c < this.cols; c++) {
+        if (this.squares[c][r].className !== '') {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
   return Board;
 })();

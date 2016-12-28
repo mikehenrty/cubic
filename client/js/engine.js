@@ -136,7 +136,10 @@ window.Engine = (function() {
   };
 
   Engine.prototype.finishPendingMove = function(id) {
-    this.me.endMove();
+    if (this.me.endMove() && this.board.isGameOver()) {
+      this.endGame();
+      return;
+    }
     delete this.pendingMoves[id];
     if (this.me.nextMove) {
       var key = this.me.nextMove;
@@ -260,7 +263,10 @@ window.Engine = (function() {
     }
 
     setTimeout(() => {
-      this.opponent.endMove();
+      if (this.opponent.endMove() && this.board.isGameOver()) {
+        this.endGame();
+        return;
+      }
     }, duration);
 
     this.connection.send('keydown_ack', `${id} 1 ${timestamp}`);
@@ -318,7 +324,10 @@ window.Engine = (function() {
 
     player.startMove(move);
     setTimeout(() => {
-      player.endMove();
+      if (player.endMove() && this.board.isGameOver()) {
+        this.endGame();
+        return;
+      }
       if (player.nextMove) {
         var key = player.nextMove;
         player.nextMove = null;
@@ -335,7 +344,23 @@ window.Engine = (function() {
     return this.me.x === this.opponent.x && this.me.y === this.opponent.y;
   };
 
+  Engine.prototype.endGame = function() {
+    if (this.player1.points === this.player2.points) {
+      this.status.setStatus('It\'s a tie');
+    } else {
+      var winner = this.player1.points > this.player2.points ?
+                     this.player1 : this.player2;
+      if (this.offlineMode) {
+        this.status.setStatus(`Player ${winner.playerNumber} wins!`);
+      } else {
+        this.status.setStatus(`You ${winner === this.me ? 'win' : 'lose'}`);
+      }
+    }
+    this.reset();
+  };
+
   Engine.prototype.reset = function() {
+    this.pendingMoves = {};
     this.board.reset();
     this.player1.reset();
     this.player2.reset();
