@@ -9,7 +9,7 @@ window.Engine = (function() {
   function Engine(container) {
     this.container = container;
     this.el = document.createElement('div');
-    this.status = new Status(container);
+    this.status = new Status(this.el);
     this.el.id = 'screen';
     this.connection = new Connection();
     this.time = new TimeSync();

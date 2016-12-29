@@ -11,7 +11,7 @@ window.Status = (() => {
 
   Status.prototype.init = function() {
     this.el.appendChild(this.status);
-    document.body.appendChild(this.el);
+    this.container.appendChild(this.el);
   };
 
   Status.prototype.setStatus = function(text) {

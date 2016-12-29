@@ -103,27 +103,6 @@ p {
   top: -200%;
 }
 
-#status {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  height: var(--status-height);
-  width: var(--board-dimension);
-}
-
-#status button {
-  font-family: 'Press Start 2P';
-  color: var(--console-green);
-}
-
-
-#status-text {
-  text-align: center;
-  padding-top: calc(var(--status-height) / 3);
-}
-
 #board {
   position: relative;
   background-color: black;
@@ -139,6 +118,21 @@ p {
   height: var(--square-dimension);
   width: var(--square-dimension);
   border: 1px solid var(--console-green);
+}
+
+#status {
+  position: absolute;
+  top: calc(0vmin - var(--status-height));
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  height: var(--status-height);
+  width: var(--board-dimension);
+}
+
+#status-text {
+  text-align: center;
+  padding-top: calc(var(--status-height) / 3);
 }
 
 #board .red {
