@@ -28,6 +28,7 @@ staticFile = new nodeStatic.Server(SITE_PATH);
 server = http.createServer((req, res) => {
   req.addListener('end', staticFile.serve.bind(staticFile, req, res)).resume();
 }).listen(PORT)
+console.log(`Listening on ${BASE_URL}`);
 
 // WebSocket Server.
 websockets = new ws.Server({ server: server, port: WS_PORT });
