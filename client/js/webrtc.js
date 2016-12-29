@@ -51,8 +51,8 @@ window.WebRTC = (function() {
       this.dataChannelHandler.bind(this);
   };
 
-  WebRTC.prototype.connect = function(peerId, nicename) {
-    return this.socket.sendCommand('ask', peerId, nicename).then((response) => {
+  WebRTC.prototype.connect = function(peerId) {
+    return this.socket.sendCommand('ask', peerId).then((response) => {
       if (response !== 'yes') {
         var err = new Error('peer will not play you');
         throw err;
@@ -182,11 +182,6 @@ window.WebRTC = (function() {
   };
 
   WebRTC.prototype.askHandler = function(err, peerId, nicename) {
-    if (err) {
-      console.log('could not send ask', peerId, nicename, err);
-      return;
-    }
-
     if (confirm(`${nicename} is asking to play you`)) {
       this.setAuthorizedPeer(peerId, nicename);
       this.socket.send('ask_ack', peerId, 'yes');

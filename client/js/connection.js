@@ -33,8 +33,8 @@ window.Connection = (function() {
     });
   };
 
-  Connection.prototype.connect = function(peerId, nicename) {
-    return this.webRTC.connect(peerId, nicename);
+  Connection.prototype.connect = function(peerId) {
+    return this.webRTC.connect(peerId);
   };
 
   Connection.prototype.registerHandler = function(type, cb) {

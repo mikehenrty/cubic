@@ -88,6 +88,11 @@ function handleMessage(socket, message) {
     return;
   }
 
+  // Append client's nicename to ask requests.
+  if (type === 'ask') {
+    payload = Utility.guidToNiceName(sender);
+  }
+
   var message = `${type} ${sender} ${payload}`;
   console.debug(`sending ${message}\n`);
   clients[recipient].send(message);
