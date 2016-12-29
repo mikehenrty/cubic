@@ -1,17 +1,21 @@
 'use strict';
 
 var os = require('os');
+var path = require('path');
 var ws = require('ws');
-var StaticServer = require('./lib/static_server.js');
-var Utility = require('./lib/utility.js');
+var http = require('http');
+var nodeStatic = require('node-static')
 var console = require('./lib/console_debug.js');
+var Utility = require('./lib/utility.js');
 
 const DEBUG = false;  // set to true for debug logging.
 const PORT = 8021;
 const WS_PORT = 8022;
 const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;
+const BASE_PATH = path.resolve(__dirname, '../');
+const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
-var server, websockets;
+var server, staticFile, websockets;
 var clients = {}; // websocket clients
 console.setDebug(DEBUG);
 
@@ -19,10 +23,11 @@ function debugClientList() {
   console.debug(`LIST: ${Utility.guidToNicename(Object.keys(clients))}`);
 }
 
-
 // Web Server.
-server = StaticServer.create(PORT);
-console.log(`Listening on ${BASE_URL}`);
+staticFile = new nodeStatic.Server(SITE_PATH);
+server = http.createServer((req, res) => {
+  req.addListener('end', staticFile.serve.bind(staticFile, req, res)).resume();
+}).listen(PORT)
 
 // WebSocket Server.
 websockets = new ws.Server({ server: server, port: WS_PORT });

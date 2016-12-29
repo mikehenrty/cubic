@@ -4,8 +4,9 @@
     "start": "node server/main.js"
   },
   "dependencies": {
-    "ws": "1.1.0",
     "bufferutil": "1.2.x",
-    "utf-8-validate": "1.2.x"
+    "node-static": "0.7.x",
+    "utf-8-validate": "1.2.x",
+    "ws": "1.1.0"
   }
 }
