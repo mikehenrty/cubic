@@ -18,8 +18,8 @@ window.Connection = (function() {
     return this.webRTC && this.webRTC.isConnected();
   };
 
-  Connection.prototype.init = function() {
-    return this.socket.init().then(clientData => {
+  Connection.prototype.init = function(suggestedNicename) {
+    return this.socket.init(suggestedNicename).then(clientData => {
       this.clientId = clientData.clientId;
       this.clientName = clientData.clientName;
       this.webRTC = new WebRTC(this.clientId, this.socket);

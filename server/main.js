@@ -16,7 +16,7 @@ var clients = {}; // websocket clients
 console.setDebug(DEBUG);
 
 function debugClientList() {
-  console.debug(`LIST: ${Utility.guidToNiceName(Object.keys(clients))}`);
+  console.debug(`LIST: ${Utility.guidToNicename(Object.keys(clients))}`);
 }
 
 
@@ -33,8 +33,9 @@ websockets.on('connection', socket => {
   });
 
   socket.on('close', () => {
-    console.debug(`disconnect ${Utility.guidToNiceName(socket.clientId)}`);
+    console.debug(`disconnect ${Utility.guidToNicename(socket.clientId)}`);
     delete clients[socket.clientId];
+    Utility.deleteGuid(socket.clientId);
     debugClientList();
   });
 });
@@ -46,13 +47,13 @@ function handleMessage(socket, message) {
   var recipient = parts.shift();
   var payload = parts.join(' ');
 
-  console.debug('\n', type, Utility.guidToNiceName(sender),
-    Utility.guidToNiceName(recipient), payload);
+  console.debug('\n', type, Utility.guidToNicename(sender),
+    Utility.guidToNicename(recipient), payload);
 
   // Register is the only message handled by the server.
   if (type === 'register') {
     var newClientId = Utility.guid();
-    var clientName = Utility.guidToNiceName(newClientId);
+    var clientName = Utility.guidToNicename(newClientId, payload);
     clients[newClientId] = socket;
     socket.clientId = newClientId;
     socket.send(`register_ack ${sender} ${newClientId} ${clientName}`);
@@ -63,7 +64,7 @@ function handleMessage(socket, message) {
     var listInfo = Object.keys(clients).map((clientId) => {
       return {
         clientId: clientId,
-        clientName: Utility.guidToNiceName(clientId)
+        clientName: Utility.guidToNicename(clientId)
       };
     });
     socket.send(`list_ack ${sender} ${JSON.stringify(listInfo)}`);
@@ -71,7 +72,7 @@ function handleMessage(socket, message) {
   }
 
   if (type === 'setname') {
-    if (!Utility.setNiceName(sender, payload)) {
+    if (!Utility.setNicename(sender, payload)) {
       console.debug(`name ${sender} ${payload}`);
       socket.send(`error ${type}_ack ${recipient} ${payload}`);
       return;
@@ -90,7 +91,7 @@ function handleMessage(socket, message) {
 
   // Append client's nicename to ask requests.
   if (type === 'ask') {
-    payload = Utility.guidToNiceName(sender);
+    payload = Utility.guidToNicename(sender);
   }
 
   var message = `${type} ${sender} ${payload}`;

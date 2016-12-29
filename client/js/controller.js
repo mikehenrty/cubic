@@ -34,6 +34,7 @@ window.Controller = (function() {
       // Hide name.
       this.ui.show({ clientName: '...' });
       this.engine.setName(newName).then(() => {
+        this.storeName(newName);
         this.showUI();
       }).catch((err) => {
         console.log('Name set error', err);
@@ -45,7 +46,8 @@ window.Controller = (function() {
     this.engine.onDisconnect(this.showUI.bind(this));
     this.engine.onConnect(this.showBoard.bind(this));
 
-    return this.engine.init().then(clientId => {
+    return this.engine.init(this.fetchName()).then(clientId => {
+      this.storeName(this.engine.getClientName());
       var peerId = Utility.getPeerId();
       if (!peerId) {
         this.showUI();
@@ -56,6 +58,15 @@ window.Controller = (function() {
       console.log('Engine init error', err);
       this.showUI();
     });
+  };
+
+  Controller.prototype.storeName = function(name) {
+    localStorage.name = name;
+  };
+
+  Controller.prototype.fetchName = function() {
+    console.log('getting name', localStorage.name);
+    return localStorage.name;
   };
 
   return Controller;

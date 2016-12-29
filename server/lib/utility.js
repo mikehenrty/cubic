@@ -2,35 +2,53 @@
 
 var clientCount = 0;
 var clientNames = {};
+var clientIds = {};
 
-function guidToNiceName(guid) {
-  if (guid === '') {
+function guidToNicename(guid, suggestedNicename) {
+  if (guid === undefined || guid === '') {
     return '---';
   }
   if (clientNames[guid]) {
-    return clientNames[guid]
+    // YUCK
+    suggestedNicename && module.exports.setNicename(guid, suggestedNicename);
+    return clientNames[guid];
   }
-  clientNames[guid] = 'Player_' + ++clientCount;
-  return clientNames[guid];
+
+  // Make sure the suggested nicename is not in use.
+  var name = (suggestedNicename && !clientIds[suggestedNicename]) ?
+    suggestedNicename : 'Player_' + ++clientCount;
+  clientNames[guid] = name;
+  clientIds[name] = guid;
+
+  return name;
 }
 
 module.exports = {
-  guidToNiceName: function(guid) {
+  guidToNicename: function(guid, suggestedNicename) {
     if (Array.isArray(guid)) {
       return guid.map(id => {
-        return guidToNiceName(id);
+        return guidToNicename(id, suggestedNicename);
       });
     }
 
-    return guidToNiceName(guid);
+    return guidToNicename(guid, suggestedNicename);
   },
 
-  setNiceName: function(guid, name) {
-    if (!clientNames[guid]) {
+  // TODO: Bad practic, refactor to Name manager.
+  deleteGuid: function(guid) {
+    delete clientIds[clientNames[guid]];
+    delete clientNames[guid];
+  },
+
+  setNicename: function(guid, name) {
+    if (!clientNames[guid] || clientIds[name]) {
       return false;
     }
 
+    // Remove old name.
+    delete clientIds[clientNames[guid]];
     clientNames[guid] = name;
+    clientIds[name] = guid;
     return true;
   },
 

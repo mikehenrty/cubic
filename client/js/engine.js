@@ -24,8 +24,8 @@ window.Engine = (function() {
     this.offlineMode = false;
   }
 
-  Engine.prototype.init = function() {
-    return this.connection.init().then(id => {
+  Engine.prototype.init = function(suggestedNicename) {
+    return this.connection.init(suggestedNicename).then(id => {
       this.container.appendChild(this.el);
       document.addEventListener('keydown', evt => {
         this.handleKeyForMe(evt.key);

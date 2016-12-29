@@ -75,19 +75,20 @@ window.Socket = (function() {
     });
   };
 
-  Socket.prototype.init = function() {
+  Socket.prototype.init = function(suggestedNicename) {
     if (this.initialized) {
       return Promise.resolve();
     }
 
-    return this.sendCommand('register').then(payload => {
-      this.initialized = true;
-      var parts = payload.split(' ');
-      return {
-        clientId: parts[0],
-        clientName: parts[1]
-      };
-    });
+    return this.sendCommand('register', null, suggestedNicename).then(
+      (payload) => {
+        this.initialized = true;
+        var parts = payload.split(' ');
+        return {
+          clientId: parts[0],
+          clientName: parts[1]
+        };
+      });
   };
 
   return Socket;
