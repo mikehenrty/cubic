@@ -1,5 +1,5 @@
 {
-  "name": "latency-test",
+  "name": "cubic",
   "scripts": {
     "start": "node server/main.js"
   },
