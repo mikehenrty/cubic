@@ -6,7 +6,7 @@ var ws = require('ws');
 var http = require('http');
 var nodeStatic = require('node-static')
 var console = require('./lib/console_debug.js');
-var Utility = require('./lib/utility.js');
+var ClientList = require('./lib/client_list.js');
 
 const DEBUG = false;  // set to true for debug logging.
 const PORT = 8021;
@@ -16,11 +16,11 @@ const BASE_PATH = path.resolve(__dirname, '../');
 const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
 var server, staticFile, websockets;
-var clients = {}; // websocket clients
+var clients = new ClientList();
 console.setDebug(DEBUG);
 
 function debugClientList() {
-  console.debug(`LIST: ${Utility.guidToNicename(Object.keys(clients))}`);
+  console.debug(`LIST: ${clients.getNameList()}\n`);
 }
 
 // Web Server.
@@ -39,9 +39,8 @@ websockets.on('connection', socket => {
   });
 
   socket.on('close', () => {
-    console.debug(`disconnect ${Utility.guidToNicename(socket.clientId)}`);
-    delete clients[socket.clientId];
-    Utility.deleteGuid(socket.clientId);
+    console.debug(`disconnect ${clients.getNicename(socket.clientId)}`);
+    clients.remove(socket.clientId);
     debugClientList();
   });
 });
@@ -53,24 +52,23 @@ function handleMessage(socket, message) {
   var recipient = parts.shift();
   var payload = parts.join(' ');
 
-  console.debug('\n', type, Utility.guidToNicename(sender),
-    Utility.guidToNicename(recipient), payload);
+  console.debug(type, clients.getNicename(sender),
+    clients.getNicename(recipient), payload);
 
   // Register is the only message handled by the server.
   if (type === 'register') {
-    var newClientId = Utility.guid();
-    var clientName = Utility.guidToNicename(newClientId, payload);
-    clients[newClientId] = socket;
-    socket.clientId = newClientId;
-    socket.send(`register_ack ${sender} ${newClientId} ${clientName}`);
+    var clientId = clients.add(socket, payload);
+    var clientName = clients.getNicename(clientId);
+    socket.clientId = clientId;
+    socket.send(`register_ack ${sender} ${clientId} ${clientName}`);
     return;
   }
 
   if (type === 'list') {
-    var listInfo = Object.keys(clients).map((clientId) => {
+    var listInfo = clients.getIdList().map((clientId) => {
       return {
         clientId: clientId,
-        clientName: Utility.guidToNicename(clientId)
+        clientName: clients.getNicename(clientId),
       };
     });
     socket.send(`list_ack ${sender} ${JSON.stringify(listInfo)}`);
@@ -78,9 +76,9 @@ function handleMessage(socket, message) {
   }
 
   if (type === 'setname') {
-    if (!Utility.setNicename(sender, payload)) {
+    if (!clients.setNicename(sender, payload)) {
       console.debug(`name ${sender} ${payload}`);
-      socket.send(`error ${type}_ack ${recipient} ${payload}`);
+      socket.send(`error setname_ack ${recipient} ${payload}`);
       return;
     }
 
@@ -89,18 +87,18 @@ function handleMessage(socket, message) {
   }
 
   // Pass message on to recipient, whatever it may mean.
-  if (!clients[recipient]) {
-    console.debug(`unrecognized ${recipient} ${Object.keys(clients)}\n`);
+  if (!clients.exists(recipient)) {
+    console.debug(`unrecognized ${recipient} ${clients.getIdList()}`);
     socket.send(`error ${type}_ack ${recipient} ${payload}`);
     return;
   }
 
   // Append client's nicename to ask requests.
   if (type === 'ask') {
-    payload = Utility.guidToNicename(sender);
+    payload = clients.getNicename(sender);
   }
 
   var message = `${type} ${sender} ${payload}`;
-  console.debug(`sending ${message}\n`);
-  clients[recipient].send(message);
+  console.debug(`sending ${message}`);
+  clients.send(recipient, message);
 }
