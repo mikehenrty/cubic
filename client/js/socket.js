@@ -34,14 +34,14 @@ window.Socket = (function() {
     var sender = parts.shift();
     var payload = parts.join(' ');
     var args = [sender, payload];
-    error = error ? `could not complete ${payload}` : null;
+    error = error ? `could not complete ${type}` : null;
     args.unshift(error);
     this.handlers[type] && this.handlers[type].forEach(handler => {
       handler.apply(null, args);
     });
   };
 
-  Socket.prototype.send = function(type, recipient, payload, cb) {
+  Socket.prototype.send = function(type, recipient, payload) {
     return this._ensureSocket().then(() => {
       recipient = recipient || '';
       payload = payload || '';
@@ -56,14 +56,22 @@ window.Socket = (function() {
     this.handlers[type].push(cb);
   };
 
-  Socket.prototype.sendCommand = function(command, payload) {
+  Socket.prototype.sendCommand = function(command, recipient, payload) {
     return new Promise((res, rej) => {
       this.registerHandler(`${command}_ack`,
+                           // Note: memory leak for every command.
                            Utility.once((err, sender, payload) => {
-        return err ? rej(err) : res(payload);
+        if (err) {
+          rej(err);
+        } else if (recipient && recipient !== sender) {
+          console.log('ack unrecognized peer', recipient, sender, command);
+          rej(new Error(`sendMessage ack from unrecognized peer ${sender}`));
+        } else {
+          res(payload);
+        }
       }));
 
-      this.send(command, null, payload);
+      this.send(command, recipient, payload);
     });
   };
 

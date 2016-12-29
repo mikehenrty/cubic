@@ -74,9 +74,9 @@ window.Engine = (function() {
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
-    this.status.setStatus('Connecting to peer...');
+    console.log('attempting to connect to', peerId);
     this.setPlayer(2);
-    return this.connection.connect(peerId).then(() => {
+    return this.connection.connect(peerId, this.getClientName()).then(() => {
       return this.time.sync();
     }).then(ping => {
       this.setReadyStatus(ping);

@@ -73,7 +73,7 @@ function handleMessage(socket, message) {
   if (type === 'setname') {
     if (!Utility.setNiceName(sender, payload)) {
       console.debug(`name ${sender} ${payload}`);
-      socket.send(`error ${type} ${recipient} ${payload}`);
+      socket.send(`error ${type}_ack ${recipient} ${payload}`);
       return;
     }
 
@@ -84,10 +84,11 @@ function handleMessage(socket, message) {
   // Pass message on to recipient, whatever it may mean.
   if (!clients[recipient]) {
     console.debug(`unrecognized ${recipient} ${Object.keys(clients)}\n`);
-    socket.send(`error ${type} ${recipient} ${payload}`);
+    socket.send(`error ${type}_ack ${recipient} ${payload}`);
     return;
   }
 
-  console.debug(`sending ${type}\n`);
-  clients[recipient].send(`${type} ${sender} ${payload}`);
+  var message = `${type} ${sender} ${payload}`;
+  console.debug(`sending ${message}\n`);
+  clients[recipient].send(message);
 }

@@ -23,7 +23,8 @@ window.Connection = (function() {
       this.clientId = clientData.clientId;
       this.clientName = clientData.clientName;
       this.webRTC = new WebRTC(this.clientId, this.socket);
-      this.webRTC.onConnnection((err, peerId) => {
+
+      this.webRTC.onConnection((err, peerId) => {
         if (!err) {
           this.connectionHandler && this.connectionHandler(peerId);
         }
@@ -32,16 +33,8 @@ window.Connection = (function() {
     });
   };
 
-  Connection.prototype.connect = function(peerId) {
-    return new Promise((res, rej) => {
-      this.webRTC.connect(peerId, err => {
-        if (err) {
-          rej(err);
-        } else {
-          res();
-        }
-      });
-    });
+  Connection.prototype.connect = function(peerId, nicename) {
+    return this.webRTC.connect(peerId, nicename);
   };
 
   Connection.prototype.registerHandler = function(type, cb) {
@@ -55,7 +48,7 @@ window.Connection = (function() {
   };
 
   Connection.prototype.setName = function(name) {
-    return this.socket.sendCommand('setname', name).then(() => {
+    return this.socket.sendCommand('setname', null, name).then(() => {
       this.clientName = name;
       return name;
     });

@@ -10,18 +10,27 @@ window.WebRTC = (function() {
     this.clientId = clientId;
     this.socket = socket;
     this.peerId = null;
+    this.authorizedPeer = null;
     this.dataChannel = null;
     this.handlers = {};
     this.queue = new Utility.Queue();
     this.connectHandlers = new Utility.Handlers();
     this.disconnectHandler = null;
 
-    this.socket.registerHandler('signaling',
-      this.signalHandler.bind(this));
+    this.socket.registerHandler('signaling', this.signalHandler.bind(this));
+    this.socket.registerHandler('ask', this.askHandler.bind(this));
   }
 
   WebRTC.prototype.isConnected = function() {
     return this.dataChannel && this.dataChannel.readyState === 'open';
+  };
+
+  WebRTC.prototype.setAuthorizedPeer = function(peerId, nicename) {
+    // Null peerId clears authorized peer.
+    this.authorizedPeer = peerId && {
+      peerId: peerId,
+      nicename: nicename
+    };
   };
 
   WebRTC.prototype.initPeerConnection = function(peerId) {
@@ -42,23 +51,47 @@ window.WebRTC = (function() {
       this.dataChannelHandler.bind(this);
   };
 
-  WebRTC.prototype.connect = function(peerId, cb) {
-    this.initPeerConnection(peerId);
-    this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL);
-    this.dataChannel.onopen = this.dataChannel.onclose =
-      this.dataChannelStateChange.bind(this);
-    this.dataChannel.onmessage = this.onMessage.bind(this);
+  WebRTC.prototype.connect = function(peerId, nicename) {
+    return this.socket.sendCommand('ask', peerId, nicename).then((response) => {
+      if (response !== 'yes') {
+        var err = new Error('peer will not play you');
+        throw err;
+      }
 
-    this.connectHandlers.add(Utility.once(cb));
-    this.peerConnection.createOffer().then(offer => {
-      this.peerConnection.setLocalDescription(offer);
-      this.sendSignal('offer', offer);
-    }).catch(err => {
-      this.connectHandlers.fail(err);
+      this.setAuthorizedPeer(peerId);
+      this.initPeerConnection(peerId);
+      this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL);
+      this.dataChannel.onopen = this.dataChannel.onclose =
+        this.dataChannelStateChange.bind(this);
+      this.dataChannel.onmessage = this.onMessage.bind(this);
+
+      return this.peerConnection.createOffer().then(offer => {
+        this.peerConnection.setLocalDescription(offer);
+        this.sendSignal('offer', offer);
+        return this.promiseNextConnection(peerId);
+      }).catch(err => {
+        this.connectHandlers.fail(err);
+        throw err;
+      });
     });
   };
 
-  WebRTC.prototype.onConnnection = function(cb) {
+  WebRTC.prototype.promiseNextConnection = function(originalPeerId) {
+    return new Promise((res, rej) => {
+      // Note: memory leak. Change to de-register this if we ever use it often.
+      this.connectHandlers.add(Utility.once((err, peerId) => {
+        if (err) {
+          rej(err);
+        } else if (peerId !== originalPeerId) {
+          rej(new Error(`connected to unintended peer, ${peerId}`));
+        } else {
+          res(peerId);
+        }
+      }));
+    });
+  };
+
+  WebRTC.prototype.onConnection = function(cb) {
     this.connectHandlers.add(cb);
   };
 
@@ -112,6 +145,11 @@ window.WebRTC = (function() {
       return;
     }
 
+    if (!this.authorizedPeer || this.authorizedPeer.peerId !== peerId) {
+      console.log('attempted signal from unauthorized peer', peerId, message);
+      return;
+    }
+
     if (peerId !== this.peerId) {
       this.initPeerConnection(peerId);
     }
@@ -142,6 +180,21 @@ window.WebRTC = (function() {
         break;
     }
   };
+
+  WebRTC.prototype.askHandler = function(err, peerId, nicename) {
+    if (err) {
+      console.log('could not send ask', peerId, nicename, err);
+      return;
+    }
+
+    if (confirm(`${nicename} is asking to play you`)) {
+      this.setAuthorizedPeer(peerId, nicename);
+      this.socket.send('ask_ack', peerId, 'yes');
+    } else {
+      this.socket.send('ask_ack', peerId, 'no');
+    }
+  };
+
 
   WebRTC.prototype.handleSignalAnswer = function(data, cb) {
     this.peerConnection.setRemoteDescription(
