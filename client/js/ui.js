@@ -61,6 +61,7 @@ window.UI = (function() {
     this.content.appendChild(this.listContainer);
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
+    this.hide();
   };
 
   UI.prototype.registerHandler = function(type, cb) {

@@ -53,6 +53,8 @@ window.Controller = (function() {
         this.showUI();
         return;
       }
+
+      this.showBoard();
       return this.engine.connectToPeer(peerId);
     }).catch(err => {
       console.log('Engine init error', err);

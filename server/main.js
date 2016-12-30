@@ -24,7 +24,7 @@ function debugClientList() {
 }
 
 // Web Server.
-staticFile = new nodeStatic.Server(SITE_PATH);
+staticFile = new nodeStatic.Server(SITE_PATH, { cache: false});
 server = http.createServer((req, res) => {
   req.addListener('end', staticFile.serve.bind(staticFile, req, res)).resume();
 }).listen(PORT);
