@@ -1,8 +1,8 @@
 window.Engine = (function() {
   'use strict';
 
-  const COLS = 10;
-  const ROWS = 10;
+  const COLS = CONST.COLS;
+  const ROWS = CONST.ROWS;
 
   const START_DELAY = 1000;
 

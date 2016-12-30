@@ -1,7 +1,7 @@
 window.Board = (function() {
   'use strict';
 
-  const STARTING_TILES = 13;
+  const STARTING_TILES = CONST.STARTING_TILES;
 
   function Board(engine, cols, rows) {
     this.engine = engine;
