@@ -38,10 +38,11 @@ window.Engine = (function() {
                                       this.handleDisconnect.bind(this));
       this.connection.onPeerConnect(this.handleConnect.bind(this));
       this.connection.registerHandler('ready', this.handleReady.bind(this));
+
       this.connection.registerHandler('start', this.handleStart.bind(this));
       this.time.init(this.connection);
       this.status.init();
-      this.status.onAgain(this.handleAgain.bind(this));
+      this.status.onAgain(this.handleAgainButton.bind(this));
       this.board.init();
       this.hideBoard();
       this.player1.init();
@@ -369,7 +370,7 @@ window.Engine = (function() {
     this.reset();
   };
 
-  Engine.prototype.handleAgain = function() {
+  Engine.prototype.handleAgainButton = function() {
     if (this.offlineMode) {
       this.startOffline();
       return;

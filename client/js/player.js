@@ -35,6 +35,7 @@ window.Player = (function() {
     this.scoreEl = document.createElement('div');
     this.scoreEl.className = 'score';
     this.scoreEl.id = `player-${this.playerNumber}`;
+    this.moves = [];
     this.nextMove = null;
     this.reset();
   }
@@ -63,7 +64,11 @@ window.Player = (function() {
   Player.prototype.startMove = function(move, duration) {
     this.moves.push(move);
     this.el.classList.add('moving', move);
-    this.setMovePosition(move, duration);
+    var position = this.getMovePosition(move);
+    if (!position) {
+      return false;
+    }
+    this.setPosition(position.x, position.y, duration);
   };
 
   // Returns true if points were added on this move.
@@ -76,6 +81,8 @@ window.Player = (function() {
     }
 
     this.cube.move(move);
+
+    // TODO: move this logic into engine
     if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
         this.board.getColor(this.x, this.y)) {
       this.board.pickUpTile(this.x, this.y)
@@ -166,14 +173,6 @@ window.Player = (function() {
     return { x: x, y: y };
   };
 
-  Player.prototype.setMovePosition = function(move, duration) {
-    var position = this.getMovePosition(move);
-    if (!position) {
-      return false;
-    }
-    this.setPosition(position.x, position.y, duration);
-  };
-
   Player.prototype.reset = function() {
     if (this.playerNumber === 1) {
       this.x = 0;
@@ -187,7 +186,7 @@ window.Player = (function() {
     this.scoreEl.textContent = this.points;
     this.cube.reset();
     this.el.classList.remove('moving');
-    this.update();
+    this.update(0);
   };
 
   return Player;
