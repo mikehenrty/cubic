@@ -54,12 +54,14 @@ window.Controller = (function() {
     return this.engine.init(this.fetchName()).then(clientId => {
       this.storeName(this.engine.getClientName());
       var peerId = Utility.getPeerId();
-      if (!peerId) {
-        this.showUI();
+      if (peerId) {
+        // Take peerId out of the URL.
+        history.replaceState(null, document.title, '/');
+        return this.attemptConnect(peerId);
         return;
       }
 
-      return this.attemptConnect(peerId);
+      this.showUI();
     }).catch(err => {
       console.log('Engine init error', err);
       this.showUI();
