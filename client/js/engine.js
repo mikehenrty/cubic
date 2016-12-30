@@ -41,6 +41,7 @@ window.Engine = (function() {
       this.connection.registerHandler('start', this.handleStart.bind(this));
       this.time.init(this.connection);
       this.status.init();
+      this.status.onAgain(this.handleAgain.bind(this));
       this.board.init();
       this.hideBoard();
       this.player1.init();
@@ -355,17 +356,26 @@ window.Engine = (function() {
 
   Engine.prototype.endGame = function() {
     if (this.player1.points === this.player2.points) {
-      this.status.setStatus('It\'s a tie');
+      this.status.setGameOverStatus('It\'s a tie');
     } else {
       var winner = this.player1.points > this.player2.points ?
                      this.player1 : this.player2;
       if (this.offlineMode) {
-        this.status.setStatus(`Player ${winner.playerNumber} wins!`);
+        this.status.setGameOverStatus(`Player ${winner.playerNumber} wins!`);
       } else {
-        this.status.setStatus(`You ${winner === this.me ? 'win' : 'lose'}`);
+        this.status.setGameOverStatus(`You ${winner === this.me ? 'win' : 'lose'}`);
       }
     }
     this.reset();
+  };
+
+  Engine.prototype.handleAgain = function() {
+    if (this.offlineMode) {
+      this.startOffline();
+      return;
+    }
+
+    // TODO: online restart logic, wait for both to be ready
   };
 
   Engine.prototype.reset = function() {
