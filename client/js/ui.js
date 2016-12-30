@@ -90,6 +90,7 @@ window.UI = (function() {
       if (options.clientList.length > 1) {
         options.clientList.forEach(clientInfo => {
           if (clientInfo.clientId === options.clientId) {
+            // Don't show link to join self.
             return;
           }
           var clientRow = document.createElement('p');
@@ -97,6 +98,11 @@ window.UI = (function() {
           var joinButton = document.createElement('a');
           joinButton.textContent = 'Join';
           joinButton.href = Utility.getPeerLink(clientInfo.clientId);
+          joinButton.onclick = evt => {
+            evt.preventDefault();
+            this.trigger('join', clientInfo.clientId);
+          };
+
           clientRow.appendChild(joinButton);
           this.listContainer.appendChild(clientRow);
         });

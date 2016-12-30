@@ -42,6 +42,11 @@ window.Controller = (function() {
       });
     });
 
+    this.ui.registerHandler('join', peerId => {
+      console.log('attempting to connect', peerId);
+      this.attemptConnect(peerId);
+    });
+
     this.ui.init();
     this.engine.onDisconnect(this.showUI.bind(this));
     this.engine.onConnect(this.showBoard.bind(this));
@@ -54,8 +59,7 @@ window.Controller = (function() {
         return;
       }
 
-      this.showBoard();
-      return this.engine.connectToPeer(peerId);
+      return this.attemptConnect(peerId);
     }).catch(err => {
       console.log('Engine init error', err);
       this.showUI();
@@ -67,8 +71,15 @@ window.Controller = (function() {
   };
 
   Controller.prototype.fetchName = function() {
-    console.log('getting name', localStorage.name);
     return localStorage.name;
+  };
+
+  Controller.prototype.attemptConnect = function(peerId) {
+    this.showBoard();
+    return this.engine.connectToPeer(peerId).catch(err => {
+      console.log('could not connect', err, peerId);
+      this.showUI();
+    });
   };
 
   return Controller;
