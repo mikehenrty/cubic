@@ -27,7 +27,7 @@ function debugClientList() {
 staticFile = new nodeStatic.Server(SITE_PATH);
 server = http.createServer((req, res) => {
   req.addListener('end', staticFile.serve.bind(staticFile, req, res)).resume();
-}).listen(PORT)
+}).listen(PORT);
 console.log(`Listening on ${BASE_URL}`);
 
 // WebSocket Server.
