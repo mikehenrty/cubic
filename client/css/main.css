@@ -71,11 +71,12 @@ p {
   background-color: #18d8e3;
   color: white;
   font-size: calc(var(--board-dimension) / 30);
-  border-radius: 10px;
-  padding: 10px;
+  box-sizing: border-box;
+  padding: 3vmin;
 }
 
 #ui #content p {
+  line-height: calc(var(--board-dimension) / 20);
   height: calc(var(--board-dimension) / 20);
 }
 
@@ -89,6 +90,8 @@ p {
 
 #name-container {
   animation: color-change 2s infinite;
+  font-size: 4vmin;
+  line-height: 4vmin;
 }
 
 #ui-status {

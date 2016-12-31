@@ -14,7 +14,7 @@ window.UI = (function() {
     this.nameContainer = document.createElement('span');
     this.nameContainer.id = 'name-container';
     this.changeNameButton = document.createElement('a');
-    this.changeNameButton.textContent = 'Change Name';
+    this.changeNameButton.textContent = 'Rename';
     this.welcomeContainer.appendChild(this.nameContainer);
     this.welcomeContainer.appendChild(this.changeNameButton);
 
