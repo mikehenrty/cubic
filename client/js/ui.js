@@ -8,8 +8,17 @@ window.UI = (function() {
     this.content = document.createElement('div');
     this.content.id = 'content';
     this.welcomeContainer = document.createElement('p');
+    this.welcomeContainer.textContent = 'Welcome ';
+    this.nameContainer = document.createElement('span');
+    this.nameContainer.id = 'name-container';
     this.changeNameButton = document.createElement('a');
     this.changeNameButton.textContent = 'Change Name';
+    this.welcomeContainer.appendChild(this.nameContainer);
+    this.welcomeContainer.appendChild(this.changeNameButton);
+
+    this.status = document.createElement('p');
+    this.status.id = 'ui-status';
+    this.status.textContent = 'Shall we play a game?';
 
     this.actionButtons = document.createElement('p');
     this.actionButtons.id = 'action-buttons';
@@ -17,7 +26,7 @@ window.UI = (function() {
     this.linkInput.className = 'peer-link';
     this.linkButton = document.createElement('button');
     this.linkButton.className = 'link-button';
-    this.linkButton.textContent = 'Invite Friends';
+    this.linkButton.textContent = 'Invite Link';
     this.offlineButton = document.createElement('button');
     this.offlineButton.id = 'offline';
     this.offlineButton.textContent = 'Play Offline';
@@ -26,6 +35,9 @@ window.UI = (function() {
     this.actionButtons.appendChild(this.linkButton);
     this.actionButtons.appendChild(this.offlineButton);
 
+    var listHeader = document.createElement('p');
+    listHeader.textContent = 'Friends Online';
+    listHeader.id = 'list-header';
     this.listContainer = document.createElement('div');
     this.listContainer.id = 'list-container';
 
@@ -51,13 +63,13 @@ window.UI = (function() {
       }, 1000);
     });
 
-
     this.content.appendChild(this.welcomeContainer);
+    this.content.appendChild(this.status);
     this.content.appendChild(this.actionButtons);
+    this.content.appendChild(listHeader);
     this.content.appendChild(this.listContainer);
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
-    this.hide();
   }
 
   UI.prototype = new Eventer();
@@ -67,8 +79,7 @@ window.UI = (function() {
       this.linkInput.value = Utility.getPeerLink(options.clientId);
     }
     if (options.clientName) {
-      this.welcomeContainer.textContent = `You are: ${options.clientName}`;
-      this.welcomeContainer.appendChild(this.changeNameButton);
+      this.nameContainer.textContent = options.clientName;
     }
     if (options.clientList) {
       this.listContainer.innerHTML = '';

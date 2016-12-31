@@ -25,6 +25,7 @@ window.GameController = (function() {
     this.connection.on('peer', this.handlePeerConnection.bind(this));
     this.engine.on('gameover', this.displayGameOverStatus.bind(this));
     this.engine.on('ping', this.displayPing.bind(this));
+    this.hideBoard();
   }
 
   GameController.prototype = new Eventer();
@@ -47,6 +48,7 @@ window.GameController = (function() {
 
   GameController.prototype.register = function(name) {
     return this.connection.register(name).then(clientInfo => {
+      console.log('registered', clientInfo);
       this.clientId = clientInfo.clientId;
       this.clientName = clientInfo.clientName;
     });

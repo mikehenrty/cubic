@@ -57,8 +57,6 @@ window.GameEngine = (function() {
     this.player2.reset();
   };
 
-  ////////// MOVE LOGIC ///////////
-
   GameEngine.prototype.handleKeydown = function(evt) {
     if (!this.offlineMode) {
       this.handleKeyForMe(evt.key);

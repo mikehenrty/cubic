@@ -82,6 +82,15 @@ p {
   font-size: calc(var(--board-dimension) / 40);
 }
 
+#name-container {
+  animation: color-change 2s infinite;
+}
+
+#ui-status {
+  text-align: center;
+  color: yellow;
+}
+
 #action-buttons {
   border-bottom: calc(var(--board-dimension) / 120) dotted white;
   text-align: center;
@@ -94,6 +103,12 @@ p {
   color: white;
   font-size: calc(var(--board-dimension) / 30);
   background-color: transparent;
+}
+
+#list-header {
+  text-align: center;
+  text-decoration: underline;
+  color: gainsboro;
 }
 
 /* Hide the link input. */
@@ -208,4 +223,10 @@ p {
 .piece.moving.moveDown {
   border-bottom-width: 0vmin;
   border-top-width: calc(var(--square-dimension) - var(--border-width));
+}
+
+@keyframes color-change {
+  0% { color: brown; }
+  50% { color: magenta; }
+  100% { color: brown; }
 }
