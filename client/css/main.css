@@ -13,6 +13,7 @@
   --score-dimension: 8vmin;
   --border-width: 1.5vmin;
   --status-height: calc( (100vmin - var(--board-dimension) ) / 2);
+  --status-color: red;
   --fade-out-duration: 3s;
 
   --cube-color-red: purple;
@@ -78,6 +79,7 @@ p {
 #ui #content p {
   line-height: calc(var(--board-dimension) / 20);
   height: calc(var(--board-dimension) / 20);
+  padding: calc(var(--board-dimension) / 80) 0;
 }
 
 #ui #content a {
@@ -96,14 +98,19 @@ p {
 
 #ui-status {
   text-align: center;
-  color: red;
+  color: var(--status-color);
+  border: 1vmin dotted var(--status-color);
+  visibility: hidden;
+}
+
+#ui-status.fade-out {
+  visibility: visible;
 }
 
 #action-buttons {
   border-bottom: calc(var(--board-dimension) / 120) dotted white;
   text-align: center;
   margin-bottom: calc(var(--board-dimension) / 50);
-  padding: calc(var(--board-dimension) / 80) 0;
 }
 
 #action-buttons button {
@@ -234,7 +241,8 @@ p {
 }
 
 @keyframes fade-out {
-  0% { opacity: 1; }
+  0% { opacity: 0; }
+  10% { opacity: 1; }
   80% { opacity: 1; }
   100% { opacity: 0; }
 }

@@ -39,7 +39,7 @@ window.UI = (function() {
 
     var listHeader = document.createElement('p');
     listHeader.id = 'list-header';
-    listHeader.textContent = 'Friends Online';
+    listHeader.textContent = 'People Online';
     this.listContainer = document.createElement('div');
     this.listContainer.id = 'list-container';
 
@@ -117,8 +117,8 @@ window.UI = (function() {
     this.status.classList.add('fade-out');
     this.statusTimeout && clearTimeout(this.statusTimeout);
     this.statusTimeout = setTimeout(() => {
-      this.status.classList.remove('fade-out');
       this.status.textContent = '';
+      this.status.classList.remove('fade-out');
     }, STATUS_TIMEOUT);
   };
 
