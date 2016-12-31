@@ -4,9 +4,9 @@ var Utility = require('./utility.js');
 
 var clientCount = 0;
 
-function Client(nicename) {
+function Client(name) {
   this.id = Utility.guid();
-  this.name = nicename;
+  this.name = name;
 }
 
 function ClientList() {
@@ -19,9 +19,9 @@ ClientList.prototype.exists = function(clientId) {
   return !!this.clientInfo[clientId];
 };
 
-ClientList.prototype.add = function(socket, nicename) {
-  var newName = this.isEligibleName(nicename) ?
-    nicename : this.generateNicename();
+ClientList.prototype.add = function(socket, name) {
+  var newName = this.isEligibleName(name) ?
+    name : this.generateName();
   var newClient = new Client(newName);
 
   this.clientInfo[newClient.id] = {
@@ -52,15 +52,15 @@ ClientList.prototype.send = function(recipientId, message) {
   recipient.socket.send(message);
 };
 
-ClientList.prototype.generateNicename = function() {
+ClientList.prototype.generateName = function() {
   return `Player_${++this.clientCount}`;
 };
 
-ClientList.prototype.isEligibleName = function(nicename) {
-  return nicename && !this.clientIds[nicename];
+ClientList.prototype.isEligibleName = function(name) {
+  return name && !this.clientIds[name];
 };
 
-ClientList.prototype.getNicename = function(guid) {
+ClientList.prototype.getName = function(guid) {
   if (guid === undefined || guid === '' || !this.clientInfo[guid]) {
     return '---';
   }
@@ -68,7 +68,7 @@ ClientList.prototype.getNicename = function(guid) {
   return this.clientInfo[guid].name;
 };
 
-ClientList.prototype.setNicename = function(guid, name) {
+ClientList.prototype.setName = function(guid, name) {
   if (!this.clientInfo[guid] || this.clientIds[name]) {
     return false;
   }

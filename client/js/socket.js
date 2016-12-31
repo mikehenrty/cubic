@@ -7,7 +7,6 @@ window.Socket = (function() {
 
   function Socket() {
     this.ws = null;
-    this.initialized = false;
   }
 
   Socket.prototype = new Eventer();
@@ -69,12 +68,12 @@ window.Socket = (function() {
     });
   };
 
-  Socket.prototype.init = function(nicename) {
+  Socket.prototype.connectToServer = function(name) {
     if (this.initialized) {
       return Promise.resolve();
     }
 
-    return this.sendCommand('register', null, nicename).then(
+    return this.sendCommand('register', null, name).then(
       (payload) => {
         this.initialized = true;
         var parts = payload.split(' ');

@@ -23,11 +23,11 @@ window.WebRTC = (function() {
     return this.dataChannel && this.dataChannel.readyState === 'open';
   };
 
-  WebRTC.prototype.setAuthorizedPeer = function(peerId, nicename) {
+  WebRTC.prototype.setAuthorizedPeer = function(peerId, name) {
     // Null peerId clears authorized peer.
     this.authorizedPeer = peerId && {
       peerId: peerId,
-      nicename: nicename
+      name: name
     };
   };
 
@@ -142,9 +142,9 @@ window.WebRTC = (function() {
     }
   };
 
-  WebRTC.prototype.askHandler = function(err, peerId, nicename) {
-    if (confirm(`${nicename} is asking to play you`)) {
-      this.setAuthorizedPeer(peerId, nicename);
+  WebRTC.prototype.askHandler = function(err, peerId, name) {
+    if (confirm(`${name} is asking to play you`)) {
+      this.setAuthorizedPeer(peerId, name);
       this.socket.send('ask_ack', peerId, 'yes');
     } else {
       this.socket.send('ask_ack', peerId, 'no');

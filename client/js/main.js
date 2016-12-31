@@ -3,6 +3,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var container = document.body;
   var controller = new Controller(container);
-  controller.init();
-  controller.run();
+  controller.start();
 });

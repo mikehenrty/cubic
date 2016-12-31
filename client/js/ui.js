@@ -3,11 +3,6 @@ window.UI = (function() {
 
   function UI(container) {
     this.container = container;
-  }
-
-  UI.prototype = new Eventer();
-
-  UI.prototype.init = function() {
     this.el = document.createElement('div');
     this.el.id = 'ui';
     this.content = document.createElement('div');
@@ -63,7 +58,9 @@ window.UI = (function() {
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
     this.hide();
-  };
+  }
+
+  UI.prototype = new Eventer();
 
   UI.prototype.show = function(options) {
     if (options.clientId) {

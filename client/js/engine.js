@@ -7,6 +7,9 @@ window.Engine = (function() {
   const START_DELAY = 1000;
 
   function Engine(container) {
+    this.clientId = null;
+    this.clientName = null;
+
     this.container = container;
     this.el = document.createElement('div');
     this.status = new Status(this.el);
@@ -20,11 +23,6 @@ window.Engine = (function() {
     this.pendingMoves = {};
     this.lastMove = null;
     this.offlineMode = false;
-  }
-
-  Engine.prototype = new Eventer();
-
-  Engine.prototype.init = function() {
     this.time.init();
     this.status.init();
     this.board.init();
@@ -45,7 +43,9 @@ window.Engine = (function() {
     document.addEventListener('keydown', evt => {
       this.handleKeyForMe(evt.key);
     });
-  };
+  }
+
+  Engine.prototype = new Eventer();
 
   Engine.prototype.hideBoard = function() {
     this.el.classList.add('hide');
@@ -63,9 +63,10 @@ window.Engine = (function() {
     return this.connection.getList();
   };
 
-  Engine.prototype.connectToServer = function(nicename) {
-    return this.connection.init(nicename).then(id => {
-      return id;
+  Engine.prototype.register = function(name) {
+    return this.connection.register(name).then(clientInfo => {
+      this.clientId = clientInfo.clientId;
+      this.clientName = clientInfo.clientName;
     });
   };
 
@@ -117,11 +118,11 @@ window.Engine = (function() {
   };
 
   Engine.prototype.getClientId = function() {
-    return this.connection.clientId;
+    return this.clientId;
   };
 
   Engine.prototype.getClientName = function() {
-    return this.connection.clientName;
+    return this.clientName;
   };
 
   Engine.prototype.getPlayerNumber = function() {

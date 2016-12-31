@@ -4,7 +4,6 @@ window.Connection = (function() {
   const FAKE_LATENCY = CONST.FAKE_LATENCY;
 
   function Connection() {
-    this.clientId = null;
     this.socket = new Socket();
     this.webRTC = new WebRTC(this.socket);
   }
@@ -15,12 +14,13 @@ window.Connection = (function() {
     return this.webRTC && this.webRTC.isConnected();
   };
 
-  Connection.prototype.init = function(nicename) {
-    return this.socket.init(nicename).then(clientData => {
-      this.clientId = clientData.clientId;
-      this.clientName = clientData.clientName;
-
-      return this.clientId;
+  Connection.prototype.register = function(name) {
+    return this.socket.sendCommand('register', null, name).then(payload => {
+      var parts = payload.split(' ');
+      return {
+        clientId: parts[0],
+        clientName: parts[1]
+      };
     });
   };
 
