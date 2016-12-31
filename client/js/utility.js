@@ -48,22 +48,6 @@ window.Utility = (function() {
     this.errorHandler = cb;
   };
 
-  function Handlers() {
-    this.handlers = [];
-  }
-
-  Handlers.prototype.add = function(handler) {
-    this.handlers.push(handler);
-  };
-
-  Handlers.prototype.succeed = function(value) {
-    this.handlers.forEach(handler => { handler(null, value); });
-  };
-
-  Handlers.prototype.fail = function(err) {
-    this.handlers.forEach(handler => { handler(err); });
-  };
-
   var peerCount = 0;
   var peerNames = {};
   function niceId(guid) {
@@ -164,6 +148,5 @@ window.Utility = (function() {
 
     niceId: niceId,
     Queue: Queue,
-    Handlers: Handlers
   };
 })();

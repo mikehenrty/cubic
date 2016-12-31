@@ -28,9 +28,16 @@ window.Controller = (function() {
     this.ui.on('rename', this.renamePlayer.bind(this));
     this.ui.on('join', this.attemptToConnect.bind(this));
 
-    // this.engine.onAsk??
+    // TODO: move logic for starting game into this handler.
+    // ie. here we call engine.startGame or something.
+    this.engine.on('peer', this.showGame.bind(this));
+    // TODO: set status message of peer rejection.
+    this.engine.on('reject', peerId => {
+      alert(`${peerId} rejected you`);
+      this.showUI();
+    });
+    // TODO: set status message of peer disconnection.
     this.engine.on('disconnect', this.showUI.bind(this));
-    this.engine.onConnect(this.showGame.bind(this));
 
     this.ui.init();
     this.engine.init();
@@ -43,6 +50,7 @@ window.Controller = (function() {
       var peerId = Utility.getPeerId();
       if (peerId) {
         history.replaceState(null, document.title, '/');
+        // TODO: set status of connecting to peer.
         this.attemptToConnect(peerId);
         return;
       }
@@ -57,11 +65,8 @@ window.Controller = (function() {
   };
 
   Controller.prototype.attemptToConnect = function(peerId) {
-    this.showGame();
-    this.engine.connectToPeer(peerId).catch(err => {
-      console.log('could not connect', err, peerId);
-      this.showUI();
-    });
+    console.log('connecting to peer', peerId);
+    this.engine.connectToPeer(peerId);
   };
 
   Controller.prototype.startOfflineGame = function() {

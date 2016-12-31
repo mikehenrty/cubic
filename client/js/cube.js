@@ -33,7 +33,6 @@ window.Cube = (function() {
     this.setCubeColor('borderBottomColor', this.sides[SOUTH]);
     this.setCubeColor('borderLeftColor', this.sides[WEST]);
     this.setCubeColor('borderRightColor', this.sides[EAST]);
-    DEBUG && this.logColors();
   };
 
   Cube.prototype.setCubeColor = function(prop, color) {

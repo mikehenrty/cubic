@@ -2,7 +2,7 @@ window.CONST = (function() {
   'use strict';
 
   return {
-    DEBUG: 0,
+    DEBUG: false,
 
     // Simulated latency.
     FAKE_LATENCY: 0,

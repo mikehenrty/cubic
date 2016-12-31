@@ -1,6 +1,7 @@
 window.Socket = (function() {
   'use strict';
 
+  // TODO: configure this for local, dev, and prod somehow.
   const WS_PORT = 8022;
   const WS_HOST = 'ws://' + window.location.hostname + ':' + WS_PORT;
 
@@ -11,7 +12,7 @@ window.Socket = (function() {
 
   Socket.prototype = new Eventer();
 
-  Socket.prototype._ensureSocket = function(cb) {
+  Socket.prototype._ensureSocket = function() {
     if (this.ws) {
       return Promise.resolve();
     }

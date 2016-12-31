@@ -12,7 +12,6 @@ window.WebRTC = (function() {
     this.authorizedPeer = null;
     this.dataChannel = null;
     this.queue = new Utility.Queue();
-    this.connectHandlers = new Utility.Handlers();
 
     this.socket.on('signaling', this.signalHandler.bind(this));
     this.socket.on('ask', this.askHandler.bind(this));
@@ -51,12 +50,13 @@ window.WebRTC = (function() {
   };
 
   WebRTC.prototype.connect = function(peerId) {
-    return this.socket.sendCommand('ask', peerId).then((response) => {
+    this.socket.sendCommand('ask', peerId).then((response) => {
       if (response !== 'yes') {
-        var err = new Error('peer will not play you');
-        throw err;
+        this.trigger('reject', peerId);
+        return;
       }
 
+      // Start signaling process.
       this.setAuthorizedPeer(peerId);
       this.initPeerConnection(peerId);
       this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL);
@@ -67,31 +67,10 @@ window.WebRTC = (function() {
       return this.peerConnection.createOffer().then(offer => {
         this.peerConnection.setLocalDescription(offer);
         this.sendSignal('offer', offer);
-        return this.promiseNextConnection(peerId);
-      }).catch(err => {
-        this.connectHandlers.fail(err);
-        throw err;
       });
+    }).catch(err => {
+      this.trigger('reject', peerId);
     });
-  };
-
-  WebRTC.prototype.promiseNextConnection = function(originalPeerId) {
-    return new Promise((res, rej) => {
-      // Note: memory leak. Change to de-register this if we ever use it often.
-      this.connectHandlers.add(Utility.once((err, peerId) => {
-        if (err) {
-          rej(err);
-        } else if (peerId !== originalPeerId) {
-          rej(new Error(`connected to unintended peer, ${peerId}`));
-        } else {
-          res(peerId);
-        }
-      }));
-    });
-  };
-
-  WebRTC.prototype.onConnection = function(cb) {
-    this.connectHandlers.add(cb);
   };
 
   WebRTC.prototype.send = function(type, payload) {
@@ -124,10 +103,6 @@ window.WebRTC = (function() {
   WebRTC.prototype.signalHandler = function(err, peerId, message) {
     if (err) {
       console.log('signaling error', err, peerId, message);
-      // If signaling failed while connecting, call handler with error.
-      if (peerId === this.peerId) {
-        this.connectHandlers.fail(err);
-      }
       return;
     }
 
@@ -247,7 +222,7 @@ window.WebRTC = (function() {
   WebRTC.prototype.dataChannelStateChange = function(evt) {
     console.log('data channel state change', this.dataChannel.readyState);
     if (this.dataChannel.readyState === 'open') {
-      this.connectHandlers.succeed(this.peerId);
+      this.trigger('peer', this.peerId);
     }
   };
 

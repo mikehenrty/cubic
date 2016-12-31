@@ -19,7 +19,6 @@ window.Engine = (function() {
     this.setPlayer(1);
     this.pendingMoves = {};
     this.lastMove = null;
-    this.connectHandler = null;
     this.offlineMode = false;
   }
 
@@ -33,13 +32,14 @@ window.Engine = (function() {
     this.player1.init();
     this.player2.init();
 
+    this.forward('reject', this.connection);
     this.status.on('again', this.handleAgainButton.bind(this));
     this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
     this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
     this.connection.on('disconnect', this.handleDisconnect.bind(this));
     this.connection.on('ready', this.handleReady.bind(this));
     this.connection.on('start', this.handleStart.bind(this));
-    this.connection.onPeerConnect(this.handleConnect.bind(this));
+    this.connection.on('peer', this.handlePeerConnection.bind(this));
     this.container.appendChild(this.el);
 
     document.addEventListener('keydown', evt => {
@@ -59,10 +59,6 @@ window.Engine = (function() {
     return this.connection.setName(name);
   };
 
-  Engine.prototype.onConnect = function(cb) {
-    this.connectHandler = cb;
-  };
-
   Engine.prototype.getList = function() {
     return this.connection.getList();
   };
@@ -74,13 +70,15 @@ window.Engine = (function() {
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
-    this.status.setStatus('Connecting...');
     this.setPlayer(2);
-    return this.connection.connect(peerId).then(() => {
-      return this.time.sync();
-    }).then(ping => {
+    this.connection.connectToPeer(peerId);
+  };
+
+  Engine.prototype.handlePeerConnection = function(peerId) {
+    this.time.sync().then(ping => {
       this.setReadyStatus(ping);
       this.connection.send('ready', ping);
+      this.trigger('peer', peerId);
     }).catch(err => {
       this.status.setStatus('');
       this.setPlayer(1);
@@ -224,10 +222,6 @@ window.Engine = (function() {
     } else {
       move.acked = true;
     }
-  };
-
-  Engine.prototype.handleConnect = function() {
-    this.connectHandler && this.connectHandler();
   };
 
   Engine.prototype.handleDisconnect = function() {

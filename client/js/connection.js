@@ -7,12 +7,9 @@ window.Connection = (function() {
     this.clientId = null;
     this.socket = new Socket();
     this.webRTC = new WebRTC(this.socket);
-    this.connectionHandler = null;
   }
 
-  Connection.prototype.onPeerConnect = function(cb) {
-    this.connectionHandler = cb;
-  };
+  Connection.prototype = new Eventer();
 
   Connection.prototype.isConnected = function() {
     return this.webRTC && this.webRTC.isConnected();
@@ -23,20 +20,16 @@ window.Connection = (function() {
       this.clientId = clientData.clientId;
       this.clientName = clientData.clientName;
 
-      this.webRTC.onConnection((err, peerId) => {
-        if (!err) {
-          this.connectionHandler && this.connectionHandler(peerId);
-        }
-      });
       return this.clientId;
     });
   };
 
-  Connection.prototype.connect = function(peerId) {
-    return this.webRTC.connect(peerId);
+  Connection.prototype.connectToPeer = function(peerId) {
+    this.webRTC.connect(peerId);
   };
 
   Connection.prototype.on = function(type, cb) {
+    // Forward all connection handlers to webRTC events.
     this.webRTC.on(type, cb);
   };
 
