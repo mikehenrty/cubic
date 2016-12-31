@@ -203,7 +203,7 @@ window.WebRTC = (function() {
       case 'closed':
         console.log('new webrtc state',
           this.peerConnection.iceConnectionState);
-        this.trigger('disconnect');
+        this.trigger('disconnect', this.peerId);
         break;
 
       default:

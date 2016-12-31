@@ -13,6 +13,7 @@
   --score-dimension: 8vmin;
   --border-width: 1.5vmin;
   --status-height: calc( (100vmin - var(--board-dimension) ) / 2);
+  --fade-out-duration: 3s;
 
   --cube-color-red: purple;
   --cube-color-blue: gray;
@@ -35,6 +36,10 @@ p {
 
 .hide {
   visibility: hidden;
+}
+
+.fade-out {
+  animation: fade-out var(--fade-out-duration) 1;
 }
 
 #screen {
@@ -88,7 +93,7 @@ p {
 
 #ui-status {
   text-align: center;
-  color: yellow;
+  color: red;
 }
 
 #action-buttons {
@@ -225,8 +230,14 @@ p {
   border-top-width: calc(var(--square-dimension) - var(--border-width));
 }
 
+@keyframes fade-out {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @keyframes color-change {
-  0% { color: brown; }
+  0% { color: salmon; }
   50% { color: magenta; }
-  100% { color: brown; }
+  100% { color: salmon; }
 }

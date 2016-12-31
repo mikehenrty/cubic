@@ -1,6 +1,8 @@
 window.UI = (function() {
   'use strict';
 
+  const STATUS_TIMEOUT = 3000;
+
   function UI(container) {
     this.container = container;
     this.el = document.createElement('div');
@@ -18,7 +20,7 @@ window.UI = (function() {
 
     this.status = document.createElement('p');
     this.status.id = 'ui-status';
-    this.status.textContent = 'Shall we play a game?';
+    this.statusTimeout = null;
 
     this.actionButtons = document.createElement('p');
     this.actionButtons.id = 'action-buttons';
@@ -114,6 +116,16 @@ window.UI = (function() {
 
   UI.prototype.hide = function() {
     this.el.classList.add('hide');
+  };
+
+  UI.prototype.setStatus = function(text) {
+    this.status.textContent = text;
+    this.status.classList.add('fade-out');
+    this.statusTimeout && clearTimeout(this.statusTimeout);
+    this.statusTimeout = setTimeout(() => {
+      this.status.classList.remove('fade-out');
+      this.status.textContent = '';
+    }, STATUS_TIMEOUT);
   };
 
   return UI;
