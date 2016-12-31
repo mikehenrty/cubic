@@ -16,6 +16,10 @@
   --status-color: red;
   --fade-out-duration: 3s;
 
+  --font-small: calc(var(--board-dimension) / 40);
+  --font-normal: calc(var(--board-dimension) / 30);
+  --font-large: calc(var(--board-dimension) / 20);
+
   --cube-color-red: purple;
   --cube-color-blue: gray;
   --cube-color-yellow: brown;
@@ -66,58 +70,63 @@ p {
   z-index: 1;
 }
 
-#ui #content {
+#content {
   width: var(--board-dimension);
   height: var(--board-dimension);
   background-color: #18d8e3;
   color: white;
-  font-size: calc(var(--board-dimension) / 30);
+  font-size: var(--font-normal);
   box-sizing: border-box;
   padding: 3vmin;
 }
 
-#ui #content p {
-  line-height: calc(var(--board-dimension) / 20);
-  height: calc(var(--board-dimension) / 20);
+#content p {
+  line-height: var(--font-large);
+  height: var(--font-large);
   padding: calc(var(--board-dimension) / 80) 0;
 }
 
-#ui #content a {
+#content a {
   float: right;
   text-decoration: underline;
   color: blue;
   cursor: pointer;
-  font-size: calc(var(--board-dimension) / 40);
+  font-size: var(--font-small);
 }
 
 #name-container {
   animation: color-change 2s infinite;
-  font-size: 4vmin;
-  line-height: 4vmin;
+  font-size: var(--font-large);
+  line-height: var(--font-large);
 }
 
-#ui-status {
+#content #ui-status {
   text-align: center;
   color: var(--status-color);
-  border: 1vmin dotted var(--status-color);
+  border: 0.5vmin solid var(--status-color);
   visibility: hidden;
+  padding: 0;
 }
 
-#ui-status.fade-out {
+#content #ui-status.fade-out {
   visibility: visible;
 }
 
-#action-buttons {
+#content #action-buttons {
   border-bottom: calc(var(--board-dimension) / 120) dotted white;
   text-align: center;
+  padding-bottom: calc(var(--board-dimension) / 20);
   margin-bottom: calc(var(--board-dimension) / 50);
 }
 
 #action-buttons button {
   font-family: 'Press Start 2P';
   color: white;
-  font-size: calc(var(--board-dimension) / 30);
+  font-size: var(--font-small);
+  height: var(--font-large);
   background-color: transparent;
+  padding: 0 1.5vmin;
+  margin: 0 1vmin;
 }
 
 #list-header {
