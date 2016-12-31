@@ -37,7 +37,11 @@ window.Player = (function() {
     this.scoreEl.id = `player-${this.playerNumber}`;
     this.moves = [];
     this.nextMove = null;
+    this.squareHeight = Utility.getCssVar('--square-dimension');
     this.reset();
+
+    this.container.appendChild(this.el);
+    this.container.appendChild(this.scoreEl);
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -55,10 +59,6 @@ window.Player = (function() {
   };
 
   Player.prototype.init = function() {
-    this.container.appendChild(this.el);
-    this.container.appendChild(this.scoreEl);
-    this.squareHeight = Utility.getCssVar('--square-dimension');
-    this.reset();
   };
 
   Player.prototype.startMove = function(move, duration) {
@@ -161,6 +161,9 @@ window.Player = (function() {
         break;
     }
 
+
+    // TODO: player should not need to know anything about opponent.
+    // Move this logic into game engine.
     if (x === this.opponent.x && y === this.opponent.y) {
       return false;
     }

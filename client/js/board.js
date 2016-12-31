@@ -10,10 +10,6 @@ window.Board = (function() {
     this.el = document.createElement('div');
     this.el.id = 'board';
     this.squares = [];
-  }
-
-  Board.prototype.init = function() {
-    this.container.appendChild(this.el);
 
     // Add sqaures to the board.
     for (var r = 0; r < this.rows; r++) {
@@ -24,7 +20,9 @@ window.Board = (function() {
         this.el.appendChild(square);
       }
     }
-  };
+
+    this.container.appendChild(this.el);
+  }
 
   Board.prototype.resetSquare = function(square) {
     square.className = '';

@@ -14,11 +14,8 @@ window.TimeSync = (function () {
     this.ready = false;
     this.offset = 0;
     this.samples = null;
-  }
-
-  TimeSync.prototype.init = function() {
     this.connection.on('timesync', this.handleSync.bind(this));
-  };
+  }
 
   TimeSync.prototype.sync = function() {
     return new Promise((res, rej) => {

@@ -9,15 +9,13 @@ window.Status = (() => {
     this.status.id = 'status-text';
     this.againButton = document.createElement('button');
     this.againButton.textContent = 'Play again?';
+    this.el.appendChild(this.status);
+    this.container.appendChild(this.el);
+
+    this.againButton.onclick = this.trigger.bind(this, 'again');
   }
 
   Status.prototype = new Eventer();
-
-  Status.prototype.init = function() {
-    this.againButton.onclick = this.trigger.bind(this, 'again');
-    this.el.appendChild(this.status);
-    this.container.appendChild(this.el);
-  };
 
   Status.prototype.setStatus = function(text) {
     this.status.innerHTML = '';
