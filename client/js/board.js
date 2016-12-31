@@ -3,9 +3,8 @@ window.Board = (function() {
 
   const STARTING_TILES = CONST.STARTING_TILES;
 
-  function Board(engine, cols, rows) {
-    this.engine = engine;
-    this.container = engine.el;
+  function Board(container, cols, rows) {
+    this.container = container;
     this.cols = cols;
     this.rows = rows;
     this.el = document.createElement('div');

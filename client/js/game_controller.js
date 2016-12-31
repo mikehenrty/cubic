@@ -1,4 +1,4 @@
-window.Engine = (function() {
+window.GameController = (function() {
   'use strict';
 
   const COLS = CONST.COLS;
@@ -6,7 +6,7 @@ window.Engine = (function() {
 
   const START_DELAY = 1000;
 
-  function Engine(container) {
+  function GameController(container) {
     this.clientId = null;
     this.clientName = null;
 
@@ -16,7 +16,7 @@ window.Engine = (function() {
     this.el.id = 'screen';
     this.connection = new Connection();
     this.time = new TimeSync(this.connection);
-    this.board = new Board(this, COLS, ROWS);
+    this.board = new Board(this.el, COLS, ROWS);
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
     this.setPlayer(1);
@@ -45,37 +45,37 @@ window.Engine = (function() {
     });
   }
 
-  Engine.prototype = new Eventer();
+  GameController.prototype = new Eventer();
 
-  Engine.prototype.hideBoard = function() {
+  GameController.prototype.hideBoard = function() {
     this.el.classList.add('hide');
   };
 
-  Engine.prototype.showBoard = function() {
+  GameController.prototype.showBoard = function() {
     this.el.classList.remove('hide');
   };
 
-  Engine.prototype.setName = function(name) {
+  GameController.prototype.setName = function(name) {
     return this.connection.setName(name);
   };
 
-  Engine.prototype.getList = function() {
+  GameController.prototype.getList = function() {
     return this.connection.getList();
   };
 
-  Engine.prototype.register = function(name) {
+  GameController.prototype.register = function(name) {
     return this.connection.register(name).then(clientInfo => {
       this.clientId = clientInfo.clientId;
       this.clientName = clientInfo.clientName;
     });
   };
 
-  Engine.prototype.connectToPeer = function(peerId) {
+  GameController.prototype.connectToPeer = function(peerId) {
     this.setPlayer(2);
     this.connection.connectToPeer(peerId);
   };
 
-  Engine.prototype.handlePeerConnection = function(peerId) {
+  GameController.prototype.handlePeerConnection = function(peerId) {
     console.log('got peer connection', peerId);
     if (this.playerNumber === 1) {
       this.time.sync().then(ping => {
@@ -91,7 +91,7 @@ window.Engine = (function() {
     }
   };
 
-  Engine.prototype.handleReadyPlayerOne = function() {
+  GameController.prototype.handleReadyPlayerOne = function() {
     this.setReadyStatus();
     this.trigger('ready');
     var tiles = this.board.generateTiles();
@@ -100,41 +100,41 @@ window.Engine = (function() {
     setTimeout(this.start.bind(this, tiles), START_DELAY);
   };
 
-  Engine.prototype.setReadyStatus = function() {
+  GameController.prototype.setReadyStatus = function() {
     this.status.setStatus(`Ready...`);
   };
 
-  Engine.prototype.handleStart = function(payload) {
+  GameController.prototype.handleStart = function(payload) {
     var startTime, tiles
     [startTime, tiles] = payload.split(' ');
     tiles = JSON.parse(tiles);
     setTimeout(this.start.bind(this, tiles), startTime - this.time.now());
   };
 
-  Engine.prototype.start = function(tiles) {
+  GameController.prototype.start = function(tiles) {
     this.status.setStatus('Go!!!');
     this.reset();
     this.board.displayTiles(tiles);
   };
 
-  Engine.prototype.startOffline = function() {
+  GameController.prototype.startOffline = function() {
     this.offlineMode = true;
     this.start(this.board.generateTiles());
   };
 
-  Engine.prototype.getClientId = function() {
+  GameController.prototype.getClientId = function() {
     return this.clientId;
   };
 
-  Engine.prototype.getClientName = function() {
+  GameController.prototype.getClientName = function() {
     return this.clientName;
   };
 
-  Engine.prototype.getPlayerNumber = function() {
+  GameController.prototype.getPlayerNumber = function() {
     return this.playerNumber;
   };
 
-  Engine.prototype.setPlayer = function(playerNumber) {
+  GameController.prototype.setPlayer = function(playerNumber) {
     if (playerNumber === 1) {
       this.playerNumber = 1;
       this.me = this.player2.opponent = this.player1;
@@ -148,7 +148,7 @@ window.Engine = (function() {
     }
   };
 
-  Engine.prototype.finishPendingMove = function(id) {
+  GameController.prototype.finishPendingMove = function(id) {
     if (this.me.endMove() && this.board.isGameOver()) {
       this.endGame();
       return;
@@ -161,18 +161,18 @@ window.Engine = (function() {
     }
   };
 
-  Engine.prototype.rollbackMoveForPlayer = function(player, position) {
+  GameController.prototype.rollbackMoveForPlayer = function(player, position) {
     player.setPosition(position.x, position.y, 10);
     player.endMove(true);
   };
 
-  Engine.prototype.rollbackPendingMove = function(id) {
+  GameController.prototype.rollbackPendingMove = function(id) {
     var move = this.pendingMoves[id];
     this.rollbackMoveForPlayer(this.me, move.position);
     delete this.pendingMoves[id];
   };
 
-  Engine.prototype.addPendingMove = function(id, position, timestamp) {
+  GameController.prototype.addPendingMove = function(id, position, timestamp) {
     this.lastMove = {
       id: id,
       timestamp: timestamp,
@@ -205,7 +205,7 @@ window.Engine = (function() {
     }, Player.MoveDuration);
   };
 
-  Engine.prototype.handleKeyAck = function(payload) {
+  GameController.prototype.handleKeyAck = function(payload) {
     var id, result, timestamp;
     [id, result, timestamp] = payload.split(' ');
 
@@ -230,12 +230,12 @@ window.Engine = (function() {
     }
   };
 
-  Engine.prototype.handleDisconnect = function() {
+  GameController.prototype.handleDisconnect = function() {
     this.reset();
     this.trigger('disconnect');
   };
 
-  Engine.prototype.handleKeyForOpponent = function(payload) {
+  GameController.prototype.handleKeyForOpponent = function(payload) {
     var key, id, timestamp;
     [id, key, timestamp] = payload.split(' ');
 
@@ -281,7 +281,7 @@ window.Engine = (function() {
     this.connection.send('keydown_ack', `${id} 1 ${timestamp}`);
   };
 
-  Engine.prototype.handleKeyForMe = function(key) {
+  GameController.prototype.handleKeyForMe = function(key) {
     if (this.offlineMode) {
       this.handleKeyForOffline(key);
       return;
@@ -310,7 +310,7 @@ window.Engine = (function() {
     this.me.startMove(move);
   };
 
-  Engine.prototype.handleKeyForOffline = function(key) {
+  GameController.prototype.handleKeyForOffline = function(key) {
     var playerNumber = Player.whichPlayerKey(key);
     if (playerNumber !== 1 && playerNumber !== 2) {
       return;
@@ -345,15 +345,15 @@ window.Engine = (function() {
     }, Player.MoveDuration);
   };
 
-  Engine.prototype.getMove = function(key) {
+  GameController.prototype.getMove = function(key) {
     return Player.KEY_MAP[key];
   };
 
-  Engine.prototype.arePositionsConflicting = function() {
+  GameController.prototype.arePositionsConflicting = function() {
     return this.me.x === this.opponent.x && this.me.y === this.opponent.y;
   };
 
-  Engine.prototype.endGame = function() {
+  GameController.prototype.endGame = function() {
     if (this.player1.points === this.player2.points) {
       this.status.setGameOverStatus('It\'s a tie');
     } else {
@@ -369,7 +369,7 @@ window.Engine = (function() {
     this.reset();
   };
 
-  Engine.prototype.handleAgainButton = function() {
+  GameController.prototype.handleAgainButton = function() {
     if (this.offlineMode) {
       this.startOffline();
       return;
@@ -378,12 +378,12 @@ window.Engine = (function() {
     // TODO: online restart logic, wait for both to be ready
   };
 
-  Engine.prototype.reset = function() {
+  GameController.prototype.reset = function() {
     this.pendingMoves = {};
     this.board.reset();
     this.player1.reset();
     this.player2.reset();
   };
 
-  return Engine;
+  return GameController;
 })();
