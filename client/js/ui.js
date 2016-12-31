@@ -36,8 +36,8 @@ window.UI = (function() {
     this.actionButtons.appendChild(this.offlineButton);
 
     var listHeader = document.createElement('p');
-    listHeader.textContent = 'Friends Online';
     listHeader.id = 'list-header';
+    listHeader.textContent = 'Friends Online';
     this.listContainer = document.createElement('div');
     this.listContainer.id = 'list-container';
 

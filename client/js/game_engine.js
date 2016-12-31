@@ -264,7 +264,7 @@ window.GameEngine = (function() {
     var winner;
     if (this.player1.points === this.player2.points) {
       winner = 0; // Tie.
-    } else if (this.player1.points > this.player1.points) {
+    } else if (this.player1.points > this.player2.points) {
       winner = 1;
     } else {
       winner = 2;

@@ -118,7 +118,7 @@ window.GameController = (function() {
     if (winner === 0) {
       this.status.setGameOverStatus('It\'s a tie');
     } else {
-      if (this.offlineMode) {
+      if (this.engine.offlineMode) {
         this.status.setGameOverStatus(`Player ${winner} wins!`);
       } else {
         this.status.setGameOverStatus(
