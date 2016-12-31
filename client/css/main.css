@@ -78,6 +78,12 @@ p {
   font-size: var(--font-normal);
   box-sizing: border-box;
   padding: 3vmin;
+  transition: transform 0.4s ease-out;
+  visibility: visible;
+}
+
+.hide #content {
+  transform: scale(0);
 }
 
 #content p {
@@ -94,7 +100,16 @@ p {
   font-size: var(--font-small);
 }
 
+#welcome {
+  position: relative;
+}
+
 #name-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  pointer-events: none;
   animation: color-change 2s infinite;
   font-size: var(--font-large);
   line-height: var(--font-large);
@@ -136,10 +151,12 @@ p {
 }
 
 /* Hide the link input. */
+/* TODO: hide in a better way. perhaps use clipboard api */
 .peer-link {
+  background: transparent;
+  color: transparent;
+  width: 0;
   border: none;
-  position: fixed;
-  top: -200%;
 }
 
 #board {
