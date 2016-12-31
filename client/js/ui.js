@@ -3,8 +3,9 @@ window.UI = (function() {
 
   function UI(container) {
     this.container = container;
-    this.handlers = {};
   }
+
+  UI.prototype = new Eventer();
 
   UI.prototype.init = function() {
     this.el = document.createElement('div');
@@ -62,19 +63,6 @@ window.UI = (function() {
     this.el.appendChild(this.content);
     this.container.appendChild(this.el);
     this.hide();
-  };
-
-  UI.prototype.registerHandler = function(type, cb) {
-    if (!this.handlers[type]) {
-      this.handlers[type] = [];
-    }
-    this.handlers[type].push(cb);
-  };
-
-  UI.prototype.trigger = function(type, payload) {
-    this.handlers[type] && this.handlers[type].forEach(handler => {
-      handler(payload);
-    });
   };
 
   UI.prototype.show = function(options) {

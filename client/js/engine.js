@@ -30,16 +30,14 @@ window.Engine = (function() {
       document.addEventListener('keydown', evt => {
         this.handleKeyForMe(evt.key);
       });
-      this.connection.registerHandler('keydown',
-                                      this.handleKeyForOpponent.bind(this));
-      this.connection.registerHandler('keydown_ack',
-                                      this.handleKeyAck.bind(this));
-      this.connection.registerHandler('disconnect',
-                                      this.handleDisconnect.bind(this));
+      this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
+      this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
+      this.connection.on('disconnect', this.handleDisconnect.bind(this));
+      this.connection.on('disconnect', this.handleDisconnect.bind(this));
+      this.connection.on('ready', this.handleReady.bind(this));
+      this.connection.on('start', this.handleStart.bind(this));
       this.connection.onPeerConnect(this.handleConnect.bind(this));
-      this.connection.registerHandler('ready', this.handleReady.bind(this));
 
-      this.connection.registerHandler('start', this.handleStart.bind(this));
       this.time.init(this.connection);
       this.status.init();
       this.status.onAgain(this.handleAgainButton.bind(this));
@@ -94,14 +92,14 @@ window.Engine = (function() {
     this.status.setStatus(`Ready... ping ${ping}ms`);
   };
 
-  Engine.prototype.handleStart = function(type, payload) {
+  Engine.prototype.handleStart = function(payload) {
     var startTime, tiles
     [startTime, tiles] = payload.split(' ');
     tiles = JSON.parse(tiles);
     setTimeout(this.start.bind(this, tiles), startTime - this.time.now());
   };
 
-  Engine.prototype.handleReady = function(type, ping) {
+  Engine.prototype.handleReady = function(ping) {
     this.setReadyStatus(ping);
     var tiles = this.board.generateTiles();
     var startTime = this.time.now() + START_DELAY;
@@ -203,7 +201,7 @@ window.Engine = (function() {
     }, Player.MoveDuration);
   };
 
-  Engine.prototype.handleKeyAck = function(type, payload) {
+  Engine.prototype.handleKeyAck = function(payload) {
     var id, result, timestamp;
     [id, result, timestamp] = payload.split(' ');
 
@@ -237,7 +235,7 @@ window.Engine = (function() {
     this.disconnectHandler && this.disconnectHandler();
   };
 
-  Engine.prototype.handleKeyForOpponent = function(type, payload) {
+  Engine.prototype.handleKeyForOpponent = function(payload) {
     var key, id, timestamp;
     [id, key, timestamp] = payload.split(' ');
 
@@ -364,7 +362,8 @@ window.Engine = (function() {
       if (this.offlineMode) {
         this.status.setGameOverStatus(`Player ${winner.playerNumber} wins!`);
       } else {
-        this.status.setGameOverStatus(`You ${winner === this.me ? 'win' : 'lose'}`);
+        this.status.setGameOverStatus(`You ${winner === this.me ?
+          'win' : 'lose'}`);
       }
     }
     this.reset();

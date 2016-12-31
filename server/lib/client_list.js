@@ -33,6 +33,11 @@ ClientList.prototype.add = function(socket, nicename) {
 };
 
 ClientList.prototype.remove = function(guid) {
+  if (!this.clientInfo[guid]) {
+    console.log('could not remove client', guid);
+    return;
+  }
+
   delete this.clientIds[this.clientInfo[guid].name];
   delete this.clientInfo[guid];
 };

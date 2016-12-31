@@ -18,39 +18,21 @@ window.Controller = (function() {
     });
   };
 
-  Controller.prototype.showBoard = function() {
+  Controller.prototype.showGame = function() {
     this.ui.hide();
     this.engine.showBoard();
   };
 
   Controller.prototype.init = function() {
-    // Play offline.
-    this.ui.registerHandler('offline', () => {
-      this.showBoard();
-      this.engine.startOffline();
-    });
+    this.ui.on('offline', this.startOfflineGame.bind(this));
+    this.ui.on('rename', this.renamePlayer.bind(this));
+    this.ui.on('join', this.attemptConnect.bind(this));
 
-    this.ui.registerHandler('rename', newName => {
-      // Hide name.
-      this.ui.show({ clientName: '...' });
-      this.engine.setName(newName).then(() => {
-        this.storeName(newName);
-        this.showUI();
-      }).catch((err) => {
-        console.log('Name set error', err);
-        this.showUI();
-      });
-    });
-
-    this.ui.registerHandler('join', peerId => {
-      console.log('attempting to connect', peerId);
-      this.attemptConnect(peerId);
-    });
+    // this.engine.onAsk??
+    this.engine.onDisconnect(this.showUI.bind(this));
+    this.engine.onConnect(this.showGame.bind(this));
 
     this.ui.init();
-    this.engine.onDisconnect(this.showUI.bind(this));
-    this.engine.onConnect(this.showBoard.bind(this));
-
     return this.engine.init(this.fetchName()).then(clientId => {
       this.storeName(this.engine.getClientName());
       var peerId = Utility.getPeerId();
@@ -58,7 +40,6 @@ window.Controller = (function() {
         // Take peerId out of the URL.
         history.replaceState(null, document.title, '/');
         return this.attemptConnect(peerId);
-        return;
       }
 
       this.showUI();
@@ -77,9 +58,26 @@ window.Controller = (function() {
   };
 
   Controller.prototype.attemptConnect = function(peerId) {
-    this.showBoard();
+    console.log('attempting to connect', peerId);
+    this.showGame();
     return this.engine.connectToPeer(peerId).catch(err => {
       console.log('could not connect', err, peerId);
+      this.showUI();
+    });
+  };
+
+  Controller.prototype.startOfflineGame = function() {
+    this.showGame();
+    this.engine.startOffline();
+  };
+
+  Controller.prototype.renamePlayer = function(name) {
+    this.ui.show({ clientName: '...' }); // Temporarily display elipses
+    this.engine.setName(name).then(() => {
+      this.storeName(name);
+      this.showUI();
+    }).catch((err) => {
+      console.log('Name set error', err);
       this.showUI();
     });
   };

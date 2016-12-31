@@ -37,8 +37,8 @@ window.Connection = (function() {
     return this.webRTC.connect(peerId);
   };
 
-  Connection.prototype.registerHandler = function(type, cb) {
-    this.webRTC.registerHandler(type, cb);
+  Connection.prototype.on = function(type, cb) {
+    this.webRTC.on(type, cb);
   };
 
   Connection.prototype.getList = function() {

@@ -18,12 +18,12 @@ window.TimeSync = (function () {
 
   TimeSync.prototype.init = function(connection) {
     this.connection = connection;
-    this.connection.registerHandler('timesync', this.handleSync.bind(this));
+    this.connection.on('timesync', this.handleSync.bind(this));
   };
 
   TimeSync.prototype.sync = function() {
     return new Promise((res, rej) => {
-      this.connection.registerHandler('timesync_ack', (type, payload) => {
+      this.connection.on('timesync_ack', payload => {
         var sentTime, serverTime;
         var now = this.now();
         [sentTime, serverTime] = payload.split(' ');
@@ -54,7 +54,7 @@ window.TimeSync = (function () {
     });
   };
 
-  TimeSync.prototype.handleSync = function(type, payload) {
+  TimeSync.prototype.handleSync = function(payload) {
     this.connection.send('timesync_ack', `${payload} ${this.now()}`);
   };
 

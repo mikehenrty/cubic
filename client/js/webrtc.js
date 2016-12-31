@@ -12,14 +12,15 @@ window.WebRTC = (function() {
     this.peerId = null;
     this.authorizedPeer = null;
     this.dataChannel = null;
-    this.handlers = {};
     this.queue = new Utility.Queue();
     this.connectHandlers = new Utility.Handlers();
     this.disconnectHandler = null;
 
-    this.socket.registerHandler('signaling', this.signalHandler.bind(this));
-    this.socket.registerHandler('ask', this.askHandler.bind(this));
+    this.socket.on('signaling', this.signalHandler.bind(this));
+    this.socket.on('ask', this.askHandler.bind(this));
   }
+
+  WebRTC.prototype = new Eventer();
 
   WebRTC.prototype.isConnected = function() {
     return this.dataChannel && this.dataChannel.readyState === 'open';
@@ -95,25 +96,12 @@ window.WebRTC = (function() {
     this.connectHandlers.add(cb);
   };
 
-  WebRTC.prototype.registerHandler = function(type, cb) {
-    if (!this.handlers[type]) {
-      this.handlers[type] = [];
-    }
-    this.handlers[type].push(cb);
-  };
-
   WebRTC.prototype.send = function(type, payload) {
     if (!this.dataChannel) {
       console.log('error, tried to call send when data channel null');
       return;
     }
     this.dataChannel.send(`${type} ${payload}`);
-  };
-
-  WebRTC.prototype.trigger = function(type, payload) {
-    this.handlers[type] && this.handlers[type].forEach(handler => {
-      handler(type, payload);
-    });
   };
 
   WebRTC.prototype.onMessage = function(evt) {

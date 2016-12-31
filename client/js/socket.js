@@ -5,20 +5,21 @@ window.Socket = (function() {
   const WS_HOST = 'ws://' + window.location.hostname + ':' + WS_PORT;
 
   function Socket() {
-    this.socket = null;
+    this.ws = null;
     this.initialized = false;
-    this.handlers = {};
   }
 
+  Socket.prototype = new Eventer();
+
   Socket.prototype._ensureSocket = function(cb) {
-    if (this.socket) {
+    if (this.ws) {
       return Promise.resolve();
     }
 
     return new Promise((res, rej) => {
-      this.socket = new WebSocket(WS_HOST);
-      this.socket.addEventListener('message', this._onMessage.bind(this));
-      this.socket.addEventListener('open', () => {
+      this.ws = new WebSocket(WS_HOST);
+      this.ws.addEventListener('message', this._onMessage.bind(this));
+      this.ws.addEventListener('open', () => {
         res();
       });
     });
@@ -36,29 +37,21 @@ window.Socket = (function() {
     var args = [sender, payload];
     error = error ? `could not complete ${type}` : null;
     args.unshift(error);
-    this.handlers[type] && this.handlers[type].forEach(handler => {
-      handler.apply(null, args);
-    });
+    args.unshift(type);
+    this.trigger.apply(this, args);
   };
 
   Socket.prototype.send = function(type, recipient, payload) {
     return this._ensureSocket().then(() => {
       recipient = recipient || '';
       payload = payload || '';
-      this.socket.send(`${type} ${recipient} ${payload}`);
+      this.ws.send(`${type} ${recipient} ${payload}`);
     });
-  };
-
-  Socket.prototype.registerHandler = function(type, cb) {
-    if (!this.handlers[type]) {
-      this.handlers[type] = [];
-    }
-    this.handlers[type].push(cb);
   };
 
   Socket.prototype.sendCommand = function(command, recipient, payload) {
     return new Promise((res, rej) => {
-      this.registerHandler(`${command}_ack`,
+      this.on(`${command}_ack`,
                            // Note: memory leak for every command.
                            Utility.once((err, sender, payload) => {
         if (err) {
