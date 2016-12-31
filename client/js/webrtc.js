@@ -201,13 +201,8 @@ window.WebRTC = (function() {
       case 'disconnected':
       case 'failed':
       case 'closed':
-        console.log('new webrtc state',
-          this.peerConnection.iceConnectionState);
-        this.trigger('disconnect', this.peerId);
-        break;
-
       default:
-        console.log('unknown webrtc state',
+        console.log('webrtc state change',
           this.peerConnection.iceConnectionState);
     };
   };
@@ -221,10 +216,28 @@ window.WebRTC = (function() {
 
   WebRTC.prototype.dataChannelStateChange = function(evt) {
     console.log('data channel state change', this.dataChannel.readyState);
-    if (this.dataChannel.readyState === 'open') {
-      this.trigger('peer', this.peerId);
-    }
+    switch (this.dataChannel.readyState) {
+      case 'open':
+        this.trigger('peer', this.peerId);
+        break;
+
+      case 'closed':
+        this.disconnect();
+        break;
+
+      default:
+        break;
+    };
   };
+
+  WebRTC.prototype.disconnect = function() {
+    this.cleanUp();
+    if (this.peerId) {
+      var peerId = this.peerId;
+      this.peerId = null;
+      this.trigger('disconnect', peerId);
+    }
+  }
 
   WebRTC.prototype.cleanUp = function() {
     if (this.dataChannel) {
