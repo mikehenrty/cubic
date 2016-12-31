@@ -130,7 +130,7 @@ window.GameController = (function() {
   };
 
   GameController.prototype.displayPing = function(ping) {
-    this.status.setStatus(`Ping ${ping}ms`);
+    this.status.setBottomStatus(`(${ping}ms)`);
   };
 
   GameController.prototype.handleAgainButton = function() {
