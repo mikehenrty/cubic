@@ -55,14 +55,8 @@ window.UI = (function() {
       this.linkInput.select();
       document.execCommand('copy');
     };
-
     document.addEventListener('copy', (evt) => {
-      var buttonText = this.linkButton.textContent;
-      this.linkButton.textContent = 'Copied!!!!';
-      setTimeout(() => {
-        this.linkButton.textContent = buttonText;
-        this.linkInput.blur();
-      }, 1000);
+      this.setStatus('Link copied to clipboard');
     });
 
     this.content.appendChild(this.welcomeContainer);
