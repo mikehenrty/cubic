@@ -12,7 +12,7 @@ window.Engine = (function() {
     this.status = new Status(this.el);
     this.el.id = 'screen';
     this.connection = new Connection();
-    this.time = new TimeSync();
+    this.time = new TimeSync(this.connection);
     this.board = new Board(this, COLS, ROWS);
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
@@ -20,32 +20,30 @@ window.Engine = (function() {
     this.pendingMoves = {};
     this.lastMove = null;
     this.connectHandler = null;
-    this.disconnectHandler = null;
     this.offlineMode = false;
   }
 
-  Engine.prototype.init = function(suggestedNicename) {
-    return this.connection.init(suggestedNicename).then(id => {
-      this.container.appendChild(this.el);
-      document.addEventListener('keydown', evt => {
-        this.handleKeyForMe(evt.key);
-      });
-      this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
-      this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
-      this.connection.on('disconnect', this.handleDisconnect.bind(this));
-      this.connection.on('disconnect', this.handleDisconnect.bind(this));
-      this.connection.on('ready', this.handleReady.bind(this));
-      this.connection.on('start', this.handleStart.bind(this));
-      this.connection.onPeerConnect(this.handleConnect.bind(this));
+  Engine.prototype = new Eventer();
 
-      this.time.init(this.connection);
-      this.status.init();
-      this.status.onAgain(this.handleAgainButton.bind(this));
-      this.board.init();
-      this.hideBoard();
-      this.player1.init();
-      this.player2.init();
-      return id;
+  Engine.prototype.init = function() {
+    this.time.init();
+    this.status.init();
+    this.board.init();
+    this.hideBoard();
+    this.player1.init();
+    this.player2.init();
+
+    this.status.on('again', this.handleAgainButton.bind(this));
+    this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
+    this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
+    this.connection.on('disconnect', this.handleDisconnect.bind(this));
+    this.connection.on('ready', this.handleReady.bind(this));
+    this.connection.on('start', this.handleStart.bind(this));
+    this.connection.onPeerConnect(this.handleConnect.bind(this));
+    this.container.appendChild(this.el);
+
+    document.addEventListener('keydown', evt => {
+      this.handleKeyForMe(evt.key);
     });
   };
 
@@ -65,12 +63,14 @@ window.Engine = (function() {
     this.connectHandler = cb;
   };
 
-  Engine.prototype.onDisconnect = function(cb) {
-    this.disconnectHandler = cb;
-  };
-
   Engine.prototype.getList = function() {
     return this.connection.getList();
+  };
+
+  Engine.prototype.connectToServer = function(nicename) {
+    return this.connection.init(nicename).then(id => {
+      return id;
+    });
   };
 
   Engine.prototype.connectToPeer = function(peerId) {
@@ -232,7 +232,7 @@ window.Engine = (function() {
 
   Engine.prototype.handleDisconnect = function() {
     this.reset();
-    this.disconnectHandler && this.disconnectHandler();
+    this.trigger('disconnect');
   };
 
   Engine.prototype.handleKeyForOpponent = function(payload) {

@@ -154,6 +154,14 @@ window.Utility = (function() {
       return window.getComputedStyle(document.body).getPropertyValue(prop);
     },
 
+    storeName: function(name) {
+      localStorage.name = name;
+    },
+
+    fetchName: function() {
+      return localStorage.name;
+    },
+
     niceId: niceId,
     Queue: Queue,
     Handlers: Handlers

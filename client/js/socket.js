@@ -68,12 +68,12 @@ window.Socket = (function() {
     });
   };
 
-  Socket.prototype.init = function(suggestedNicename) {
+  Socket.prototype.init = function(nicename) {
     if (this.initialized) {
       return Promise.resolve();
     }
 
-    return this.sendCommand('register', null, suggestedNicename).then(
+    return this.sendCommand('register', null, nicename).then(
       (payload) => {
         this.initialized = true;
         var parts = payload.split(' ');

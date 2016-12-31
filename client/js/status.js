@@ -9,11 +9,12 @@ window.Status = (() => {
     this.status.id = 'status-text';
     this.againButton = document.createElement('button');
     this.againButton.textContent = 'Play again?';
-    this.againButton.onclick = this.handleAgain.bind(this);
-    this.againHandler = null;
   }
 
+  Status.prototype = new Eventer();
+
   Status.prototype.init = function() {
+    this.againButton.onclick = this.trigger.bind(this, 'again');
     this.el.appendChild(this.status);
     this.container.appendChild(this.el);
   };
@@ -30,10 +31,6 @@ window.Status = (() => {
 
   Status.prototype.handleAgain = function() {
     this.againHandler && this.againHandler();
-  };
-
-  Status.prototype.onAgain = function(cb) {
-    this.againHandler = cb;
   };
 
   return Status;

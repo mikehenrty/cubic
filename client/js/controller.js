@@ -26,41 +26,39 @@ window.Controller = (function() {
   Controller.prototype.init = function() {
     this.ui.on('offline', this.startOfflineGame.bind(this));
     this.ui.on('rename', this.renamePlayer.bind(this));
-    this.ui.on('join', this.attemptConnect.bind(this));
+    this.ui.on('join', this.attemptToConnect.bind(this));
 
     // this.engine.onAsk??
-    this.engine.onDisconnect(this.showUI.bind(this));
+    this.engine.on('disconnect', this.showUI.bind(this));
     this.engine.onConnect(this.showGame.bind(this));
 
     this.ui.init();
-    return this.engine.init(this.fetchName()).then(clientId => {
-      this.storeName(this.engine.getClientName());
+    this.engine.init();
+  };
+
+  Controller.prototype.run = function() {
+    this.engine.connectToServer(Utility.fetchName()).then(() => {
+      Utility.storeName(this.engine.getClientName());
+
       var peerId = Utility.getPeerId();
       if (peerId) {
-        // Take peerId out of the URL.
         history.replaceState(null, document.title, '/');
-        return this.attemptConnect(peerId);
+        this.attemptToConnect(peerId);
+        return;
       }
 
+      // Game is ready.
       this.showUI();
+
     }).catch(err => {
-      console.log('Engine init error', err);
+      console.log('Error connecting to server', err);
       this.showUI();
     });
   };
 
-  Controller.prototype.storeName = function(name) {
-    localStorage.name = name;
-  };
-
-  Controller.prototype.fetchName = function() {
-    return localStorage.name;
-  };
-
-  Controller.prototype.attemptConnect = function(peerId) {
-    console.log('attempting to connect', peerId);
+  Controller.prototype.attemptToConnect = function(peerId) {
     this.showGame();
-    return this.engine.connectToPeer(peerId).catch(err => {
+    this.engine.connectToPeer(peerId).catch(err => {
       console.log('could not connect', err, peerId);
       this.showUI();
     });
@@ -74,7 +72,7 @@ window.Controller = (function() {
   Controller.prototype.renamePlayer = function(name) {
     this.ui.show({ clientName: '...' }); // Temporarily display elipses
     this.engine.setName(name).then(() => {
-      this.storeName(name);
+      Utility.storeName(name);
       this.showUI();
     }).catch((err) => {
       console.log('Name set error', err);

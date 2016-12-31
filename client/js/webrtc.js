@@ -6,15 +6,13 @@ window.WebRTC = (function() {
 
   const CHANNEL_LABEL = 'p2p';
 
-  function WebRTC(clientId, socket) {
-    this.clientId = clientId;
+  function WebRTC(socket) {
     this.socket = socket;
     this.peerId = null;
     this.authorizedPeer = null;
     this.dataChannel = null;
     this.queue = new Utility.Queue();
     this.connectHandlers = new Utility.Handlers();
-    this.disconnectHandler = null;
 
     this.socket.on('signaling', this.signalHandler.bind(this));
     this.socket.on('ask', this.askHandler.bind(this));

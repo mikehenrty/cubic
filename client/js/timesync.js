@@ -9,15 +9,14 @@ window.TimeSync = (function () {
     return serverTime - currentTime + latency;
   }
 
-  function TimeSync() {
+  function TimeSync(connection) {
+    this.connection = connection;
     this.ready = false;
-    this.connection = null;
     this.offset = 0;
     this.samples = null;
   }
 
-  TimeSync.prototype.init = function(connection) {
-    this.connection = connection;
+  TimeSync.prototype.init = function() {
     this.connection.on('timesync', this.handleSync.bind(this));
   };
 

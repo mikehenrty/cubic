@@ -6,7 +6,7 @@ window.Connection = (function() {
   function Connection() {
     this.clientId = null;
     this.socket = new Socket();
-    this.webRTC = null;
+    this.webRTC = new WebRTC(this.socket);
     this.connectionHandler = null;
   }
 
@@ -18,11 +18,10 @@ window.Connection = (function() {
     return this.webRTC && this.webRTC.isConnected();
   };
 
-  Connection.prototype.init = function(suggestedNicename) {
-    return this.socket.init(suggestedNicename).then(clientData => {
+  Connection.prototype.init = function(nicename) {
+    return this.socket.init(nicename).then(clientData => {
       this.clientId = clientData.clientId;
       this.clientName = clientData.clientName;
-      this.webRTC = new WebRTC(this.clientId, this.socket);
 
       this.webRTC.onConnection((err, peerId) => {
         if (!err) {
