@@ -74,7 +74,7 @@ ClientList.prototype.setName = function(guid, name) {
   }
 
   // Remove old name.
-  delete this.clientIds[this.clientInfo[guid]];
+  delete this.clientIds[this.clientInfo[guid].name];
   this.clientInfo[guid].name = name;
   this.clientIds[name] = guid;
   return true;

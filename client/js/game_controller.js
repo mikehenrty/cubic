@@ -39,7 +39,9 @@ window.GameController = (function() {
   };
 
   GameController.prototype.setName = function(name) {
-    return this.connection.setName(name);
+    return this.connection.setName(name).then(name => {
+      this.clientName = name;
+    });
   };
 
   GameController.prototype.getList = function() {
