@@ -35,7 +35,7 @@ window.Engine = (function() {
     this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
     this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
     this.connection.on('disconnect', this.handleDisconnect.bind(this));
-    this.connection.on('ready', this.handleReady.bind(this));
+    this.connection.on('readyPlayerOne', this.handleReadyPlayerOne.bind(this));
     this.connection.on('start', this.handleStart.bind(this));
     this.connection.on('peer', this.handlePeerConnection.bind(this));
     this.container.appendChild(this.el);
@@ -76,19 +76,32 @@ window.Engine = (function() {
   };
 
   Engine.prototype.handlePeerConnection = function(peerId) {
-    this.time.sync().then(ping => {
-      this.setReadyStatus(ping);
-      this.connection.send('ready', ping);
-      this.trigger('peer', peerId);
-    }).catch(err => {
-      this.status.setStatus('');
-      this.setPlayer(1);
-      throw err;
-    });
+    console.log('got peer connection', peerId);
+    if (this.playerNumber === 1) {
+      this.time.sync().then(ping => {
+        this.setReadyStatus();
+        this.connection.send('readyPlayerOne');
+        // For fairness, delay triggering ready for half a ping.
+        setTimeout(this.trigger.bind(this, 'ready'), ping / 2);
+      }).catch(err => {
+        this.status.setStatus('Could not sync time');
+        this.setPlayer(1);
+        throw err;
+      });
+    }
   };
 
-  Engine.prototype.setReadyStatus = function(ping) {
-    this.status.setStatus(`Ready... ping ${ping}ms`);
+  Engine.prototype.handleReadyPlayerOne = function() {
+    this.setReadyStatus();
+    this.trigger('ready');
+    var tiles = this.board.generateTiles();
+    var startTime = this.time.now() + START_DELAY;
+    this.connection.send('start', `${startTime} ${JSON.stringify(tiles)}`);
+    setTimeout(this.start.bind(this, tiles), START_DELAY);
+  };
+
+  Engine.prototype.setReadyStatus = function() {
+    this.status.setStatus(`Ready...`);
   };
 
   Engine.prototype.handleStart = function(payload) {
@@ -96,14 +109,6 @@ window.Engine = (function() {
     [startTime, tiles] = payload.split(' ');
     tiles = JSON.parse(tiles);
     setTimeout(this.start.bind(this, tiles), startTime - this.time.now());
-  };
-
-  Engine.prototype.handleReady = function(ping) {
-    this.setReadyStatus(ping);
-    var tiles = this.board.generateTiles();
-    var startTime = this.time.now() + START_DELAY;
-    this.connection.send('start', `${startTime} ${JSON.stringify(tiles)}`);
-    setTimeout(this.start.bind(this, tiles), START_DELAY);
   };
 
   Engine.prototype.start = function(tiles) {

@@ -12,7 +12,7 @@ window.Controller = (function() {
 
     // TODO: move logic for starting game into this handler.
     // ie. here we call engine.startGame or something.
-    this.engine.on('peer', this.showGame.bind(this));
+    this.engine.on('ready', this.showGame.bind(this));
     // TODO: set status message of peer rejection.
     this.engine.on('reject', peerId => {
       alert(`${peerId} rejected you`);
