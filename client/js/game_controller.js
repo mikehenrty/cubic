@@ -11,6 +11,8 @@ window.GameController = (function() {
 
     this.clientId = null;
     this.clientName = null;
+    this.readyAgain = false;
+    this.peerReadyAgain = false;
 
     this.connection = new Connection();
     this.time = new TimeSync(this.connection);
@@ -20,6 +22,7 @@ window.GameController = (function() {
     this.forward('reject', this.connection);
     this.forward('disconnect', this.connection);
     this.status.on('again', this.handleAgainButton.bind(this));
+    this.connection.on('again', this.handleAgainPeer.bind(this));
     this.connection.on('readyPlayerOne', this.handleReadyPlayerOne.bind(this));
     this.connection.on('start', this.handleStart.bind(this));
     this.connection.on('peer', this.handlePeerConnection.bind(this));
@@ -84,7 +87,7 @@ window.GameController = (function() {
     var tiles = this.engine.generateTiles();
     var startTime = this.time.now() + START_DELAY;
     this.connection.send('start', `${startTime} ${JSON.stringify(tiles)}`);
-    setTimeout(this.start.bind(this, tiles), START_DELAY);
+    setTimeout(this.startOnline.bind(this, tiles), START_DELAY);
   };
 
   GameController.prototype.setReadyStatus = function() {
@@ -95,10 +98,12 @@ window.GameController = (function() {
     var startTime, tiles
     [startTime, tiles] = payload.split(' ');
     tiles = JSON.parse(tiles);
-    setTimeout(this.start.bind(this, tiles), startTime - this.time.now());
+    setTimeout(this.startOnline.bind(this, tiles), startTime - this.time.now());
   };
 
-  GameController.prototype.start = function(tiles) {
+  GameController.prototype.startOnline = function(tiles) {
+    this.readyAgain = false;
+    this.peerReadyAgain = false;
     this.status.setStatus('Go!!!');
     this.engine.startGame(tiles);
   };
@@ -106,6 +111,14 @@ window.GameController = (function() {
   GameController.prototype.startOffline = function() {
     this.status.setStatus('Go!!!');
     this.engine.startOffline();
+  };
+
+  GameController.prototype.attemptToStartAgain = function() {
+    console.log('attempting to start again', this.readyAgain, this.peerReadyAgain);
+    if (this.engine.playerNumber === 1 &&
+        this.readyAgain && this.peerReadyAgain) {
+      this.connection.send('readyPlayerOne');
+    }
   };
 
   GameController.prototype.getClientId = function() {
@@ -117,6 +130,7 @@ window.GameController = (function() {
   };
 
   GameController.prototype.displayGameOverStatus = function(winner) {
+    this.status.setBottomStatus('');
     if (winner === 0) {
       this.status.setGameOverStatus('It\'s a tie');
     } else {
@@ -139,7 +153,17 @@ window.GameController = (function() {
       return;
     }
 
-    // TODO: online restart logic, wait for both to be ready
+    if (this.engine.playerNumber === 1) {
+      this.readyAgain = true;
+      this.attemptToStartAgain();
+    } else {
+      this.connection.send('again');
+    }
+  };
+
+  GameController.prototype.handleAgainPeer = function() {
+    this.peerReadyAgain = true;
+    this.attemptToStartAgain();
   };
 
   return GameController;
