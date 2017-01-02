@@ -19,6 +19,7 @@ window.Controller = (function() {
     this.game.on('confirm', this.showConfirmation.bind(this));
     this.game.on('reject', this.showRejection.bind(this));
     this.game.on('disconnect', this.showDisconnect.bind(this));
+    this.game.on('gameover', this.showPlayAgain.bind(this));
   }
 
   Controller.prototype.createClientList = function(list) {
@@ -107,6 +108,17 @@ window.Controller = (function() {
   Controller.prototype.startOfflineGame = function() {
     this.showGame();
     this.game.startOffline();
+  };
+
+  Controller.prototype.showPlayAgain = function(status) {
+    this.dialog.showConfirm(`${status}. Play again?`).then(result => {
+      if (result) {
+        // restart game
+        this.game.handleAgainButton();
+      } else {
+        this.showUI();
+      }
+    });
   };
 
   Controller.prototype.renamePlayer = function() {

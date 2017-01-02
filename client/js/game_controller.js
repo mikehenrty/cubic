@@ -132,7 +132,6 @@ window.GameController = (function() {
   };
 
   GameController.prototype.attemptToStartAgain = function() {
-    console.log('attempting to start again', this.readyAgain, this.peerReadyAgain);
     if (this.engine.playerNumber === 1 &&
         this.readyAgain && this.peerReadyAgain) {
       this.connection.send('readyPlayerOne');
@@ -148,17 +147,19 @@ window.GameController = (function() {
   };
 
   GameController.prototype.displayGameOverStatus = function(winner) {
+    var status = ''
     this.status.setBottomStatus('');
     if (winner === 0) {
-      this.status.setGameOverStatus('It\'s a tie');
+      status = 'It\'s a tie';
     } else {
       if (this.engine.offlineMode) {
-        this.status.setGameOverStatus(`Player ${winner} wins!`);
+        status = `Player ${winner} wins!`;
       } else {
-        this.status.setGameOverStatus(
-          `You ${winner === this.engine.playerNumber ? 'win' : 'lose'}`);
+        status = `You ${winner === this.engine.playerNumber ? 'win' : 'lose'}`;
       }
     }
+    this.status.setGameOverStatus(status);
+    this.trigger('gameover', status);
   };
 
   GameController.prototype.displayPing = function(ping) {
