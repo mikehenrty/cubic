@@ -14,7 +14,6 @@
   --border-width: 1.5vmin;
   --status-height: calc( (100vmin - var(--board-dimension) ) / 2);
   --status-color: red;
-  --fade-out-duration: 3s;
 
   --dialog-width: 60vmin;
   --dialog-height: 40vmin;
@@ -29,6 +28,9 @@
   --cube-color-orange: pink;
   --cube-color-white: magenta;
   --cube-color-green: aquamarine;
+
+  --fade-duration: 0.15s;
+  --fade-in-out-duration: 3s;
 }
 
 body {
@@ -70,8 +72,11 @@ input {
   animation: color-change 2s infinite;
 }
 
-.fade-out {
-  animation: fade-out var(--fade-out-duration) 1;
+.fade {
+}
+
+.fade-in-out {
+  animation: fade-in-out var(--fade-in-out-duration) 1;
 }
 
 body > div {
@@ -92,12 +97,6 @@ body > div {
 
 #ui {
   z-index: 1;
-}
-
-#dialog {
-  position: fixed;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 2;
 }
 
 #content {
@@ -152,7 +151,7 @@ body > div {
   padding: 0;
 }
 
-#content #ui-status.fade-out {
+#content #ui-status.fade-in-out {
   visibility: visible;
 }
 
@@ -307,6 +306,19 @@ body > div {
   border-top-width: calc(var(--square-dimension) - var(--border-width));
 }
 
+#dialog {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  transition: opacity ease-in var(--fade-duration);
+  visibility: visible;
+}
+
+#dialog.hide {
+  pointer-events: none;
+  opacity: 0;
+}
+
 #dialog-box {
   box-sizing: border-box;
   padding: 3vmin;
@@ -315,6 +327,7 @@ body > div {
   width: var(--dialog-width);
   border: 1px solid var(--console-green);
   text-align: center;
+  visibility: si
 }
 
 #dialog-title {
@@ -334,7 +347,7 @@ body > div {
   background-color: #535353;
 }
 
-@keyframes fade-out {
+@keyframes fade-in-out {
   0% { opacity: 0; }
   10% { opacity: 1; }
   80% { opacity: 1; }
