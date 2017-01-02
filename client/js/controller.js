@@ -9,11 +9,13 @@ window.Controller = (function() {
 
     this.ui.on('offline', this.startOfflineGame.bind(this));
     this.ui.on('rename', this.renamePlayer.bind(this));
-    this.ui.on('join', this.attemptToConnect.bind(this));
+    this.ui.on('join', this.askToConnect.bind(this));
 
+    this.game.on('ask', this.confirmConnection.bind(this));
     // TODO: move logic for starting game into this handler.
     // ie. here we call game.startGame or something.
     this.game.on('ready', this.showGame.bind(this));
+    this.game.on('confirm', this.showConfirmation.bind(this));
     this.game.on('reject', this.showRejection.bind(this));
     this.game.on('disconnect', this.showDisconnect.bind(this));
   }
@@ -42,9 +44,29 @@ window.Controller = (function() {
     this.game.showBoard();
   };
 
+  Controller.prototype.askToConnect = function(peerId) {
+    console.log('asking to connect to peer', peerId);
+    this.game.askToConnect(peerId);
+  };
+
+  Controller.prototype.confirmConnection = function(peerId, name) {
+    if (confirm(`${name} is asking to play you`)) {
+      this.game.allowPeer(peerId);
+      this.game.connectToPeer(peerId);
+    } else {
+      this.game.rejectPeer(peerId);
+    }
+  };
+
   Controller.prototype.showRejection = function(peerId) {
     var peer = this.clientList[peerId] || peerId;
     this.ui.setStatus(`${peer} rejected you`);
+    this.showUI();
+  };
+
+  Controller.prototype.showConfirmation = function(peerId) {
+    var peer = this.clientList[peerId] || peerId;
+    this.ui.setStatus(`${peer} is connecting`);
     this.showUI();
   };
 
@@ -62,7 +84,7 @@ window.Controller = (function() {
       if (peerId) {
         history.replaceState(null, document.title, '/');
         // TODO: set status of connecting to peer.
-        this.attemptToConnect(peerId);
+        this.askToConnect(peerId);
         return;
       }
 
@@ -73,11 +95,6 @@ window.Controller = (function() {
       console.log('Error connecting to server', err);
       this.showUI();
     });
-  };
-
-  Controller.prototype.attemptToConnect = function(peerId) {
-    console.log('connecting to peer', peerId);
-    this.game.connectToPeer(peerId);
   };
 
   Controller.prototype.startOfflineGame = function() {

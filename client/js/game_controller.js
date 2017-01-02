@@ -19,8 +19,9 @@ window.GameController = (function() {
     this.engine = new GameEngine(this.el, this.connection, this.time);
     this.status = new Status(this.el);
 
-    this.forward('reject', this.connection);
+    this.forward('ask', this.connection);
     this.forward('disconnect', this.connection);
+
     this.status.on('again', this.handleAgainButton.bind(this));
     this.connection.on('again', this.handleAgainPeer.bind(this));
     this.connection.on('readyPlayerOne', this.handleReadyPlayerOne.bind(this));
@@ -57,6 +58,23 @@ window.GameController = (function() {
       this.clientId = clientInfo.clientId;
       this.clientName = clientInfo.clientName;
     });
+  };
+
+  GameController.prototype.askToConnect = function(peerId) {
+    this.connection.askToConnect(peerId).then(() => {
+      this.trigger('confirm', peerId);
+    }).catch(err => {
+      console.log('unable to connect', err, peerId);
+      this.trigger('reject', peerId);
+    });
+  };
+
+  GameController.prototype.allowPeer = function(peerId) {
+    this.connection.allowPeer(peerId);
+  };
+
+  GameController.prototype.rejectPeer = function(peerId) {
+    this.connection.rejectPeer(peerId);
   };
 
   GameController.prototype.connectToPeer = function(peerId) {

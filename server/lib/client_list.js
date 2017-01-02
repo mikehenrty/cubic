@@ -84,8 +84,13 @@ ClientList.prototype.getIdList = function() {
   return Object.keys(this.clientInfo);
 };
 
-ClientList.prototype.getNameList = function() {
-  return Object.keys(this.clientIds);
+ClientList.prototype.printList = function() {
+  console.log('LIST:');
+  Object.keys(this.clientIds).forEach(name => {
+    var id = this.clientIds[name];
+    console.log('--', name, id.substr(0, id.indexOf('-')));
+  });
+  console.log('');
 };
 
 module.exports = ClientList;

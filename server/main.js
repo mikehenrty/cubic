@@ -19,10 +19,6 @@ var server, staticFile, websockets;
 var clients = new ClientList();
 console.setDebug(DEBUG);
 
-function debugClientList() {
-  console.debug(`LIST: ${clients.getNameList()}\n`);
-}
-
 // Web Server.
 staticFile = new nodeStatic.Server(SITE_PATH, { cache: false});
 server = http.createServer((req, res) => {
@@ -35,13 +31,13 @@ websockets = new ws.Server({ server: server, port: WS_PORT });
 websockets.on('connection', socket => {
   socket.on('message', message => {
     handleMessage(socket, message);
-    debugClientList();
+    DEBUG && clients.printList();
   });
 
   socket.on('close', () => {
     console.debug(`disconnect ${clients.getName(socket.clientId)}`);
     clients.remove(socket.clientId);
-    debugClientList();
+    DEBUG && clients.printList();
   });
 });
 
@@ -86,7 +82,7 @@ function handleMessage(socket, message) {
     return;
   }
 
-  // Pass message on to recipient, whatever it may mean.
+  // Make sure the recipienct exists.
   if (!clients.exists(recipient)) {
     console.debug(`unrecognized ${recipient} ${clients.getIdList()}`);
     socket.send(`error ${type}_ack ${recipient} ${payload}`);
@@ -98,6 +94,7 @@ function handleMessage(socket, message) {
     payload = clients.getName(sender);
   }
 
+  // Pass message on to recipient, whatever it may mean.
   var message = `${type} ${sender} ${payload}`;
   console.debug(`sending ${message}`);
   clients.send(recipient, message);

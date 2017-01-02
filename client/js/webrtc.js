@@ -14,7 +14,6 @@ window.WebRTC = (function() {
     this.queue = new Utility.Queue();
 
     this.socket.on('signaling', this.signalHandler.bind(this));
-    this.socket.on('ask', this.askHandler.bind(this));
   }
 
   WebRTC.prototype = new Eventer();
@@ -23,12 +22,8 @@ window.WebRTC = (function() {
     return this.dataChannel && this.dataChannel.readyState === 'open';
   };
 
-  WebRTC.prototype.setAuthorizedPeer = function(peerId, name) {
-    // Null peerId clears authorized peer.
-    this.authorizedPeer = peerId && {
-      peerId: peerId,
-      name: name
-    };
+  WebRTC.prototype.authorizePeer = function(peerId) {
+    this.authorizedPeer = peerId;
   };
 
   WebRTC.prototype.initPeerConnection = function(peerId) {
@@ -50,29 +45,19 @@ window.WebRTC = (function() {
   };
 
   WebRTC.prototype.connect = function(peerId) {
-    this.socket.sendCommand('ask', peerId).then((response) => {
-      if (response !== 'yes') {
-        this.trigger('reject', peerId);
-        return;
-      }
+    this.authorizePeer(peerId);
+    this.initPeerConnection(peerId);
+    this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL, {
+      ordered: false,
+      maxRetransmits: 0
+    });
+    this.dataChannel.onopen = this.dataChannel.onclose =
+      this.dataChannelStateChange.bind(this);
+    this.dataChannel.onmessage = this.onMessage.bind(this);
 
-      // Start signaling process.
-      this.setAuthorizedPeer(peerId);
-      this.initPeerConnection(peerId);
-      this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL, {
-        ordered: false,
-        maxRetransmits: 0
-      });
-      this.dataChannel.onopen = this.dataChannel.onclose =
-        this.dataChannelStateChange.bind(this);
-      this.dataChannel.onmessage = this.onMessage.bind(this);
-
-      return this.peerConnection.createOffer().then(offer => {
-        this.peerConnection.setLocalDescription(offer);
-        this.sendSignal('offer', offer);
-      });
-    }).catch(err => {
-      this.trigger('reject', peerId);
+    this.peerConnection.createOffer().then(offer => {
+      this.peerConnection.setLocalDescription(offer);
+      this.sendSignal('offer', offer);
     });
   };
 
@@ -109,7 +94,7 @@ window.WebRTC = (function() {
       return;
     }
 
-    if (!this.authorizedPeer || this.authorizedPeer.peerId !== peerId) {
+    if (!this.authorizedPeer || this.authorizedPeer !== peerId) {
       console.log('attempted signal from unauthorized peer', peerId, message);
       return;
     }
@@ -144,16 +129,6 @@ window.WebRTC = (function() {
         break;
     }
   };
-
-  WebRTC.prototype.askHandler = function(err, peerId, name) {
-    if (confirm(`${name} is asking to play you`)) {
-      this.setAuthorizedPeer(peerId, name);
-      this.socket.send('ask_ack', peerId, 'yes');
-    } else {
-      this.socket.send('ask_ack', peerId, 'no');
-    }
-  };
-
 
   WebRTC.prototype.handleSignalAnswer = function(data, cb) {
     this.peerConnection.setRemoteDescription(
