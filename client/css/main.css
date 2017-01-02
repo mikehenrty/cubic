@@ -16,6 +16,9 @@
   --status-color: red;
   --fade-out-duration: 3s;
 
+  --dialog-width: 60vmin;
+  --dialog-height: 40vmin;
+
   --font-small: calc(var(--board-dimension) / 40);
   --font-normal: calc(var(--board-dimension) / 30);
   --font-large: calc(var(--board-dimension) / 20);
@@ -31,12 +34,32 @@
 body {
   background-color: black;
   font-family: 'Press Start 2P';
-  font-size: calc(var(--status-height) / 3);
+  font-size: var(--font-normal);
   color: var(--console-green);
 }
 
 p {
   margin: 0;
+}
+
+button {
+  font-family: 'Press Start 2P';
+  color: var(--console-green);
+  font-size: var(--font-small);
+  height: var(--font-large);
+  background-color: transparent;
+  padding: 0 1.5vmin;
+  margin: 0 1vmin;
+}
+
+input {
+  font-family: 'Press Start 2P';
+  color: var(--console-green);
+  font-size: var(--font-small);
+  height: var(--font-large);
+  background-color: white;
+  padding: 0 1.5vmin;
+  margin: 0 1vmin;
 }
 
 .hide {
@@ -51,27 +74,30 @@ p {
   animation: fade-out var(--fade-out-duration) 1;
 }
 
-#screen {
+body > div {
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+
+#screen {
   top: var(--status-height);
   bottom: var(--status-height);
-  left: 0;
-  right: 0;
 }
 
 #ui {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   z-index: 1;
+}
+
+#dialog {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2;
 }
 
 #content {
@@ -138,13 +164,7 @@ p {
 }
 
 #action-buttons button {
-  font-family: 'Press Start 2P';
   color: white;
-  font-size: var(--font-small);
-  height: var(--font-large);
-  background-color: transparent;
-  padding: 0 1.5vmin;
-  margin: 0 1vmin;
 }
 
 #list-header {
@@ -285,6 +305,33 @@ p {
 .piece.moving.moveDown {
   border-bottom-width: 0vmin;
   border-top-width: calc(var(--square-dimension) - var(--border-width));
+}
+
+#dialog-box {
+  box-sizing: border-box;
+  padding: 3vmin;
+  position: relative;
+  background-color: black;
+  width: var(--dialog-width);
+  border: 1px solid var(--console-green);
+  text-align: center;
+}
+
+#dialog-title {
+  margin-bottom: 3vmin;
+}
+
+#input-container {
+  margin-bottom: 3vmin;
+}
+
+#input-container input {
+  background-color: #535353;
+  display: none;
+}
+
+#input-container.prompt {
+  display: unset;
 }
 
 @keyframes fade-out {

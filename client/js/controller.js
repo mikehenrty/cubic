@@ -5,6 +5,7 @@ window.Controller = (function() {
     this.container = container;
     this.game = new GameController(container);
     this.ui = new UI(container);
+    this.dialog = new Dialog(container);
     this.clientList = null;
 
     this.ui.on('offline', this.startOfflineGame.bind(this));
@@ -50,12 +51,14 @@ window.Controller = (function() {
   };
 
   Controller.prototype.confirmConnection = function(peerId, name) {
-    if (confirm(`${name} is asking to play you`)) {
-      this.game.allowPeer(peerId);
-      this.game.connectToPeer(peerId);
-    } else {
-      this.game.rejectPeer(peerId);
-    }
+    this.dialog.showPrompt(`${name} is asking to play you`).then(result => {
+      if (result) {
+        this.game.allowPeer(peerId);
+        this.game.connectToPeer(peerId);
+      } else {
+        this.game.rejectPeer(peerId);
+      }
+    });
   };
 
   Controller.prototype.showRejection = function(peerId) {
