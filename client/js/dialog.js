@@ -126,7 +126,7 @@ window.Dialog = (() => {
     if (this.pendingDeferred) {
       var deferred = this.pendingDeferred;
       this.pendingDeferred = null;
-      rej(new Error('hide called before user interacted with dialog'));
+      deferred.rej(new Error('hide called before any buttons clicked'));
     }
   };
 
