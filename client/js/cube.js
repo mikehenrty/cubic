@@ -15,6 +15,26 @@ window.Cube = (function() {
 
   function Cube(el) {
     this.el = el;
+    this.top = document.createElement('div');
+    this.top.className = 'top';
+    this.north = document.createElement('div');
+    this.north.className = 'north';
+    this.east = document.createElement('div');
+    this.east.className = 'east';
+    this.south = document.createElement('div');
+    this.south.className = 'south';
+    this.west = document.createElement('div');
+    this.west.className = 'west';
+    this.bottom = document.createElement('div');
+    this.bottom.className = 'bottom';
+
+    this.el.appendChild(this.bottom);
+    this.el.appendChild(this.north);
+    this.el.appendChild(this.east);
+    this.el.appendChild(this.west);
+    this.el.appendChild(this.south);
+    this.el.appendChild(this.top);
+
     this.sides = null;
     this.reset();
   }
@@ -28,15 +48,24 @@ window.Cube = (function() {
   };
 
   Cube.prototype.update = function() {
-    this.setCubeColor('backgroundColor', this.sides[TOP]);
-    this.setCubeColor('borderTopColor', this.sides[NORTH]);
-    this.setCubeColor('borderBottomColor', this.sides[SOUTH]);
-    this.setCubeColor('borderLeftColor', this.sides[WEST]);
-    this.setCubeColor('borderRightColor', this.sides[EAST]);
+    this.setSideColor('top', this.sides[TOP]);
+    this.setSideColor('north', this.sides[NORTH]);
+    this.setSideColor('south', this.sides[SOUTH]);
+    this.setSideColor('west', this.sides[WEST]);
+    this.setSideColor('east', this.sides[EAST]);
+    this.setSideColor('bottom', this.sides[BOTTOM]);
+
+    // TODO: check if this is faster.
+    // this.top.className  = `north ${this.sides[TOP]}`;
+    // this.north.className  = `north ${this.sides[TOP]}`;
+    // this.south.className  = `north ${this.sides[SOUTH]}`;
+    // this.west.className  = `north ${this.sides[WEST]}`;
+    // this.east.className  = `north ${this.sides[EAST]}`;
+    // this.bottom.className  = `north ${this.sides[BOTTOM]}`;
   };
 
-  Cube.prototype.setCubeColor = function(prop, color) {
-    this.el.style[prop] = `var(--cube-color-${color})`;
+  Cube.prototype.setSideColor = function(prop, color) {
+    this[prop].style.backgroundColor = `var(--cube-color-${color})`;
   };
 
   Cube.prototype.reset = function() {

@@ -248,7 +248,7 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.rollbackMoveForPlayer = function(player, position) {
-    player.setPosition(position.x, position.y, 10);
+    player.setPosition(position.x, position.y);
     player.endMove(true);
   };
 

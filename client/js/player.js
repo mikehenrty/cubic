@@ -65,10 +65,8 @@ window.Player = (function() {
     this.moves.push(move);
     this.el.classList.add('moving', move);
     var position = this.getMovePosition(move);
-    if (!position) {
-      return false;
-    }
-    this.setPosition(position.x, position.y, duration);
+    this.setPosition(position.x, position.y);
+    this.setMoveDuration(duration);
   };
 
   // Returns true if points were added on this move.
@@ -81,6 +79,7 @@ window.Player = (function() {
     }
 
     this.cube.move(move);
+    this.update();
 
     // TODO: move this logic into engine
     if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
@@ -101,12 +100,12 @@ window.Player = (function() {
     return this.moves.length > 0;
   };
 
-  Player.prototype.update = function(duration) {
-    duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
-    this.el.style.transitionDuration = duration + 'ms';
-    this.el.style.transform =
-      `translateY(calc(${this.y} * ${this.squareHeight}))` +
-      `translateX(calc(${this.x} * ${this.squareHeight}))`;
+  Player.prototype.update = function() {
+    this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
+    this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
+    // this.el.style.transform =
+    //  `translateY(calc(${this.y} * ${this.squareHeight}))` +
+    //  `translateX(calc(${this.x} * ${this.squareHeight}))`;
   };
 
   Player.prototype.getPosition = function() {
@@ -119,7 +118,11 @@ window.Player = (function() {
   Player.prototype.setPosition = function(x, y, duration) {
     this.x = x;
     this.y = y;
-    this.update(duration);
+  };
+
+  Player.prototype.setMoveDuration = function(duration) {
+    duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
+    this.el.style.transitionDuration = duration + 'ms';
   };
 
   Player.prototype.getMovePosition = function(move) {
@@ -189,7 +192,7 @@ window.Player = (function() {
     this.scoreEl.textContent = this.points;
     this.cube.reset();
     this.el.classList.remove('moving');
-    this.update(0);
+    this.update();
   };
 
   return Player;

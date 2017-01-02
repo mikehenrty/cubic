@@ -88,6 +88,10 @@ window.Controller = (function() {
     this.game.register(Utility.fetchName()).then(() => {
       Utility.storeName(this.game.getClientName());
 
+
+      this.startOfflineGame();
+      return;
+
       var peerId = Utility.getPeerId();
       if (peerId) {
         history.replaceState(null, document.title, '/');

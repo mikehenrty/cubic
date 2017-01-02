@@ -31,6 +31,7 @@
 
   --fade-duration: 0.15s;
   --fade-in-out-duration: 3s;
+  --board-spin-duration: 15s;
 }
 
 body {
@@ -93,6 +94,7 @@ body > div {
 #screen {
   top: var(--status-height);
   bottom: var(--status-height);
+  transform-style: preserve-3d;
 }
 
 #ui {
@@ -183,11 +185,17 @@ body > div {
 
 #board {
   position: relative;
-  background-color: black;
+  background-color: transparent;
   width: var(--board-dimension);
   height: var(--board-dimension);
   line-height: 0;
   border: 1px solid var(--console-green);
+
+
+  transform-style: preserve-3d;
+  animation: spin var(--board-spin-duration) infinite;
+  perspective: 70vmin;
+  backface-visibility:visible;
 }
 
 #board span {
@@ -196,6 +204,7 @@ body > div {
   height: var(--square-dimension);
   width: var(--square-dimension);
   border: 1px solid var(--console-green);
+  display:none;
 }
 
 #status {
@@ -275,6 +284,74 @@ body > div {
 }
 
 .piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--square-dimension);
+  width: var(--square-dimension);
+  transition: transform linear;
+  transform-style: preserve-3d;
+  perspective: 80vmin;
+}
+
+.piece > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: var(--square-dimension);
+  width: var(--square-dimension);
+  perspective: 80vmin;
+  backface-visibility:hidden;
+}
+
+.piece .top {
+  transform: translateZ(var(--square-dimension));
+}
+
+.piece .north {
+  transform-origin: top;
+  transform: rotateX(90deg);
+}
+
+.piece .east {
+  transform-origin: right;
+  transform: rotateY(90deg);
+}
+
+.piece .south {
+  transform-origin: bottom;
+  transform: rotateX(-90deg);
+}
+
+.piece .west {
+  transform-origin: left;
+  transform: rotateY(-90deg);
+}
+
+.piece.moving.moveLeft {
+  transform-origin: left;
+  transform: rotateY(-90deg);
+}
+
+.piece.moving.moveRight {
+  transform-origin: right;
+  transform: rotateY(90deg);
+}
+
+.piece.moving.moveUp {
+  transform-origin: top;
+  transform: rotateX(90deg);
+}
+
+.piece.moving.moveDown {
+  transform-origin: bottom;
+  transform: rotateX(-90deg);
+}
+
+/*
+.piece {
   box-sizing: border-box;
   border-width: var(--border-width);
   border-style: solid;
@@ -285,6 +362,7 @@ body > div {
   width: var(--square-dimension);
   transition-property: border-width, transform;
 }
+
 
 .piece.moving.moveLeft {
   border-left-width: 0vmin;
@@ -305,6 +383,8 @@ body > div {
   border-bottom-width: 0vmin;
   border-top-width: calc(var(--square-dimension) - var(--border-width));
 }
+
+*/
 
 #dialog {
   position: fixed;
@@ -327,7 +407,6 @@ body > div {
   width: var(--dialog-width);
   border: 1px solid var(--console-green);
   text-align: center;
-  visibility: si
 }
 
 #dialog-title {
@@ -349,6 +428,21 @@ body > div {
 
 #input-container input {
   background-color: #535353;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotateX(60deg) rotateZ(-10deg);
+    animation-timing-function: ease-in-out;
+  }
+  50% {
+    transform: rotateX(60deg) rotateZ(10deg);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: rotateX(60deg) rotateZ(-10deg);
+    animation-timing-function: ease-in-out;
+  }
 }
 
 @keyframes fade-in-out {
