@@ -323,15 +323,15 @@ body > div {
 
 #input-container {
   margin-bottom: 3vmin;
+  display: none;
+}
+
+.prompt #input-container {
+  display: inline-block;
 }
 
 #input-container input {
   background-color: #535353;
-  display: none;
-}
-
-#input-container.prompt {
-  display: unset;
 }
 
 @keyframes fade-out {

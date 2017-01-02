@@ -12,6 +12,7 @@ window.Dialog = (() => {
     this.title = document.createElement('div');
     this.title.id = 'dialog-title';
     this.input = document.createElement('input');
+    this.input.onkeydown = this.onKeyDown.bind(this);
     this.inputContainer = document.createElement('div');
     this.inputContainer.id = 'input-container';
     this.inputContainer.appendChild(this.input);
@@ -41,10 +42,49 @@ window.Dialog = (() => {
     return !this.el.classList.contains('hide');
   };
 
-  Dialog.prototype.showPrompt = function(message) {
-    if (this.isShowing()) {
-      return false;
+  Dialog.prototype.isPrompt = function() {
+    return this.el.classList.contains('prompt');
+  };
+
+  Dialog.prototype.debounce = function() {
+    if (this.pendingDeferred) {
+      var deferred = this.pendingDeferred;
+      this.pendingDeferred = null;
+      deferred.rej(new Error('showed new prompt before old done'));
     }
+  };
+
+  Dialog.prototype.onKeyDown = function(evt) {
+    if (!this.isShowing() || !this.pendingDeferred || !this.isPrompt()) {
+      console.log('keydown event without showing prompt');
+      return;
+    }
+
+    // Handle 'enter' key.
+    if (evt.keyCode === 13) {
+      this.onResponse(true);
+    }
+  };
+
+  Dialog.prototype.showPrompt = function(message) {
+    this.debounce();
+
+    return new Promise((res, rej) => {
+      this.pendingDeferred = {
+        res: res,
+        rej: rej
+      };
+
+      this.input.value = '';
+      this.title.textContent = message;
+      this.el.classList.add('prompt');
+      this.el.classList.remove('hide');
+      this.input.focus();
+    });
+  };
+
+  Dialog.prototype.showConfirm = function(message) {
+    this.debounce();
 
     return new Promise((res, rej) => {
       this.pendingDeferred = {
@@ -53,17 +93,8 @@ window.Dialog = (() => {
       };
 
       this.title.textContent = message;
-      this.el.classList.add('prompt');
-      this.el.classList.remove('hide');
+      this.el.classList.remove('hide', 'prompt');
     });
-  };
-
-  Dialog.prototype.showConfirm = function(message) {
-    if (this.isShowing()) {
-      return false;
-    }
-
-    this.el.classList.remove('hide', 'prompt');
   };
 
   Dialog.prototype.onResponse = function(result) {
@@ -76,7 +107,11 @@ window.Dialog = (() => {
     this.pendingDeferred = null;
 
     this.hide();
-    deferred.res(result);
+    if (this.isPrompt()) {
+      deferred.res(result && this.input.value);
+    } else {
+      deferred.res(result);
+    }
   };
 
   Dialog.prototype.hide = function() {

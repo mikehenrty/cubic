@@ -51,7 +51,7 @@ window.Controller = (function() {
   };
 
   Controller.prototype.confirmConnection = function(peerId, name) {
-    this.dialog.showPrompt(`${name} is asking to play you`).then(result => {
+    this.dialog.showConfirm(`${name} is asking to play you`).then(result => {
       if (result) {
         this.game.allowPeer(peerId);
         this.game.connectToPeer(peerId);
@@ -105,14 +105,22 @@ window.Controller = (function() {
     this.game.startOffline();
   };
 
-  Controller.prototype.renamePlayer = function(name) {
-    this.ui.show({ clientName: '...' }); // Temporarily display elipses
-    this.game.setName(name).then(() => {
-      Utility.storeName(name);
-      this.showUI();
-    }).catch((err) => {
-      console.log('Name set error', err);
-      this.showUI();
+  Controller.prototype.renamePlayer = function() {
+    this.dialog.showPrompt('What is your name?').then(name => {
+      if (!name) {
+        return;
+      }
+
+      this.ui.show({ clientName: '...' }); // Temporarily display elipses
+      this.game.setName(name).then(() => {
+        Utility.storeName(name);
+        this.ui.setStatus('Name changed');
+        this.showUI();
+      }).catch((err) => {
+        console.log('Name set error', err);
+        this.ui.setStatus('Could not change name');
+        this.showUI();
+      });
     });
   };
 

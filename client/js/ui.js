@@ -45,12 +45,7 @@ window.UI = (function() {
     this.listContainer = document.createElement('div');
     this.listContainer.id = 'list-container';
 
-    this.changeNameButton.onclick = evt => {
-      var newName = prompt('New name?');
-      if (newName) {
-        this.trigger('rename', newName);
-      }
-    };
+    this.changeNameButton.onclick = this.trigger.bind(this, 'rename');
 
     this.linkButton.onclick = evt => {
       this.linkInput.focus();
