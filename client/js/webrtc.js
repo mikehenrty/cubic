@@ -59,7 +59,10 @@ window.WebRTC = (function() {
       // Start signaling process.
       this.setAuthorizedPeer(peerId);
       this.initPeerConnection(peerId);
-      this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL);
+      this.dataChannel = this.peerConnection.createDataChannel(CHANNEL_LABEL, {
+        ordered: false,
+        maxRetransmits: 0
+      });
       this.dataChannel.onopen = this.dataChannel.onclose =
         this.dataChannelStateChange.bind(this);
       this.dataChannel.onmessage = this.onMessage.bind(this);
