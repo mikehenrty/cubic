@@ -343,6 +343,10 @@ body > div {
   display: inline-block;
 }
 
+.alert #confirm-button {
+  display: none;
+}
+
 #input-container input {
   background-color: #535353;
 }

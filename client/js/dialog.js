@@ -18,9 +18,11 @@ window.Dialog = (() => {
     this.inputContainer.appendChild(this.input);
 
     this.cancel = document.createElement('button');
+    this.cancel.id = 'cancel-button';
     this.cancel.textContent = 'Cancel';
     this.cancel.onclick = this.onResponse.bind(this, false);
     this.confirm = document.createElement('button');
+    this.confirm.id = 'confirm-button';
     this.confirm.textContent = 'Accept';
     this.confirm.onclick = this.onResponse.bind(this, true);
     this.buttons = document.createElement('div');
@@ -77,8 +79,7 @@ window.Dialog = (() => {
 
       this.input.value = '';
       this.title.textContent = message;
-      this.el.classList.add('prompt');
-      this.el.classList.remove('hide');
+      this.el.className = ('prompt');
       this.input.focus();
     });
   };
@@ -93,8 +94,14 @@ window.Dialog = (() => {
       };
 
       this.title.textContent = message;
-      this.el.classList.remove('hide', 'prompt');
+      this.el.className = '';
     });
+  };
+
+  Dialog.prototype.showAlert = function(message) {
+    var promise = this.showConfirm(message);
+    this.el.className = 'alert';
+    return promise;
   };
 
   Dialog.prototype.onResponse = function(result) {
@@ -116,6 +123,11 @@ window.Dialog = (() => {
 
   Dialog.prototype.hide = function() {
     this.el.classList.add('hide');
+    if (this.pendingDeferred) {
+      var deferred = this.pendingDeferred;
+      this.pendingDeferred = null;
+      rej(new Error('hide called before user interacted with dialog'));
+    }
   };
 
   return Dialog;

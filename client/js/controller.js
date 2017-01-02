@@ -29,6 +29,7 @@ window.Controller = (function() {
   };
 
   Controller.prototype.showUI = function() {
+    this.dialog.hide();
     this.game.getList().then(list => {
       this.createClientList(list);
       this.game.hideBoard();
@@ -41,12 +42,15 @@ window.Controller = (function() {
   };
 
   Controller.prototype.showGame = function() {
+    this.dialog.hide();
     this.ui.hide();
     this.game.showBoard();
   };
 
   Controller.prototype.askToConnect = function(peerId) {
     console.log('asking to connect to peer', peerId);
+    var peer = this.clientList[peerId] || peerId;
+    this.dialog.showAlert(`Asking ${peer} to connect...`);
     this.game.askToConnect(peerId);
   };
 
