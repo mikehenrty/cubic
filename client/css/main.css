@@ -73,9 +73,6 @@ input {
   animation: color-change 2s infinite;
 }
 
-.fade {
-}
-
 .fade-in-out {
   animation: fade-in-out var(--fade-in-out-duration) 1;
 }
@@ -94,7 +91,7 @@ body > div {
 #screen {
   top: var(--status-height);
   bottom: var(--status-height);
-  transform-style: preserve-3d;
+  perspective: 400vmin;
 }
 
 #ui {
@@ -185,17 +182,12 @@ body > div {
 
 #board {
   position: relative;
-  background-color: transparent;
   width: var(--board-dimension);
   height: var(--board-dimension);
-  line-height: 0;
   border: 1px solid var(--console-green);
-
-
   transform-style: preserve-3d;
   animation: spin var(--board-spin-duration) infinite;
-  perspective: 70vmin;
-  backface-visibility:visible;
+  line-height: 0;
 }
 
 #board span {
@@ -204,7 +196,6 @@ body > div {
   height: var(--square-dimension);
   width: var(--square-dimension);
   border: 1px solid var(--console-green);
-  display:none;
 }
 
 #status {
@@ -285,25 +276,16 @@ body > div {
 
 .piece {
   position: absolute;
-  top: 0;
-  left: 0;
   height: var(--square-dimension);
   width: var(--square-dimension);
-  transition: transform linear;
+  transition: transform ease-in-out;
   transform-style: preserve-3d;
-  perspective: 80vmin;
 }
 
 .piece > div {
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
   height: var(--square-dimension);
   width: var(--square-dimension);
-  perspective: 80vmin;
-  backface-visibility:hidden;
 }
 
 .piece .top {
@@ -328,6 +310,11 @@ body > div {
 .piece .west {
   transform-origin: left;
   transform: rotateY(-90deg);
+}
+
+.piece .bottom {
+  transform-origin: top;
+  transform: rotateZ(0);
 }
 
 .piece.moving.moveLeft {
