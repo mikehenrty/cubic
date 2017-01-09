@@ -154,6 +154,10 @@ window.GameEngine = (function() {
 
     // Make sure we have enough time for animation to complete,
     // otherwise we reject the move.
+
+    // TODO(polish): check if this move happened before my last move.
+    //   If nothing happened in the meantime, gracefully allow this move.
+    //   see: https://github.com/mikehenrty/cubic/issues/10
     if (duration < 0) {
       console.log('not enough time for opponent move', duration);
       this.ackOpponentMove(false, id, timestamp);
