@@ -1,6 +1,8 @@
 window.GameEngine = (function() {
   'use strict';
 
+  const DEBUG = CONST.DEBUG;
+
   const COLS = CONST.COLS;
   const ROWS = CONST.ROWS;
 
@@ -13,6 +15,7 @@ window.GameEngine = (function() {
     this.pendingMoves = {};
     this.lastMoveInfo = null;
     this.offlineMode = null;
+    this.startTime = null;
     this.setPlayer(1);
 
     this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
@@ -47,10 +50,12 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.startGame = function(tiles) {
     this.reset();
+    this.startTime = this.time.now();
     this.board.displayTiles(tiles);
   };
 
   GameEngine.prototype.reset = function() {
+    this.startTime = null;
     this.pendingMoves = {};
     this.board.reset();
     this.player1.reset();
@@ -152,7 +157,8 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.addPendingMove = function(id, moveInfo) {
-    this.pendingMoves[id] = moveInfo
+    this.pendingMoves[id] = moveInfo;
+    DEBUG && this.logPendingMove(id, 'adding');
   };
 
   GameEngine.prototype.getPendingMove = function(id) {
@@ -160,10 +166,51 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.checkPendingMove = function(id) {
+    DEBUG && this.logPendingMove(id, 'checking');
     var moveInfo = this.getPendingMove(id);
     if (moveInfo.acked && moveInfo.animated) {
-        this.finishPendingMove(id);
+      this.finishPendingMove(id);
     }
+  };
+
+  GameEngine.prototype.finishPendingMove = function(id) {
+    if (this.me.endMove() && this.board.isGameOver()) {
+      this.endGame();
+      return;
+    }
+    DEBUG && this.logPendingMove(id, '--------------finishing-delete');
+    delete this.pendingMoves[id];
+    if (this.me.nextMove) {
+      var key = this.me.nextMove;
+      this.me.nextMove = null;
+      setTimeout(this.handleKeyForMe.bind(this, key), 0);
+    }
+  };
+
+  GameEngine.prototype.rollbackPendingMove = function(id) {
+    var moveInfo = this.getPendingMove(id);
+    var move = this.pendingMoves[id];
+    this.rollbackMoveForPlayer(this.me, move.position);
+    DEBUG && this.logPendingMove(id, '--------------finishing-rollingback');
+    delete this.pendingMoves[id];
+  };
+
+  GameEngine.prototype.rollbackMoveForPlayer = function(player, position) {
+    player.setPosition(position.x, position.y);
+    player.endMove(true);
+  };
+
+
+  GameEngine.prototype.logPendingMove = function(id, message) {
+    var info = this.getPendingMove(id);
+    if (!info) {
+      console.log('could not find move to log', id, message);
+      return;
+    }
+
+    var elapsed = this.time.now() - info.timestamp;
+    console.log(id.substr(0, 6), elapsed, message && message.toUpperCase(),
+      `acked=${info.acked}, animated=${info.animated}`);
   };
 
   GameEngine.prototype.ackOpponentMove = function(accepted, id, timestamp) {
@@ -174,6 +221,8 @@ window.GameEngine = (function() {
   GameEngine.prototype.handleKeyForOpponent = function(payload) {
     var key, id, timestamp;
     [id, key, timestamp] = payload.split(' ');
+
+    DEBUG && console.log('handling opponent key', id, key);
 
     var move = this.getMove(key);
     if (!move) {
@@ -249,30 +298,6 @@ window.GameEngine = (function() {
     // Move must be both acked and animated before completion.
     moveInfo.acked = true;
     this.checkPendingMove(id);
-  };
-
-  GameEngine.prototype.finishPendingMove = function(id) {
-    if (this.me.endMove() && this.board.isGameOver()) {
-      this.endGame();
-      return;
-    }
-    delete this.pendingMoves[id];
-    if (this.me.nextMove) {
-      var key = this.me.nextMove;
-      this.me.nextMove = null;
-      setTimeout(this.handleKeyForMe.bind(this, key), 0);
-    }
-  };
-
-  GameEngine.prototype.rollbackPendingMove = function(id) {
-    var move = this.pendingMoves[id];
-    this.rollbackMoveForPlayer(this.me, move.position);
-    delete this.pendingMoves[id];
-  };
-
-  GameEngine.prototype.rollbackMoveForPlayer = function(player, position) {
-    player.setPosition(position.x, position.y);
-    player.endMove(true);
   };
 
   GameEngine.prototype.getMove = function(key) {

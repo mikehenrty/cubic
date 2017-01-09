@@ -5,7 +5,7 @@ window.TimeSync = (function () {
 
   function getOffset(sentTime, serverTime, currentTime) {
     var ping = currentTime - sentTime;
-    var latency = ping / 2;
+    var latency = Math.round(ping / 2);
     return serverTime - currentTime + latency;
   }
 

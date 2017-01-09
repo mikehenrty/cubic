@@ -179,9 +179,15 @@ window.WebRTC = (function() {
       case 'disconnected':
       case 'failed':
       case 'closed':
+        console.log('disconnect from webrtc state change',
+          this.peerConnection.iceConnectionState);
+        this.disconnect();
+        break;
+
       default:
         console.log('webrtc state change',
           this.peerConnection.iceConnectionState);
+        break;
     };
   };
 
@@ -200,6 +206,7 @@ window.WebRTC = (function() {
         break;
 
       case 'closed':
+        console.log('disconnect from data channel state change');
         this.disconnect();
         break;
 
@@ -209,6 +216,7 @@ window.WebRTC = (function() {
   };
 
   WebRTC.prototype.disconnect = function() {
+    console.log('webrtc disconnect', this.peerId);
     this.cleanUp();
     if (this.peerId) {
       var peerId = this.peerId;

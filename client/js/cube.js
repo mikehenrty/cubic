@@ -56,10 +56,24 @@ window.Cube = (function() {
       this.el.style.transitionDuration = duration + 'ms';
       this.el.classList.add('moving', move);
 
+      var ended = false;
       this.el.addEventListener('transitionend', function onEnd(evt) {
         evt.currentTarget.removeEventListener('transitionend', onEnd);
+
+        if (ended) {
+          console.log('transitionend was pre-empted by setTimeout', duration);
+          return;
+        }
+        ended = true;
         res();
       });
+      setTimeout(() => {
+        if (!ended) {
+          ended = true;
+          console.log('manual timeout', move, duration);
+          res();
+        }
+      }, Math.round(duration * 1.2));
     });
   };
 
