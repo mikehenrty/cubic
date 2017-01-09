@@ -25,14 +25,14 @@ window.GameEngine = (function() {
   GameEngine.prototype.setPlayer = function(playerNumber) {
     if (playerNumber === 1) {
       this.playerNumber = 1;
-      this.me = this.player2.opponent = this.player1;
+      this.me = this.player1;
       this.opponentNumber = 2;
-      this.opponent = this.me.opponent = this.player2;
+      this.opponent = this.player2;
     } else {
       this.playerNumber = 2;
-      this.me = this.player1.opponent = this.player2;
+      this.me = this.player2;
       this.opponentNumber = 1;
-      this.opponent = this.me.opponent = this.player1;
+      this.opponent = this.player1;
     }
   };
 
@@ -82,7 +82,13 @@ window.GameEngine = (function() {
       return;
     }
 
-    if (!player.getMovePosition(move)) {
+    var newPosition = player.getMovePosition(move);
+    if (!newPosition) {
+      return;
+    }
+
+    var opponenet = playerNumber === 1 ? this.player2 : this.player1;
+    if (this.arePositionsConflicting(newPosition, opponenet.getPosition())) {
       return;
     }
 
@@ -117,11 +123,20 @@ window.GameEngine = (function() {
       return false;
     }
 
+    if (this.arePositionsConflicting(position, this.opponent.getPosition())) {
+      return false;
+    }
+
     var now = this.time.now();
     var id = Utility.guid();
     this.addPendingMove(id, this.me.getPosition(), now);
     this.connection.send('keydown', `${id} ${key} ${now}`);
     this.me.startMove(move);
+  };
+
+  GameEngine.prototype.ackOpponentMove = function(accepted, id, timestamp) {
+    accepted = accepted ? 1 : 0; // Convert to int.
+    this.connection.send('keydown_ack', `${id} ${accepted} ${timestamp}`);
   };
 
   GameEngine.prototype.handleKeyForOpponent = function(payload) {
@@ -140,34 +155,44 @@ window.GameEngine = (function() {
     // Make sure we have enough time for animation to complete,
     // otherwise we reject the move.
     if (duration < 0) {
-      this.connection.send('keydown_ack', `${id} 0 ${timestamp}`);
+      console.log('not enough time for opponent move', duration);
+      this.ackOpponentMove(false, id, timestamp);
       return;
     }
 
-    var oldPos = this.opponent.getPosition();
-    this.opponent.startMove(move, duration);
+    // Make sure move requested by opponenet is valid.
+    var oppPosition = this.opponent.getMovePosition(move);
+    if (!oppPosition) {
+      console.log('opponent request invalid move', move);
+      this.ackOpponentMove(false, id, timestamp);
+      return;
+    }
 
-    // Move causes conflict, figure out who gets the contested sqaure.
-    if (this.arePositionsConflicting()) {
+    // Check for move conflict.
+    if (this.arePositionsConflicting(oppPosition, this.me.getPosition())) {
+      // Move causes conflict, figure out who gets the contested sqaure.
       if (!this.me.isMoving() || timestamp > this.lastMove.timestamp) {
+        console.log('move caused conflict', timestamp, this.lastMove);
         // We moved first, tell peer to rollback.
-        this.connection.send('keydown_ack', `${id} 0 ${timestamp}`);
-        this.rollbackMoveForPlayer(this.opponent, oldPos);
+        this.ackOpponentMove(false, id, timestamp);
         return;
       }
 
       // Here we rollback our pending move, but ack peer's.
+      console.log('peer moved first', timestamp, this.lastMove);
       this.rollbackPendingMove(this.lastMove.id);
     }
 
+    // If we got here, we can ack the opponents move successfully.
+    this.ackOpponentMove(true, id, timestamp);
+
+    this.opponent.startMove(move, duration);
     setTimeout(() => {
       if (this.opponent.endMove() && this.board.isGameOver()) {
         this.endGame();
         return;
       }
     }, duration);
-
-    this.connection.send('keydown_ack', `${id} 1 ${timestamp}`);
   };
 
   GameEngine.prototype.handleKeyAck = function(payload) {
@@ -256,8 +281,8 @@ window.GameEngine = (function() {
     return Player.KEY_MAP[key];
   };
 
-  GameEngine.prototype.arePositionsConflicting = function() {
-    return this.me.x === this.opponent.x && this.me.y === this.opponent.y;
+  GameEngine.prototype.arePositionsConflicting = function(pos1, pos2) {
+    return pos1.x === pos2.x && pos1.y === pos2.y;
   };
 
   GameEngine.prototype.endGame = function() {

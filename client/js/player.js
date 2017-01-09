@@ -35,7 +35,6 @@ window.Player = (function() {
     this.scoreEl.id = `player-${this.playerNumber}`;
     this.container.appendChild(this.scoreEl);
 
-    this.opponent = null;
     this.moves = [];
     this.nextMove = null;
     this.reset();
@@ -53,9 +52,6 @@ window.Player = (function() {
     } else {
       return 0;
     }
-  };
-
-  Player.prototype.init = function() {
   };
 
   Player.prototype.startMove = function(move, duration) {
@@ -145,13 +141,6 @@ window.Player = (function() {
       default:
         console.log('unrecognized move', move);
         break;
-    }
-
-
-    // TODO: player should not need to know anything about opponent.
-    // Move this logic into game engine.
-    if (x === this.opponent.x && y === this.opponent.y) {
-      return false;
     }
 
     var color = this.board.getColor(x, y);
