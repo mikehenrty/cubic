@@ -11,7 +11,7 @@ window.GameEngine = (function() {
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
     this.pendingMoves = {};
-    this.lastMove = null;
+    this.lastMoveInfo = null;
     this.offlineMode = null;
     this.setPlayer(1);
 
@@ -128,9 +128,42 @@ window.GameEngine = (function() {
 
     var now = this.time.now();
     var id = Utility.guid();
-    this.addPendingMove(id, this.me.getPosition(), now);
+    this.lastMoveInfo = {
+      id: id,
+      timestamp: now,
+      position: this.me.getPosition(),
+      acked: false,
+      animated: false,
+    };
+
+    this.addPendingMove(id, this.lastMoveInfo);
+
     this.connection.send('keydown', `${id} ${key} ${now}`);
-    this.me.startMove(move);
+    this.me.startMove(move, Player.MoveDuration).then(() => {
+      var moveInfo = this.getPendingMove(id);
+      if (!moveInfo) {
+        console.log('timeout, pending move not found');
+        return;
+      }
+
+      moveInfo.animated = true;
+      this.checkPendingMove(id);
+    });
+  };
+
+  GameEngine.prototype.addPendingMove = function(id, moveInfo) {
+    this.pendingMoves[id] = moveInfo
+  };
+
+  GameEngine.prototype.getPendingMove = function(id) {
+    return this.pendingMoves[id];
+  };
+
+  GameEngine.prototype.checkPendingMove = function(id) {
+    var moveInfo = this.getPendingMove(id);
+    if (moveInfo.acked && moveInfo.animated) {
+        this.finishPendingMove(id);
+    }
   };
 
   GameEngine.prototype.ackOpponentMove = function(accepted, id, timestamp) {
@@ -174,16 +207,16 @@ window.GameEngine = (function() {
     // Check for move conflict.
     if (this.arePositionsConflicting(oppPosition, this.me.getPosition())) {
       // Move causes conflict, figure out who gets the contested sqaure.
-      if (!this.me.isMoving() || timestamp > this.lastMove.timestamp) {
-        console.log('move caused conflict', timestamp, this.lastMove);
+      if (!this.me.isMoving() || timestamp > this.lastMoveInfo.timestamp) {
+        console.log('move caused conflict', timestamp, this.lastMoveInfo);
         // We moved first, tell peer to rollback.
         this.ackOpponentMove(false, id, timestamp);
         return;
       }
 
       // Here we rollback our pending move, but ack peer's.
-      console.log('peer moved first', timestamp, this.lastMove);
-      this.rollbackPendingMove(this.lastMove.id);
+      console.log('peer moved first', timestamp, this.lastMoveInfo);
+      this.rollbackPendingMove(this.lastMoveInfo.id);
     }
 
     // If we got here, we can ack the move and run it locally.
@@ -202,8 +235,8 @@ window.GameEngine = (function() {
 
     this.trigger('ping', this.time.now() - timestamp);
 
-    var move = this.pendingMoves[id];
-    if (!move) {
+    var moveInfo = this.getPendingMove(id);
+    if (!moveInfo) {
       console.log('pending move not found', id);
       return;
     }
@@ -214,44 +247,8 @@ window.GameEngine = (function() {
     }
 
     // Move must be both acked and animated before completion.
-    if (move.animated) {
-      this.finishPendingMove(id);
-    } else {
-      move.acked = true;
-    }
-  };
-
-  GameEngine.prototype.addPendingMove = function(id, position, timestamp) {
-    this.lastMove = {
-      id: id,
-      timestamp: timestamp,
-      acked: false,
-      animated: false,
-      position: position
-    };
-    this.pendingMoves[id] = this.lastMove;
-
-    // To be run approximately when animation completes.
-    setTimeout(() => {
-      // If we don't have a connection, we can just finish moves immediately.
-      if (!this.connection.isConnected()) {
-        this.finishPendingMove(id);
-        return;
-      }
-
-      var move = this.pendingMoves[id];
-      if (!this.pendingMoves[id]) {
-        console.log('timeout, pending move not found');
-        return;
-      }
-
-      // Move must be both acked and animated before completion.
-      if (move.acked) {
-        this.finishPendingMove(id);
-      } else {
-        move.animated = true;
-      }
-    }, Player.MoveDuration);
+    moveInfo.acked = true;
+    this.checkPendingMove(id);
   };
 
   GameEngine.prototype.finishPendingMove = function(id) {
