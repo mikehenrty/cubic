@@ -28,20 +28,17 @@ window.Player = (function() {
     this.playerNumber = playerNumber;
     this.board = board;
     this.container = board.el;
-    this.el = document.createElement('div');
-    this.el.className = `piece player-${playerNumber}`;
-    this.cube = new Cube(this.el);
-    this.opponent = null;
+    this.cube = new Cube(this.container, this.playerNumber);
+
     this.scoreEl = document.createElement('div');
     this.scoreEl.className = 'score';
     this.scoreEl.id = `player-${this.playerNumber}`;
+    this.container.appendChild(this.scoreEl);
+
+    this.opponent = null;
     this.moves = [];
     this.nextMove = null;
-    this.squareHeight = Utility.getCssVar('--square-dimension');
     this.reset();
-
-    this.container.appendChild(this.el);
-    this.container.appendChild(this.scoreEl);
   }
 
   Player.MoveDuration = MOVE_DURATION;
@@ -63,28 +60,27 @@ window.Player = (function() {
 
   Player.prototype.startMove = function(move, duration) {
     this.moves.push(move);
-    this.el.classList.add('moving', move);
+    this.cube.setMoving(move);
+
     var position = this.getMovePosition(move);
     this.setPosition(position.x, position.y);
-    this.setMoveDuration(duration);
+    this.cube.setMoveDuration(duration);
   };
 
   // Returns true if points were added on this move.
   Player.prototype.endMove = function(isRollback) {
     var move = this.moves.shift();
-    this.el.classList.remove('moving', move);
-    this.el.style.transitionDuration = '0ms';
+    this.cube.setNotMoving(move);
     if (isRollback) {
       return false;
     }
 
     this.cube.move(move);
-    this.update();
 
     // TODO: move this logic into engine
     if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
-        this.board.getColor(this.x, this.y)) {
-      this.board.pickUpTile(this.x, this.y)
+        this.board.getColor(this.cube.x, this.cube.y)) {
+      this.board.pickUpTile(this.cube.x, this.cube.y)
       this.addPoint();
       return true;
     }
@@ -100,34 +96,21 @@ window.Player = (function() {
     return this.moves.length > 0;
   };
 
-  Player.prototype.update = function() {
-    this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
-    this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
-    // this.el.style.transform =
-    //  `translateY(calc(${this.y} * ${this.squareHeight}))` +
-    //  `translateX(calc(${this.x} * ${this.squareHeight}))`;
-  };
-
   Player.prototype.getPosition = function() {
     return {
-      x: this.x,
-      y: this.y
+      x: this.cube.x,
+      y: this.cube.y
     };
   };
 
   Player.prototype.setPosition = function(x, y, duration) {
-    this.x = x;
-    this.y = y;
-  };
-
-  Player.prototype.setMoveDuration = function(duration) {
-    duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
-    this.el.style.transitionDuration = duration + 'ms';
+    this.cube.x = x;
+    this.cube.y = y;
   };
 
   Player.prototype.getMovePosition = function(move) {
-    var x = this.x;
-    var y = this.y;
+    var x = this.cube.x;
+    var y = this.cube.y;
     var bottomColor;
 
     switch (move) {
@@ -180,19 +163,18 @@ window.Player = (function() {
   };
 
   Player.prototype.reset = function() {
+    var x, y;
     if (this.playerNumber === 1) {
-      this.x = 0;
-      this.y = 0;
+      x = 0;
+      y = 0;
     } else {
-      this.x = this.board.rows - 1;
-      this.y = this.board.cols - 1;
+      x = this.board.rows - 1;
+      y = this.board.cols - 1;
     }
     this.moves = [];
     this.points = 0;
     this.scoreEl.textContent = this.points;
-    this.cube.reset();
-    this.el.classList.remove('moving');
-    this.update();
+    this.cube.reset(x, y);
   };
 
   return Player;

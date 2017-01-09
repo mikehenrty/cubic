@@ -2,6 +2,7 @@ window.Cube = (function() {
   'use strict';
 
   const DEBUG = CONST.DEBUG;
+  const MOVE_DURATION = CONST.MOVE_DURATION;
 
   // Positions on the cube.
   const TOP    = CONST.CUBE_SIDES.TOP;
@@ -13,8 +14,10 @@ window.Cube = (function() {
 
   const COLORS = CONST.CUBE_COLORS;
 
-  function Cube(el) {
-    this.el = el;
+  function Cube(container, playerNumber) {
+    this.container = container;
+    this.el = document.createElement('div');
+    this.el.className = `piece player-${playerNumber}`;
     this.top = document.createElement('div');
     this.top.className = 'top';
     this.north = document.createElement('div');
@@ -27,6 +30,7 @@ window.Cube = (function() {
     this.west.className = 'west';
     this.bottom = document.createElement('div');
     this.bottom.className = 'bottom';
+    this.squareHeight = Utility.getCssVar('--square-dimension');
 
     this.el.appendChild(this.bottom);
     this.el.appendChild(this.north);
@@ -34,10 +38,22 @@ window.Cube = (function() {
     this.el.appendChild(this.west);
     this.el.appendChild(this.south);
     this.el.appendChild(this.top);
+    this.container.appendChild(this.el);
 
+    this.x = null;
+    this.y = null;
     this.sides = null;
     this.reset();
   }
+
+  Cube.prototype.setMoving = function(move) {
+    this.el.classList.add('moving', move);
+  };
+
+  Cube.prototype.setNotMoving = function(move) {
+    this.el.classList.remove('moving', move);
+    this.el.style.transitionDuration = '0ms';
+  };
 
   Cube.prototype.move = function(move) {
     if (!this[move]) {
@@ -62,15 +78,29 @@ window.Cube = (function() {
     // this.west.className  = `north ${this.sides[WEST]}`;
     // this.east.className  = `north ${this.sides[EAST]}`;
     // this.bottom.className  = `north ${this.sides[BOTTOM]}`;
+
+    this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
+    this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
+    // this.el.style.transform =
+    //  `translateY(calc(${this.y} * ${this.squareHeight}))` +
+    //  `translateX(calc(${this.x} * ${this.squareHeight}))`;
   };
 
   Cube.prototype.setSideColor = function(prop, color) {
     this[prop].style.backgroundColor = `var(--cube-color-${color})`;
   };
 
-  Cube.prototype.reset = function() {
+  Cube.prototype.reset = function(x, y) {
+    this.x = typeof x !== 'undefined' ? x : 0;
+    this.y = typeof y !== 'undefined' ? y : 0;
+    this.el.classList.remove('moving');
     this.sides = COLORS.slice(0); // Clone.
     this.update();
+  };
+
+  Cube.prototype.setMoveDuration = function(duration) {
+    duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
+    this.el.style.transitionDuration = duration + 'ms';
   };
 
   Cube.prototype.cpSide = function(src, dest) {
