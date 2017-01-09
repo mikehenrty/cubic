@@ -54,19 +54,19 @@ window.Player = (function() {
     }
   };
 
+  /**
+   * @returns (Promise): resolves when animation is complete.
+   */
   Player.prototype.startMove = function(move, duration) {
     this.moves.push(move);
-    this.cube.setMoving(move);
-
-    var position = this.getMovePosition(move);
-    this.setPosition(position.x, position.y);
-    this.cube.setMoveDuration(duration);
+    this.setMovePosition(move);
+    return this.cube.startMoving(move, duration);
   };
 
   // Returns true if points were added on this move.
   Player.prototype.endMove = function(isRollback) {
     var move = this.moves.shift();
-    this.cube.setNotMoving(move);
+    this.cube.stopMoving(move);
     if (isRollback) {
       return false;
     }
@@ -99,7 +99,7 @@ window.Player = (function() {
     };
   };
 
-  Player.prototype.setPosition = function(x, y, duration) {
+  Player.prototype.setPosition = function(x, y) {
     this.cube.x = x;
     this.cube.y = y;
   };
@@ -149,6 +149,16 @@ window.Player = (function() {
     }
 
     return { x: x, y: y };
+  };
+
+  Player.prototype.setMovePosition = function(move) {
+    var pos = this.getMovePosition(move);
+    if (!pos) {
+      console.log('could not set move', move);
+      return null;
+    }
+
+    this.setPosition(pos.x, pos.y);
   };
 
   Player.prototype.reset = function() {

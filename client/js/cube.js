@@ -16,8 +16,9 @@ window.Cube = (function() {
 
   function Cube(container, playerNumber) {
     this.container = container;
+    this.playerNumber = playerNumber;
     this.el = document.createElement('div');
-    this.el.className = `piece player-${playerNumber}`;
+    this.el.className = `cube player-${playerNumber}`;
     this.top = document.createElement('div');
     this.top.className = 'top';
     this.north = document.createElement('div');
@@ -46,11 +47,23 @@ window.Cube = (function() {
     this.reset();
   }
 
-  Cube.prototype.setMoving = function(move) {
-    this.el.classList.add('moving', move);
+  /**
+   * @returns (Promise): resolves when animation is complete.
+   */
+  Cube.prototype.startMoving = function(move, duration) {
+    return new Promise((res, rej) => {
+      duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION);
+      this.el.style.transitionDuration = duration + 'ms';
+      this.el.classList.add('moving', move);
+
+      this.el.addEventListener('transitionend', function onEnd(evt) {
+        evt.currentTarget.removeEventListener('transitionend', onEnd);
+        res();
+      });
+    });
   };
 
-  Cube.prototype.setNotMoving = function(move) {
+  Cube.prototype.stopMoving = function(move) {
     this.el.classList.remove('moving', move);
     this.el.style.transitionDuration = '0ms';
   };
@@ -64,13 +77,6 @@ window.Cube = (function() {
   };
 
   Cube.prototype.update = function() {
-    this.setSideColor('top', this.sides[TOP]);
-    this.setSideColor('north', this.sides[NORTH]);
-    this.setSideColor('south', this.sides[SOUTH]);
-    this.setSideColor('west', this.sides[WEST]);
-    this.setSideColor('east', this.sides[EAST]);
-    this.setSideColor('bottom', this.sides[BOTTOM]);
-
     // TODO(perf): is using classes faster than setting bg style?
     // this.top.className  = `north ${this.sides[TOP]}`;
     // this.north.className  = `north ${this.sides[TOP]}`;
@@ -78,13 +84,19 @@ window.Cube = (function() {
     // this.west.className  = `north ${this.sides[WEST]}`;
     // this.east.className  = `north ${this.sides[EAST]}`;
     // this.bottom.className  = `north ${this.sides[BOTTOM]}`;
+    this.setSideColor('top', this.sides[TOP]);
+    this.setSideColor('north', this.sides[NORTH]);
+    this.setSideColor('south', this.sides[SOUTH]);
+    this.setSideColor('west', this.sides[WEST]);
+    this.setSideColor('east', this.sides[EAST]);
+    this.setSideColor('bottom', this.sides[BOTTOM]);
 
-    this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
-    this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
     // TODO(perf): is using transforms rather than top/left faster?
     // this.el.style.transform =
     //  `translateY(calc(${this.y} * ${this.squareHeight}))` +
     //  `translateX(calc(${this.x} * ${this.squareHeight}))`;
+    this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
+    this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
   };
 
   Cube.prototype.setSideColor = function(prop, color) {
@@ -97,11 +109,6 @@ window.Cube = (function() {
     this.el.classList.remove('moving');
     this.sides = COLORS.slice(0); // Clone.
     this.update();
-  };
-
-  Cube.prototype.setMoveDuration = function(duration) {
-    duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION)
-    this.el.style.transitionDuration = duration + 'ms';
   };
 
   Cube.prototype.cpSide = function(src, dest) {

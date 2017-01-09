@@ -274,7 +274,7 @@ body > div {
   right: calc(0vmin - var(--score-dimension));
 }
 
-.piece {
+.cube {
   position: absolute;
   height: var(--square-dimension);
   width: var(--square-dimension);
@@ -282,63 +282,63 @@ body > div {
   transform-style: preserve-3d;
 }
 
-.piece > div {
+.cube > div {
   position: absolute;
   height: var(--square-dimension);
   width: var(--square-dimension);
 }
 
-.piece .top {
+.cube .top {
   transform: translateZ(var(--square-dimension));
 }
 
-.piece .north {
+.cube .north {
   transform-origin: top;
   transform: rotateX(90deg);
 }
 
-.piece .east {
+.cube .east {
   transform-origin: right;
   transform: rotateY(90deg);
 }
 
-.piece .south {
+.cube .south {
   transform-origin: bottom;
   transform: rotateX(-90deg);
 }
 
-.piece .west {
+.cube .west {
   transform-origin: left;
   transform: rotateY(-90deg);
 }
 
-.piece .bottom {
+.cube .bottom {
   transform-origin: top;
   transform: rotateZ(0);
 }
 
-.piece.moving.moveLeft {
+.cube.moving.moveLeft {
   transform-origin: left;
   transform: rotateY(-90deg);
 }
 
-.piece.moving.moveRight {
+.cube.moving.moveRight {
   transform-origin: right;
   transform: rotateY(90deg);
 }
 
-.piece.moving.moveUp {
+.cube.moving.moveUp {
   transform-origin: top;
   transform: rotateX(90deg);
 }
 
-.piece.moving.moveDown {
+.cube.moving.moveDown {
   transform-origin: bottom;
   transform: rotateX(-90deg);
 }
 
 /*
-.piece {
+.cube {
   box-sizing: border-box;
   border-width: var(--border-width);
   border-style: solid;
@@ -351,22 +351,22 @@ body > div {
 }
 
 
-.piece.moving.moveLeft {
+.cube.moving.moveLeft {
   border-left-width: 0vmin;
   border-right-width: calc(var(--square-dimension) - var(--border-width));
 }
 
-.piece.moving.moveRight {
+.cube.moving.moveRight {
   border-right-width: 0vmin;
   border-left-width: calc(var(--square-dimension) - var(--border-width));
 }
 
-.piece.moving.moveUp {
+.cube.moving.moveUp {
   border-top-width: 0vmin;
   border-bottom-width: calc(var(--square-dimension) - var(--border-width));
 }
 
-.piece.moving.moveDown {
+.cube.moving.moveDown {
   border-bottom-width: 0vmin;
   border-top-width: calc(var(--square-dimension) - var(--border-width));
 }

@@ -92,8 +92,7 @@ window.GameEngine = (function() {
       return;
     }
 
-    player.startMove(move);
-    setTimeout(() => {
+    player.startMove(move).then(() => {
       if (player.endMove() && this.board.isGameOver()) {
         this.endGame();
         return;
@@ -103,7 +102,7 @@ window.GameEngine = (function() {
         player.nextMove = null;
         setTimeout(this.handleKeyForOffline.bind(this, key), 0);
       }
-    }, Player.MoveDuration);
+    });
   };
 
   GameEngine.prototype.handleKeyForMe = function(key) {
@@ -187,16 +186,14 @@ window.GameEngine = (function() {
       this.rollbackPendingMove(this.lastMove.id);
     }
 
-    // If we got here, we can ack the opponents move successfully.
+    // If we got here, we can ack the move and run it locally.
     this.ackOpponentMove(true, id, timestamp);
-
-    this.opponent.startMove(move, duration);
-    setTimeout(() => {
+    this.opponent.startMove(move, duration).then(() => {
       if (this.opponent.endMove() && this.board.isGameOver()) {
         this.endGame();
         return;
       }
-    }, duration);
+    });
   };
 
   GameEngine.prototype.handleKeyAck = function(payload) {
