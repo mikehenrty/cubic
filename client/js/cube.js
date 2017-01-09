@@ -71,7 +71,7 @@ window.Cube = (function() {
     this.setSideColor('east', this.sides[EAST]);
     this.setSideColor('bottom', this.sides[BOTTOM]);
 
-    // TODO: check if this is faster.
+    // TODO(perf): is using classes faster than setting bg style?
     // this.top.className  = `north ${this.sides[TOP]}`;
     // this.north.className  = `north ${this.sides[TOP]}`;
     // this.south.className  = `north ${this.sides[SOUTH]}`;
@@ -81,6 +81,7 @@ window.Cube = (function() {
 
     this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
     this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
+    // TODO(perf): is using transforms rather than top/left faster?
     // this.el.style.transform =
     //  `translateY(calc(${this.y} * ${this.squareHeight}))` +
     //  `translateX(calc(${this.x} * ${this.squareHeight}))`;
