@@ -1,6 +1,8 @@
 window.Sound = (() => {
   'use strict';
 
+  const MUTE = CONST.MUTE;
+
   const VOLUME_BG = 0.25;
   const VOLUME_EF = 0.25;
 
@@ -58,6 +60,10 @@ window.Sound = (() => {
     var soundInfo = this.sounds[name];
     if (!soundInfo) {
       console.log('attempted to play non-loaded sound', name);
+      return;
+    }
+
+    if (MUTE) {
       return;
     }
 

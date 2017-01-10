@@ -4,6 +4,8 @@ window.CONST = (function() {
   return {
     DEBUG: false,
 
+    MUTE: false,
+
     // Simulated latency.
     FAKE_LATENCY: 0,
     // miliseconds of piece movement.
