@@ -21,6 +21,7 @@
   --font-small: calc(var(--board-dimension) / 40);
   --font-normal: calc(var(--board-dimension) / 30);
   --font-large: calc(var(--board-dimension) / 22);
+  --font-very-large: calc(var(--board-dimension) / 10);
 
   --cube-color-red: purple;
   --cube-color-blue: gray;
@@ -33,6 +34,7 @@
   --fade-in-out-duration: 3s;
   --board-spin-duration: 30s;
   --board-breathe-duration: 15s;
+  --board-roll-duration: 5s;
 }
 
 body {
@@ -103,6 +105,7 @@ body > div {
   right: 0;
   left: 0;
   bottom: 0;
+  perspective: 150vmin;
 }
 
 #screen {
@@ -120,25 +123,25 @@ body > div {
 #ui {
   z-index: 1;
   transition: opacity 0.3s ease-in, transform 0.4s ease-out;
-}
-
-#ui.hide  {
-  opacity: 0;
-  transform: scale(0) rotateZ(360deg);
+  animation: twist 2.2s infinite;
 }
 
 #content {
+  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
   border: 1vmin solid var(--console-green);
   width: var(--board-dimension);
   height: var(--board-dimension);
-  /* background-color: #18d8e3; */
   font-size: var(--font-normal);
   box-sizing: border-box;
   padding: 3vmin;
-  transition: transform 0.4s ease-out;
-  visibility: visible;
-  animation: twist 2.2s infinite;
 }
+
+#ui.hide #content {
+  opacity: 0;
+  transform: rotateX(60deg) rotateZ(-10deg);
+  animation-timing-function: ease-in-out;
+}
+
 
 #content p {
   line-height: var(--font-large);
@@ -153,6 +156,42 @@ body > div {
   cursor: pointer;
   font-size: var(--font-small);
   color: unset;
+}
+
+#title {
+  text-align: center;
+  margin-top: 2vmin;
+  margin-bottom: 4vmin;
+  perspective: 55vmin;
+}
+
+.title-letter {
+  animation: roll var(--board-roll-duration) infinite;
+  line-height: calc(var(--font-very-large) * 1.4);
+  height: calc(var(--font-very-large) * 1.4);
+  width: calc(var(--font-very-large) * 1.4);
+  font-size: var(--font-very-large);
+  margin: 0.3vmin;
+  display: inline-block;
+  border: 1px solid var(--console-green);
+  text-align: center;
+  vertical-align: middle;
+}
+
+#title .title-letter:nth-child(1) {
+  animation-delay: calc(var(--board-roll-duration) / 6 * 1);
+}
+#title .title-letter:nth-child(2) {
+  animation-delay: calc(var(--board-roll-duration) / 6 * 2);
+}
+#title .title-letter:nth-child(3) {
+  animation-delay: calc(var(--board-roll-duration) / 6 * 3);
+}
+#title .title-letter:nth-child(4) {
+  animation-delay: calc(var(--board-roll-duration) / 6 * 4);
+}
+#title .title-letter:nth-child(5) {
+  animation-delay: calc(var(--board-roll-duration) / 6 * 5);
 }
 
 #welcome {
@@ -191,6 +230,10 @@ body > div {
 #list-header {
   text-align: center;
   text-decoration: underline;
+}
+
+#list-container {
+  font-size: var(--font-small);
 }
 
 /* Hide the link input. */
@@ -419,6 +462,44 @@ body > div {
     animation-timing-function: ease-in-out;
   }
 }
+
+@keyframes roll {
+  0% {
+    background-color: transparent;
+    transform-origin: bottom;
+    transform: rotateX(0deg);
+    animation-timing-function: ease-in;
+  }
+  20% {
+    background-color: transparent;
+    transform-origin: bottom;
+    transform: rotateX(0deg);
+    animation-timing-function: ease-in;
+  }
+  25% {
+    background-color: green;
+    transform-origin: bottom;
+    transform: rotateX(-90deg);
+    visibility: hidden
+  }
+  35% {
+    background-color: green;
+    transform-origin: top;
+    transform: rotateX(90deg);
+    visibility: hidden
+  }
+  40% {
+    transform-origin: top;
+    transform: rotateX(0);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform-origin: top;
+    transform: rotateX(0);
+    animation-timing-function: ease-in;
+  }
+}
+
 
 @keyframes breathe {
   0% {

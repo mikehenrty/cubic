@@ -9,9 +9,19 @@ window.UI = (function() {
     this.el.id = 'ui';
     this.content = document.createElement('div');
     this.content.id = 'content';
+    this.titleContainer = document.createElement('div');
+    this.titleContainer.id = 'title';
+
+    'CUBIC'.split('').forEach(letter => {
+      var el = document.createElement('div');
+      el.className = 'title-letter';
+      el.textContent = letter;
+      this.titleContainer.appendChild(el);
+    });
+
     this.welcomeContainer = document.createElement('p');
     this.welcomeContainer.id = 'welcome';
-    this.welcomeContainer.textContent = 'Welcome ';
+    this.welcomeContainer.textContent = 'Welcome, ';
     this.nameContainer = document.createElement('span');
     this.nameContainer.id = 'name-container';
     this.nameContainer.classList.add('color-change');
@@ -56,6 +66,7 @@ window.UI = (function() {
       this.setStatus('Link copied to clipboard');
     });
 
+    this.content.appendChild(this.titleContainer);
     this.content.appendChild(this.welcomeContainer);
     this.content.appendChild(this.status);
     this.content.appendChild(this.actionButtons);
@@ -83,7 +94,10 @@ window.UI = (function() {
             return;
           }
           var clientRow = document.createElement('p');
-          clientRow.textContent = clientInfo.clientName;
+          var clientName = document.createElement('span');
+          clientName.className = 'color-change';
+          clientName.textContent = clientInfo.clientName;
+          clientRow.appendChild(clientName);
           var joinButton = document.createElement('a');
           joinButton.textContent = 'Join';
           joinButton.href = Utility.getPeerLink(clientInfo.clientId);
