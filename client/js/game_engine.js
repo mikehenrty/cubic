@@ -1,7 +1,8 @@
 window.GameEngine = (function() {
   'use strict';
 
-  const DEBUG = CONST.DEBUG;
+  // const DEBUG = CONST.DEBUG;
+  const DEBUG = true;
 
   const COLS = CONST.COLS;
   const ROWS = CONST.ROWS;
@@ -196,32 +197,30 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.finishPendingMove = function(id) {
-    if (this.endMoveForPlayer(this.me) && this.board.isGameOver()) {
-      this.endGame();
-      return;
-    }
-    DEBUG && this.logPendingMove(id, '--------------finishing-delete');
-    delete this.pendingMoves[id];
-    if (this.me.nextMove) {
-      var key = this.me.nextMove;
-      this.me.nextMove = null;
-      setTimeout(this.handleKeyForMe.bind(this, key), 0);
-    }
+    this.endMoveForPlayer(this.me).then(() => {
+      if (this.board.isGameOver()) {
+        this.endGame();
+        return;
+      }
+
+      DEBUG && this.logPendingMove(id, '--------------finishing-delete');
+      delete this.pendingMoves[id];
+      if (this.me.nextMove) {
+        var key = this.me.nextMove;
+        this.me.nextMove = null;
+        this.handleKeyForMe.bind(this, key);
+      }
+    });
   };
 
   GameEngine.prototype.rollbackPendingMove = function(id) {
     var moveInfo = this.getPendingMove(id);
     var move = this.pendingMoves[id];
-    this.rollbackMoveForPlayer(this.me, move.position);
+    this.me.setPosition(move.position.x, move.position.y);
     DEBUG && this.logPendingMove(id, '--------------finishing-rollingback');
     delete this.pendingMoves[id];
-  };
-
-  GameEngine.prototype.rollbackMoveForPlayer = function(player, position) {
-    player.setPosition(position.x, position.y);
     this.endMoveForPlayer(player, true);
   };
-
 
   GameEngine.prototype.logPendingMove = function(id, message) {
     var info = this.getPendingMove(id);
@@ -292,10 +291,14 @@ window.GameEngine = (function() {
 
     // If we got here, we can ack the move and run it locally.
     this.ackOpponentMove(true, id, timestamp);
+    console.log('starting opponent move', id);
     this.opponent.startMove(move, duration).then(() => {
-      if (this.endMoveForPlayer(this.opponent) && this.board.isGameOver()) {
+      console.log('ending opponent move', id);
+      return this.endMoveForPlayer(this.opponent);
+    }).then(() => {
+      console.log('ready for next move', id);
+      if (this.board.isGameOver()) {
         this.endGame();
-        return;
       }
     });
   };

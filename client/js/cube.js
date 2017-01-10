@@ -60,11 +60,19 @@ window.Cube = (function() {
         return;
       }
 
+      var handle = setTimeout(() => {
+        console.log('falling back to timeout animation end', move);
+        res();
+      }, duration * 2);
+
       this.el.addEventListener('transitionend', function onEnd(evt) {
+        console.log('got transition end event!', move);
+        clearTimeout(handle);
         evt.currentTarget.removeEventListener('transitionend', onEnd);
         res();
       });
       this.el.classList.add('moving', move);
+
     });
   };
 

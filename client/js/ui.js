@@ -78,8 +78,11 @@ window.UI = (function() {
 
   UI.prototype = new Eventer();
 
-  UI.prototype.show = function(options) {
+  UI.prototype.activate = function() {
     this.container.classList.add('active');
+  };
+
+  UI.prototype.show = function(options) {
     if (options.clientId) {
       this.linkInput.value = Utility.getPeerLink(options.clientId);
     }

@@ -91,6 +91,7 @@ window.Controller = (function() {
       this.game.register(Utility.fetchName()),
       this.game.loadAssets(),
     ]).then(() => {
+      this.ui.activate();
       this.ui.setStatus('READY!!!');
       Utility.storeName(this.game.getClientName());
 
