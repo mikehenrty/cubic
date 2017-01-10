@@ -12,20 +12,23 @@ window.Sound = (() => {
   }
 
   Sound.prototype._getBufSrc = function(buffer, options) {
+    options = options || {};
+    options.volume = typeof options.volume !== 'undefined' ? options.volume : 1;
+
     var src = this.context.createBufferSource();
-    src.loop = options && options.loop;
+    var gainNode = this.context.createGain();
+    src.loop = options.loop;
     src.buffer = buffer;
+    src.connect(gainNode);
+    gainNode.connect(this.context.destination);
 
     // If volume was provided, set up gain node to handle it.
-    if (options && typeof options.volume !== 'undefined') {
-      var gainNode = this.context.createGain();
+    if (options.fade) {
       gainNode.gain.setValueAtTime(0.001, this.context.currentTime);
       gainNode.gain.linearRampToValueAtTime(options.volume,
-        this.context.currentTime + 2);
-      src.connect(gainNode);
-      gainNode.connect(this.context.destination);
+        this.context.currentTime + options.fade);
     } else {
-      src.connect(this.context.destination);
+      gainNode.gain.value = options.volume;
     }
     return src;
   };
@@ -85,6 +88,7 @@ window.Sound = (() => {
     options = options || {};
     options.loop = true;
     options.volume = VOLUME_BG;
+    options.fade = options.fade || 2;
 
     if (options.double) {
       this.backgroundSrc2 = this._playWithOptions(name, options);
