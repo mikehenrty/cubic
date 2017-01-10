@@ -7,7 +7,8 @@
 }
 
 :root {
-  --console-green: #2ff20e;
+  /* --console-green: #2ff20e; */
+  --console-green: #49fb35;
   --board-dimension: 80vmin;
   --square-dimension: 8vmin;
   --score-dimension: 8vmin;
@@ -23,12 +24,12 @@
   --font-large: calc(var(--board-dimension) / 22);
   --font-very-large: calc(var(--board-dimension) / 10);
 
-  --cube-color-red: purple;
-  --cube-color-blue: gray;
-  --cube-color-yellow: brown;
-  --cube-color-orange: pink;
-  --cube-color-white: magenta;
-  --cube-color-green: aquamarine;
+  --cube-color-red: rgb(254,0,0);
+  --cube-color-blue: rgb(1,30,254);
+  --cube-color-yellow: rgb(253,254,2);
+  --cube-color-orange: rgb(254,0,246);
+  --cube-color-white: white;
+  --cube-color-green: rgb(11,255,1);
 
   --fade-duration: 0.15s;
   --fade-in-out-duration: 3s;
@@ -38,7 +39,7 @@
 }
 
 body {
-  background-color: black;
+  background-color: #1E023F;
   font-family: 'Press Start 2P';
   font-size: var(--font-normal);
   color: var(--console-green);
