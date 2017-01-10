@@ -39,6 +39,7 @@ window.Controller = (function() {
         clientName: this.game.getClientName(),
         clientList: list,
       });
+      this.game.engine.startIntroMusic();
     });
   };
 
@@ -85,7 +86,14 @@ window.Controller = (function() {
   };
 
   Controller.prototype.start = function() {
-    this.game.register(Utility.fetchName()).then(() => {
+    this.ui.setStatus('Loading...');
+    Promise.all([
+      this.game.register(Utility.fetchName()),
+      this.game.loadAssets(),
+    ]).then(() => {
+      this.ui.setStatus('READY!!!');
+      // TODO: this should be inside engine.
+      this.game.engine.startIntroMusic();
       Utility.storeName(this.game.getClientName());
 
       var peerId = Utility.getPeerId();

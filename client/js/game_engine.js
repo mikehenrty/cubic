@@ -6,12 +6,22 @@ window.GameEngine = (function() {
   const COLS = CONST.COLS;
   const ROWS = CONST.ROWS;
 
+  const SND_INTRO_BG = 'bg-pump';
+  const SND_MAIN_BG = 'bg-mellow';
+  const SND_SCORE = 'ef-beat';
+  const SOUND_FILES = {
+    [SND_INTRO_BG]: CONST.SOUND_FILES[SND_INTRO_BG],
+    [SND_SCORE]: CONST.SOUND_FILES[SND_SCORE],
+    [SND_MAIN_BG]: CONST.SOUND_FILES[SND_MAIN_BG],
+  };
+
   function GameEngine(container, connection, time) {
     this.connection = connection;
     this.time = time;
     this.board = new Board(container, COLS, ROWS);
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
+    this.sound = new Sound();
     this.pendingMoves = {};
     this.lastMoveInfo = null;
     this.offlineMode = null;
@@ -24,6 +34,14 @@ window.GameEngine = (function() {
   }
 
   GameEngine.prototype = new Eventer();
+
+  GameEngine.prototype.loadSounds = function() {
+    return Promise.all(Object.keys(SOUND_FILES).map(name => {
+      return this.sound.loadSound(name, SOUND_FILES[name]);
+    })).then(() => {
+      console.log('sound files loaded');
+    });
+  };
 
   GameEngine.prototype.setPlayer = function(playerNumber) {
     if (playerNumber === 1) {
@@ -52,6 +70,7 @@ window.GameEngine = (function() {
     this.reset();
     this.startTime = this.time.now();
     this.board.displayTiles(tiles);
+    this.startMainMusic();
   };
 
   GameEngine.prototype.reset = function() {
@@ -98,7 +117,7 @@ window.GameEngine = (function() {
     }
 
     player.startMove(move).then(() => {
-      if (player.endMove() && this.board.isGameOver()) {
+      if (this.endMoveForPlayer(player) && this.board.isGameOver()) {
         this.endGame();
         return;
       }
@@ -174,7 +193,7 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.finishPendingMove = function(id) {
-    if (this.me.endMove() && this.board.isGameOver()) {
+    if (this.endMoveForPlayer(this.me) && this.board.isGameOver()) {
       this.endGame();
       return;
     }
@@ -197,7 +216,7 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.rollbackMoveForPlayer = function(player, position) {
     player.setPosition(position.x, position.y);
-    player.endMove(true);
+    this.endMoveForPlayer(player, true);
   };
 
 
@@ -271,11 +290,19 @@ window.GameEngine = (function() {
     // If we got here, we can ack the move and run it locally.
     this.ackOpponentMove(true, id, timestamp);
     this.opponent.startMove(move, duration).then(() => {
-      if (this.opponent.endMove() && this.board.isGameOver()) {
+      if (this.endMoveForPlayer(this.opponent) && this.board.isGameOver()) {
         this.endGame();
         return;
       }
     });
+  };
+
+  GameEngine.prototype.endMoveForPlayer = function(player, isRollback) {
+    var score = player.endMove(isRollback);
+    if (score) {
+      this.sound.play(SND_SCORE);
+    }
+    return score;
   };
 
   GameEngine.prototype.handleKeyAck = function(payload) {
@@ -318,6 +345,14 @@ window.GameEngine = (function() {
       winner = 2;
     }
     this.trigger('gameover', winner);
+  };
+
+  GameEngine.prototype.startIntroMusic = function() {
+    this.sound.playBackground(SND_INTRO_BG);
+  };
+
+  GameEngine.prototype.startMainMusic = function() {
+    this.sound.playBackground(SND_MAIN_BG);
   };
 
   return GameEngine;

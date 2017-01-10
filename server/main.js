@@ -8,7 +8,7 @@ var nodeStatic = require('node-static')
 var console = require('./lib/console_debug.js');
 var ClientList = require('./lib/client_list.js');
 
-const DEBUG = true;  // set to true for debug logging.
+const DEBUG = false;  // set to true for debug logging.
 const PORT = 8021;
 const WS_PORT = 8022;
 const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;

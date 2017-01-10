@@ -34,6 +34,11 @@ window.GameController = (function() {
 
   GameController.prototype = new Eventer();
 
+  GameController.prototype.loadAssets = function() {
+    return this.engine.loadSounds();
+  };
+
+
   GameController.prototype.hideBoard = function() {
     this.el.classList.add('hide');
   };
