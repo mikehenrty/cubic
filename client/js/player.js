@@ -75,10 +75,12 @@ window.Player = (function() {
 
     return Utility.nextFrame().then(() => {
       this.moving = false;
-      // TODO: move this logic into engine
-      if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
-          this.board.getColor(this.cube.x, this.cube.y)) {
-        this.board.pickUpTile(this.cube.x, this.cube.y);
+      var x = this.cube.x;
+      var y = this.cube.y;
+      var cubeColor = this.cube.getScoreSideColor();
+      var tileColor = this.board.getColor(x, y);
+      if (cubeColor === tileColor) {
+        this.board.pickUpTile(x, y);
         this.addPoint();
         return true;
       }

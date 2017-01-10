@@ -12,6 +12,7 @@ window.Cube = (function() {
   const WEST   = CONST.CUBE_SIDES.WEST;
   const BOTTOM = CONST.CUBE_SIDES.BOTTOM;
 
+  const SCORE_SIDE = CONST.SCORE_SIDE;
   const COLORS = CONST.CUBE_COLORS;
 
   function Cube(container, playerNumber) {
@@ -66,7 +67,6 @@ window.Cube = (function() {
       }, duration * 2);
 
       this.el.addEventListener('transitionend', function onEnd(evt) {
-        console.log('got transition end event!', move);
         clearTimeout(handle);
         evt.currentTarget.removeEventListener('transitionend', onEnd);
         res();
@@ -115,6 +115,10 @@ window.Cube = (function() {
 
   Cube.prototype.setSideColor = function(prop, color) {
     this[prop].style.backgroundColor = `var(--cube-color-${color})`;
+  };
+
+  Cube.prototype.getScoreSideColor = function() {
+      return this.sides[SCORE_SIDE];
   };
 
   Cube.prototype.reset = function(x, y) {

@@ -88,7 +88,6 @@ window.GameController = (function() {
   };
 
   GameController.prototype.handlePeerConnection = function(peerId) {
-    console.log('got peer connection', peerId);
     // Only player 1 needs to sync timestamps.
     if (this.engine.playerNumber === 1) {
       this.time.sync().then(ping => {

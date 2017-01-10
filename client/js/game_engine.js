@@ -119,10 +119,6 @@ window.GameEngine = (function() {
     player.startMove(move).then(() => {
       return this.endMoveForPlayer(player);
     }).then(() => {
-      if (this.board.isGameOver()) {
-        this.endGame();
-        return;
-      }
 
       if (player.nextMove) {
         var key = player.nextMove;
@@ -135,7 +131,6 @@ window.GameEngine = (function() {
   GameEngine.prototype.handleKeyForMe = function(key) {
     // Only process one move at a time.
     if (this.me.isMoving()) {
-      console.log('being saved for later', key);
       this.me.nextMove = key;
       return;
     }
@@ -202,10 +197,6 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.finishPendingMove = function(id) {
     this.endMoveForPlayer(this.me).then(() => {
-      if (this.board.isGameOver()) {
-        this.endGame();
-        return;
-      }
 
       if (DEBUG) {
         this.logPendingMove(id, '--------------finishing-delete');
@@ -215,7 +206,6 @@ window.GameEngine = (function() {
       if (this.me.nextMove) {
         var key = this.me.nextMove;
         this.me.nextMove = null;
-        console.log('move was waiting', key);
         this.handleKeyForMe(key);
       }
     });
@@ -291,37 +281,35 @@ window.GameEngine = (function() {
     if (this.arePositionsConflicting(oppPosition, this.me.getPosition())) {
       // Move causes conflict, figure out who gets the contested sqaure.
       if (!this.me.isMoving() || timestamp > this.lastMoveInfo.timestamp) {
-        console.log('move caused conflict', timestamp, this.lastMoveInfo);
         // We moved first, tell peer to rollback.
         this.ackOpponentMove(false, id, timestamp);
         return;
       }
 
       // Here we rollback our pending move, but ack peer's.
-      console.log('peer moved first', timestamp, this.lastMoveInfo);
       this.rollbackPendingMove(this.lastMoveInfo.id);
     }
 
     // If we got here, we can ack the move and run it locally.
     this.ackOpponentMove(true, id, timestamp);
-    console.log('starting opponent move', id);
     this.opponent.startMove(move, duration).then(() => {
-      console.log('ending opponent move', id);
       return this.endMoveForPlayer(this.opponent);
-    }).then(() => {
-      console.log('ready for next move', id);
-      if (this.board.isGameOver()) {
-        this.endGame();
-      }
     });
   };
 
   GameEngine.prototype.endMoveForPlayer = function(player, isRollback) {
-    return player.endMove(isRollback).then(score => {
-      if (score) {
-        this.sound.play(SND_SCORE);
+    return player.endMove(isRollback).then(scored => {
+      if (isRollback || !scored) {
+        return null;
       }
-      return score;
+
+      if (scored) {
+        this.sound.play(SND_SCORE);
+
+        if (this.board.isGameOver()) {
+          this.endGame();
+        }
+      }
     });
   };
 

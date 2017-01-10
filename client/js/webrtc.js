@@ -215,7 +215,6 @@ window.WebRTC = (function() {
 
       case 'closed':
         console.log('disconnect from data channel state change');
-        this.disconnect();
         break;
 
       default:

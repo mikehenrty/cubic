@@ -25,6 +25,8 @@ window.CONST = (function() {
       BOTTOM: 5
     },
 
+    SCORE_SIDE: 5, // Bottom
+
     CUBE_COLORS: [
       'red',
       'blue',
