@@ -142,6 +142,20 @@ window.GameController = (function() {
     }
   };
 
+  GameController.prototype.playAgain = function() {
+    if (this.engine.offlineMode) {
+      this.startOffline();
+      return;
+    }
+
+    if (this.engine.playerNumber === 1) {
+      this.readyAgain = true;
+      this.attemptToStartAgain();
+    } else {
+      this.connection.send('again');
+    }
+  };
+
   GameController.prototype.getClientId = function() {
     return this.clientId;
   };
@@ -173,6 +187,11 @@ window.GameController = (function() {
   GameController.prototype.handleAgainPeer = function() {
     this.peerReadyAgain = true;
     this.attemptToStartAgain();
+  };
+
+  GameController.prototype.reset = function() {
+    this.engine.reset();
+    this.connection.reset();
   };
 
   return GameController;

@@ -92,5 +92,9 @@ window.Connection = (function() {
     this.webRTC.send(type, payload);
   };
 
+  Connection.prototype.reset = function() {
+    this.webRTC.disconnect();
+  };
+
   return Connection;
 })();

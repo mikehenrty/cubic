@@ -227,17 +227,17 @@ window.WebRTC = (function() {
 
   WebRTC.prototype.cleanUp = function() {
     if (this.dataChannel) {
-      this.dataChannel.close();
       this.dataChannel.onopen = null;
       this.dataChannel.onclose = null;
+      this.dataChannel.close();
       this.dataChannel = null;
     }
 
     if (this.peerConnection) {
-      this.peerConnection.close();
       this.peerConnection.onicecandidate = null;
       this.peerConnection.oniceconnectionstatechange = null;
       this.peerConnection.ondatachannel = null;
+      this.peerConnection.close();
       this.peerConnection = null;
     }
   };

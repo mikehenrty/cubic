@@ -122,8 +122,9 @@ window.Controller = (function() {
     this.dialog.showConfirm(`${status}. Play again?`).then(result => {
       if (result) {
         // restart game
-        this.game.handleAgainButton();
+        this.game.playAgain();
       } else {
+        this.game.reset();
         this.showUI();
       }
     });
