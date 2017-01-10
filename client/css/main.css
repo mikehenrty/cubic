@@ -329,6 +329,9 @@ body > div {
   text-align: center;
   line-height: var(--score-dimension);
   vertical-align: middle;
+  transform-origin: bottom;
+  transform: rotateX(-80deg);
+  border: 0.5vmin solid green;
 }
 
 #player-1.score {
