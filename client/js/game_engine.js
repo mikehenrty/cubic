@@ -9,10 +9,12 @@ window.GameEngine = (function() {
   const SND_INTRO_BG = 'bg-pump';
   const SND_MAIN_BG = 'bg-mellow';
   const SND_SCORE = 'ef-beat';
+  const SND_WIN = 'ef-powerup';
   const SOUND_FILES = {
     [SND_INTRO_BG]: CONST.SOUND_FILES[SND_INTRO_BG],
     [SND_SCORE]: CONST.SOUND_FILES[SND_SCORE],
     [SND_MAIN_BG]: CONST.SOUND_FILES[SND_MAIN_BG],
+    [SND_WIN]: CONST.SOUND_FILES[SND_WIN],
   };
 
   function GameEngine(container, connection, time) {
@@ -344,6 +346,7 @@ window.GameEngine = (function() {
     } else {
       winner = 2;
     }
+    this.sound.play(SND_WIN);
     this.trigger('gameover', winner);
   };
 

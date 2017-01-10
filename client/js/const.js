@@ -35,6 +35,7 @@ window.CONST = (function() {
       'bg-pump': '/sound/pumpup.ogg',
       'bg-mellow': '/sound/mellow.ogg',
       'ef-beat': '/sound/beat.ogg',
+      'ef-powerup': '/sound/powerup.ogg',
     }
   };
 })();
