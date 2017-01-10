@@ -1,8 +1,7 @@
 window.GameEngine = (function() {
   'use strict';
 
-  // const DEBUG = CONST.DEBUG;
-  const DEBUG = true;
+  const DEBUG = CONST.DEBUG;
 
   const COLS = CONST.COLS;
   const ROWS = CONST.ROWS;
@@ -228,7 +227,7 @@ window.GameEngine = (function() {
       this.logPendingMove(id, '--------------finishing-rollingback');
     }
     delete this.pendingMoves[id];
-    this.endMoveForPlayer(player, true);
+    this.endMoveForPlayer(this.me, true);
   };
 
   GameEngine.prototype.logPendingMove = function(id, message) {
