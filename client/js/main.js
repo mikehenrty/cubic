@@ -1,7 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+(() => {
   'use strict';
 
-  var container = document.body;
-  var controller = new Controller(container);
-  controller.start();
-});
+  window.addEventListener('load', () => {
+    var container = document.body;
+    var controller = new Controller(container);
+    controller.start();
+  });
+})();

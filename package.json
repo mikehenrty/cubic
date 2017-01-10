@@ -2,8 +2,13 @@
   "name": "cubic",
   "dependencies": {
     "bufferutil": "1.2.x",
+    "concat-files": "0.1.1",
+    "del": "2.2.2",
+    "ff": "0.2.1",
+    "glob": "7.1.1",
     "gulp": "3.9.1",
     "gulp-nodemon": "2.2.x",
+    "mkdirp": "0.5.1",
     "node-static": "0.7.x",
     "utf-8-validate": "1.2.x",
     "ws": "1.1.0"
