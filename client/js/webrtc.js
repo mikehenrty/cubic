@@ -173,16 +173,23 @@ window.WebRTC = (function() {
 
   WebRTC.prototype.stateChangeHandler = function() {
     switch (this.peerConnection.iceConnectionState) {
+      case 'completed':
+        conole.log('connection complete!', this.peerId);
+        break;
+
       case 'connected':
         console.log('connected to', this.peerId);
         break;
 
       case 'disconnected':
+        console.log('got the "official" disconnect message');
+        this.disconnect();
+        break;
+
       case 'failed':
       case 'closed':
         console.log('disconnect from webrtc state change',
           this.peerConnection.iceConnectionState);
-        this.disconnect();
         break;
 
       default:
