@@ -22,7 +22,6 @@ window.GameController = (function() {
     this.forward('ask', this.connection);
     this.forward('disconnect', this.connection);
 
-    this.status.on('again', this.handleAgainButton.bind(this));
     this.connection.on('again', this.handleAgainPeer.bind(this));
     this.connection.on('readyPlayerOne', this.handleReadyPlayerOne.bind(this));
     this.connection.on('start', this.handleStart.bind(this));
@@ -169,20 +168,6 @@ window.GameController = (function() {
 
   GameController.prototype.displayPing = function(ping) {
     this.status.setBottomStatus(`(${ping}ms)`);
-  };
-
-  GameController.prototype.handleAgainButton = function() {
-    if (this.engine.offlineMode) {
-      this.startOffline();
-      return;
-    }
-
-    if (this.engine.playerNumber === 1) {
-      this.readyAgain = true;
-      this.attemptToStartAgain();
-    } else {
-      this.connection.send('again');
-    }
   };
 
   GameController.prototype.handleAgainPeer = function() {
