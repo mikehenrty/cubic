@@ -55,9 +55,10 @@ window.Utility = (function() {
       return 'Me';
     }
     if (peerNames[guid]) {
-      return peerNames[guid]
+      return peerNames[guid];
     }
-    peerNames[guid] = 'peer_' + ++peerCount;
+    ++peerCount;
+    peerNames[guid] = 'peer_' + peerCount;
     return peerNames[guid];
   }
 
@@ -106,7 +107,7 @@ window.Utility = (function() {
     },
 
     trimOutliers: function(data) {
-      var median = Utility.median(data)
+      var median = Utility.median(data);
       var stddev = Utility.stddev(data);
       return data.filter(val => {
         return Math.abs(median - val) <= (stddev * 1.5);

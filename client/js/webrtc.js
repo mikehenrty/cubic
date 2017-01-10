@@ -174,7 +174,7 @@ window.WebRTC = (function() {
   WebRTC.prototype.stateChangeHandler = function() {
     switch (this.peerConnection.iceConnectionState) {
       case 'completed':
-        conole.log('connection complete!', this.peerId);
+        console.log('connection complete!', this.peerId);
         break;
 
       case 'connected':

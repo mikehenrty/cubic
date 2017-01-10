@@ -27,7 +27,7 @@ gulp.task('clean', () => {
 });
 
 gulp.task('lint', () => {
-  var task = gulp.src(PATH_JS + '*.js');
+  var task = gulp.src(path.join(PATH_JS, '/**/*.js'));
   return task.pipe(jshint()).pipe(jshint.reporter('default'));
 });
 
@@ -44,7 +44,7 @@ gulp.task('bundle', ['clean', 'lint'], (done) => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(path.join(PATH_JS + '*.js'), ['bundle']);
+  gulp.watch(path.join(PATH_JS + '/**/*.js'), ['bundle']);
 });
 
 gulp.task('listen', () => {

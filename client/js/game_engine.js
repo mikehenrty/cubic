@@ -135,6 +135,7 @@ window.GameEngine = (function() {
   GameEngine.prototype.handleKeyForMe = function(key) {
     // Only process one move at a time.
     if (this.me.isMoving()) {
+      console.log('being saved for later', key);
       this.me.nextMove = key;
       return;
     }
@@ -214,7 +215,8 @@ window.GameEngine = (function() {
       if (this.me.nextMove) {
         var key = this.me.nextMove;
         this.me.nextMove = null;
-        this.handleKeyForMe.bind(this, key);
+        console.log('move was waiting', key);
+        this.handleKeyForMe(key);
       }
     });
   };
@@ -222,6 +224,7 @@ window.GameEngine = (function() {
   GameEngine.prototype.rollbackPendingMove = function(id) {
     var moveInfo = this.getPendingMove(id);
     var move = this.pendingMoves[id];
+    console.log('rolling back move', move);
     this.me.setPosition(move.position.x, move.position.y);
     if (DEBUG) {
       this.logPendingMove(id, '--------------finishing-rollingback');

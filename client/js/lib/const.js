@@ -4,12 +4,13 @@ window.CONST = (function() {
   return {
     DEBUG: false,
 
-    MUTE: true,
+    MUTE: false,
 
     // Simulated latency.
     FAKE_LATENCY: 0,
+
     // miliseconds of piece movement.
-    MOVE_DURATION: 250,
+    MOVE_DURATION: 200,
 
     COLS: 10,
     ROWS: 10,
