@@ -40,9 +40,7 @@ window.GameEngine = (function() {
   GameEngine.prototype.loadSounds = function() {
     return Promise.all(Object.keys(SOUND_FILES).map(name => {
       return this.sound.loadSound(name, SOUND_FILES[name]);
-    })).then(() => {
-      console.log('sound files loaded');
-    });
+    }));
   };
 
   GameEngine.prototype.setPlayer = function(playerNumber) {
@@ -119,14 +117,17 @@ window.GameEngine = (function() {
     }
 
     player.startMove(move).then(() => {
-      if (this.endMoveForPlayer(player) && this.board.isGameOver()) {
+      return this.endMoveForPlayer(player);
+    }).then(() => {
+      if (this.board.isGameOver()) {
         this.endGame();
         return;
       }
+
       if (player.nextMove) {
         var key = player.nextMove;
         player.nextMove = null;
-        setTimeout(this.handleKeyForOffline.bind(this, key), 0);
+        this.handleKeyForOffline.bind(this, key);
       }
     });
   };
@@ -300,11 +301,12 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.endMoveForPlayer = function(player, isRollback) {
-    var score = player.endMove(isRollback);
-    if (score) {
-      this.sound.play(SND_SCORE);
-    }
-    return score;
+    return player.endMove(isRollback).then(score => {
+      if (score) {
+        this.sound.play(SND_SCORE);
+      }
+      return score;
+    });
   };
 
   GameEngine.prototype.handleKeyAck = function(payload) {

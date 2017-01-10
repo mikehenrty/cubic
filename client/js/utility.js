@@ -146,6 +146,12 @@ window.Utility = (function() {
       return localStorage.name;
     },
 
+    nextFrame: function() {
+      return new Promise(function(resolve, reject) {
+        requestAnimationFrame(function() { resolve(); });
+      });
+    },
+
     niceId: niceId,
     Queue: Queue,
   };

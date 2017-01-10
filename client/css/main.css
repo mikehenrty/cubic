@@ -126,8 +126,12 @@ body > div {
   transform: rotateZ(-1.5deg);
 }
 
-#ui.active {
+.active #ui {
   animation: twist 2.2s infinite;
+}
+
+#ui.hide {
+  pointer-events: none;
 }
 
 #content {
@@ -205,6 +209,12 @@ body > div {
   font-size: var(--font-small);
 }
 
+body:not(.active) #action-buttons,
+body:not(.active) #list-header,
+body:not(.active) #welcome {
+  visibility: hidden;
+}
+
 #name-container {
   position: absolute;
   left: 0;
@@ -236,9 +246,7 @@ body > div {
 
 #list-header {
   text-align: center;
-  text-decoration: underline;
 }
-
 #list-container {
   font-size: var(--font-small);
   text-align: center;
@@ -354,9 +362,12 @@ body > div {
 
 .cube {
   position: absolute;
+  top: 0;
+  left: 0;
   height: var(--square-dimension);
   width: var(--square-dimension);
-  transition: transform ease-in-out;
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
   transform-style: preserve-3d;
 }
 

@@ -52,28 +52,19 @@ window.Cube = (function() {
    */
   Cube.prototype.startMoving = function(move, duration) {
     return new Promise((res, rej) => {
+
       duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION);
       this.el.style.transitionDuration = duration + 'ms';
-      this.el.classList.add('moving', move);
+      if (duration === 0) {
+        res();
+        return;
+      }
 
-      var ended = false;
       this.el.addEventListener('transitionend', function onEnd(evt) {
         evt.currentTarget.removeEventListener('transitionend', onEnd);
-
-        if (ended) {
-          console.log('transitionend was pre-empted by setTimeout', duration);
-          return;
-        }
-        ended = true;
         res();
       });
-      setTimeout(() => {
-        if (!ended) {
-          ended = true;
-          console.log('manual timeout', move, duration);
-          res();
-        }
-      }, Math.round(duration * 1.2));
+      this.el.classList.add('moving', move);
     });
   };
 
@@ -109,6 +100,7 @@ window.Cube = (function() {
     // this.el.style.transform =
     //  `translateY(calc(${this.y} * ${this.squareHeight}))` +
     //  `translateX(calc(${this.x} * ${this.squareHeight}))`;
+
     this.el.style.top =`calc(${this.y} * ${this.squareHeight})`;
     this.el.style.left = `calc(${this.x} * ${this.squareHeight})`;
   };

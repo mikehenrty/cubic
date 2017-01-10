@@ -4,7 +4,7 @@ window.CONST = (function() {
   return {
     DEBUG: false,
 
-    MUTE: false,
+    MUTE: true,
 
     // Simulated latency.
     FAKE_LATENCY: 0,

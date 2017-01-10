@@ -7,6 +7,7 @@ window.GameController = (function() {
     this.container = container;
     this.el = document.createElement('div');
     this.el.id = 'screen';
+    this.el.className = 'hide';
     this.container.appendChild(this.el);
 
     this.clientId = null;

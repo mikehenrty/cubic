@@ -35,6 +35,7 @@ window.Player = (function() {
     this.scoreEl.id = `player-${this.playerNumber}`;
     this.container.appendChild(this.scoreEl);
 
+    this.moving = false;
     this.moves = [];
     this.nextMove = null;
     this.reset();
@@ -58,6 +59,7 @@ window.Player = (function() {
    * @returns (Promise): resolves when animation is complete.
    */
   Player.prototype.startMove = function(move, duration) {
+    this.moving = true;
     this.moves.push(move);
     this.setMovePosition(move);
     return this.cube.startMoving(move, duration);
@@ -67,29 +69,30 @@ window.Player = (function() {
   Player.prototype.endMove = function(isRollback) {
     var move = this.moves.shift();
     this.cube.stopMoving(move);
-    if (isRollback) {
+    if (!isRollback) {
+      this.cube.move(move);
+    }
+
+    return Utility.nextFrame().then(() => {
+      this.moving = false;
+      // TODO: move this logic into engine
+      if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
+          this.board.getColor(this.cube.x, this.cube.y)) {
+        this.board.pickUpTile(this.cube.x, this.cube.y)
+        this.addPoint();
+        return true;
+      }
       return false;
-    }
+    });
+  };
 
-    this.cube.move(move);
-
-    // TODO: move this logic into engine
-    if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
-        this.board.getColor(this.cube.x, this.cube.y)) {
-      this.board.pickUpTile(this.cube.x, this.cube.y)
-      this.addPoint();
-      return true;
-    }
-    return false;
+  Player.prototype.isMoving = function() {
+    return !!this.moving;
   };
 
   Player.prototype.addPoint = function() {
     ++this.points;
     this.scoreEl.textContent = this.points;
-  };
-
-  Player.prototype.isMoving = function() {
-    return this.moves.length > 0;
   };
 
   Player.prototype.getPosition = function() {
