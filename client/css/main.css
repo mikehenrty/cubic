@@ -31,7 +31,8 @@
 
   --fade-duration: 0.15s;
   --fade-in-out-duration: 3s;
-  --board-spin-duration: 15s;
+  --board-spin-duration: 30s;
+  --board-breathe-duration: 15s;
 }
 
 body {
@@ -91,7 +92,7 @@ body > div {
 #screen {
   top: var(--status-height);
   bottom: var(--status-height);
-  perspective: 400vmin;
+  animation: breathe var(--board-breathe-duration) infinite;
 }
 
 #ui {
@@ -337,42 +338,6 @@ body > div {
   transform: rotateX(-90deg);
 }
 
-/*
-.cube {
-  box-sizing: border-box;
-  border-width: var(--border-width);
-  border-style: solid;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: var(--square-dimension);
-  width: var(--square-dimension);
-  transition-property: border-width, transform;
-}
-
-
-.cube.moving.moveLeft {
-  border-left-width: 0vmin;
-  border-right-width: calc(var(--square-dimension) - var(--border-width));
-}
-
-.cube.moving.moveRight {
-  border-right-width: 0vmin;
-  border-left-width: calc(var(--square-dimension) - var(--border-width));
-}
-
-.cube.moving.moveUp {
-  border-top-width: 0vmin;
-  border-bottom-width: calc(var(--square-dimension) - var(--border-width));
-}
-
-.cube.moving.moveDown {
-  border-bottom-width: 0vmin;
-  border-top-width: calc(var(--square-dimension) - var(--border-width));
-}
-
-*/
-
 #dialog {
   position: fixed;
   background-color: rgba(0, 0, 0, 0.8);
@@ -428,6 +393,21 @@ body > div {
   }
   100% {
     transform: rotateX(60deg) rotateZ(-10deg);
+    animation-timing-function: ease-in-out;
+  }
+}
+
+@keyframes breathe {
+  0% {
+    perspective: 150vmin;
+    animation-timing-function: ease-in-out;
+  }
+  50% {
+    perspective: 200vmin;
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    perspective: 150vmin;
     animation-timing-function: ease-in-out;
   }
 }
