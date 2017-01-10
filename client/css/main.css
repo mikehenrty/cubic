@@ -20,7 +20,7 @@
 
   --font-small: calc(var(--board-dimension) / 40);
   --font-normal: calc(var(--board-dimension) / 30);
-  --font-large: calc(var(--board-dimension) / 20);
+  --font-large: calc(var(--board-dimension) / 22);
 
   --cube-color-red: purple;
   --cube-color-blue: gray;
@@ -50,10 +50,27 @@ button {
   font-family: 'Press Start 2P';
   color: var(--console-green);
   font-size: var(--font-small);
-  height: var(--font-large);
+  line-height: 1.2vmin;
   background-color: transparent;
-  padding: 0 1.5vmin;
+  padding: 2vmin 3.5vmin;
   margin: 0 1vmin;
+  border: 0.3vmin solid var(--console-green);
+  cursor: pointer;
+  transition: transform 0.01s ease-in;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:hover {
+  background-color: var(--console-green);
+  color: black;
+}
+
+input:focus,
+button:focus {
+  outline: 0;
 }
 
 input {
@@ -92,10 +109,12 @@ body > div {
   top: var(--status-height);
   bottom: var(--status-height);
   animation: breathe var(--board-breathe-duration) infinite;
+  transition: opacity 0.3s ease-in;
 }
 
 #screen.hide {
-  visibility: hidden;
+  transition: opacity 0.3s ease-in;
+  opacity: 0;
 }
 
 #ui {
@@ -109,10 +128,10 @@ body > div {
 }
 
 #content {
+  border: 1vmin solid var(--console-green);
   width: var(--board-dimension);
   height: var(--board-dimension);
-  background-color: #18d8e3;
-  color: white;
+  /* background-color: #18d8e3; */
   font-size: var(--font-normal);
   box-sizing: border-box;
   padding: 3vmin;
@@ -130,13 +149,13 @@ body > div {
 #content a {
   float: right;
   text-decoration: underline;
-  color: blue;
+  text-transform: uppercase;
   cursor: pointer;
   font-size: var(--font-small);
 }
 
 #welcome {
-  position: relative;
+  font-size: var(--font-small);
 }
 
 #name-container {
@@ -145,16 +164,16 @@ body > div {
   right: 0;
   text-align: center;
   pointer-events: none;
-  font-size: var(--font-large);
   line-height: var(--font-large);
+  font-size: var(--font-large);
 }
 
 #content #ui-status {
   text-align: center;
   color: var(--status-color);
-  border: 0.5vmin solid var(--status-color);
   visibility: hidden;
   padding: 0;
+  margin: 1.5vmin 0;
 }
 
 #content #ui-status.fade-in-out {
@@ -162,29 +181,26 @@ body > div {
 }
 
 #content #action-buttons {
-  border-bottom: calc(var(--board-dimension) / 120) dotted white;
+  border-bottom: calc(var(--board-dimension) / 120) dotted var(--console-green);
   text-align: center;
-  padding-bottom: calc(var(--board-dimension) / 20);
-  margin-bottom: calc(var(--board-dimension) / 50);
-}
-
-#action-buttons button {
-  color: white;
+  padding-bottom: 6vmin;
+  margin-bottom: 3vmin;
 }
 
 #list-header {
   text-align: center;
   text-decoration: underline;
-  color: gainsboro;
 }
 
 /* Hide the link input. */
 /* TODO: hide in a better way. perhaps use clipboard api */
-.peer-link {
+#action-buttons .peer-link {
   background: transparent;
   color: transparent;
   width: 0;
   border: none;
+  padding: 0;
+  margin: 0;
 }
 
 #board {
