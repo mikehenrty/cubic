@@ -67,7 +67,6 @@ input {
 }
 
 .hide {
-  visibility: hidden;
 }
 
 .color-change {
@@ -95,8 +94,18 @@ body > div {
   animation: breathe var(--board-breathe-duration) infinite;
 }
 
+#screen.hide {
+  visibility: hidden;
+}
+
 #ui {
   z-index: 1;
+  transition: opacity 0.3s ease-in, transform 0.4s ease-out;
+}
+
+#ui.hide  {
+  opacity: 0;
+  transform: scale(0) rotateZ(360deg);
 }
 
 #content {
@@ -109,10 +118,7 @@ body > div {
   padding: 3vmin;
   transition: transform 0.4s ease-out;
   visibility: visible;
-}
-
-.hide #content {
-  transform: scale(0);
+  animation: twist 2.2s infinite;
 }
 
 #content p {
@@ -409,6 +415,29 @@ body > div {
   100% {
     perspective: 150vmin;
     animation-timing-function: ease-in-out;
+  }
+}
+
+@keyframes twist {
+  0% {
+    transform: rotateZ(-1.5deg);
+    animation-timing-function: ease-in;
+  }
+  10% {
+    transform: rotateZ(1.5deg);
+    animation-timing-function: ease-in;
+  }
+  50% {
+    transform: rotateZ(1.5deg);
+    animation-timing-function: ease-in;
+  }
+  60% {
+    transform: rotateZ(-1.5deg);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: rotateZ(-1.5deg);
+    animation-timing-function: ease-in;
   }
 }
 
