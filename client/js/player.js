@@ -78,7 +78,7 @@ window.Player = (function() {
       // TODO: move this logic into engine
       if (this.cube.sides[CONST.CUBE_SIDES.BOTTOM] ===
           this.board.getColor(this.cube.x, this.cube.y)) {
-        this.board.pickUpTile(this.cube.x, this.cube.y)
+        this.board.pickUpTile(this.cube.x, this.cube.y);
         this.addPoint();
         return true;
       }

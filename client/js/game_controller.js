@@ -118,7 +118,7 @@ window.GameController = (function() {
   };
 
   GameController.prototype.handleStart = function(payload) {
-    var startTime, tiles
+    var startTime, tiles;
     [startTime, tiles] = payload.split(' ');
     tiles = JSON.parse(tiles);
     setTimeout(this.startOnline.bind(this, tiles), startTime - this.time.now());
@@ -166,7 +166,7 @@ window.GameController = (function() {
   };
 
   GameController.prototype.displayGameOverStatus = function(winner) {
-    var status = ''
+    var status = '';
     this.status.setBottomStatus('');
     if (winner === 0) {
       status = 'It\'s a tie';

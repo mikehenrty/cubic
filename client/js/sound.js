@@ -81,11 +81,15 @@ window.Sound = (() => {
   };
 
   Sound.prototype.stopBackground = function() {
-    this.backgroundSrc && this.backgroundSrc.stop();
-    this.backgroundSrc = null;
+    if (this.backgroundSrc) {
+      this.backgroundSrc.stop();
+      this.backgroundSrc = null;
+    }
 
-    this.backgroundSrc2 && this.backgroundSrc2.stop();
-    this.backgroundSrc2 = null;
+    if (this.backgroundSrc2) {
+      this.backgroundSrc2.stop();
+      this.backgroundSrc2 = null;
+    }
   };
 
   Sound.prototype.playBackground = function(name, options) {

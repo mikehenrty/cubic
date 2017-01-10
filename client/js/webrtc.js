@@ -106,38 +106,39 @@ window.WebRTC = (function() {
     var type = parts.shift();
     try {
       var data = JSON.parse(parts.join('|'));
-    } catch (err) {
-      console.log('could not parse signaling message', err);
+      switch (type) {
+        case 'candidate':
+          this.queue.add(this.handleSignalCandidate.bind(this, data));
+          break;
+
+        case 'offer':
+          this.queue.add(this.handleSignalOffer.bind(this, data));
+          break;
+
+        case 'answer':
+          this.queue.add(this.handleSignalAnswer.bind(this, data));
+          break;
+
+        default:
+          console.log('unrecognized signaling message', type);
+          break;
+      }
+
+    } catch (e) {
+      console.log('could not parse signaling message', e);
       return;
     }
 
-    switch (type) {
-      case 'candidate':
-        this.queue.add(this.handleSignalCandidate.bind(this, data));
-        break;
-
-      case 'offer':
-        this.queue.add(this.handleSignalOffer.bind(this, data));
-        break;
-
-      case 'answer':
-        this.queue.add(this.handleSignalAnswer.bind(this, data));
-        break;
-
-      default:
-        console.log('unrecognized signaling message', type);
-        break;
-    }
   };
 
   WebRTC.prototype.handleSignalAnswer = function(data, cb) {
     this.peerConnection.setRemoteDescription(
       new RTCSessionDescription(data)
     ).then(() => {
-      cb && cb(null);
-    }).catch(err => {
+      if (cb) { cb(null); }
+    }).catch(e => {
       console.log('error setting answer');
-      cb && cb(err);
+      if (cb) { cb(e); }
     });
   };
 
@@ -151,10 +152,10 @@ window.WebRTC = (function() {
     }).then(() => {
       this.sendSignal('answer',
         this.peerConnection.localDescription);
-      cb && cb(null);
-    }).catch(err => {
+      if (cb) { cb(null); }
+    }).catch(e => {
       console.log('error creating answer', err);
-      cb && cb(err);
+      if (cb) { cb(e); }
     });
   };
 
@@ -162,10 +163,10 @@ window.WebRTC = (function() {
     this.peerConnection.addIceCandidate(
       new RTCIceCandidate(data)
     ).then(() => {
-      cb && cb(null);
-    }).catch((err) => {
+      if (cb) { cb(null); }
+    }).catch((e) => {
       console.log('error adding ice candidate', err, data);
-      cb && cb(err);
+      if (cb) { cb(e); }
     });
   };
 
@@ -188,7 +189,7 @@ window.WebRTC = (function() {
         console.log('webrtc state change',
           this.peerConnection.iceConnectionState);
         break;
-    };
+    }
   };
 
   WebRTC.prototype.dataChannelHandler = function(evt) {
@@ -212,7 +213,7 @@ window.WebRTC = (function() {
 
       default:
         break;
-    };
+    }
   };
 
   WebRTC.prototype.disconnect = function() {
@@ -223,7 +224,7 @@ window.WebRTC = (function() {
       this.peerId = null;
       this.trigger('disconnect', peerId);
     }
-  }
+  };
 
   WebRTC.prototype.cleanUp = function() {
     if (this.dataChannel) {

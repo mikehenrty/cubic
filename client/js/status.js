@@ -30,7 +30,9 @@ window.Status = (() => {
   };
 
   Status.prototype.handleAgain = function() {
-    this.againHandler && this.againHandler();
+    if (this.againHandler) {
+      this.againHandler();
+    }
   };
 
   return Status;

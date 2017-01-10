@@ -13,6 +13,7 @@ var ff = require('ff');
 var fs = require('fs');
 var glob = require('glob');
 var gulp = require('gulp');
+var jshint = require('gulp-jshint');
 var mkdirp = require('mkdirp');
 var nodemon = require('gulp-nodemon');
 var path = require('path');
@@ -25,7 +26,12 @@ gulp.task('clean', () => {
   return del([PATH_DIST]);
 });
 
-gulp.task('bundle', ['clean'], (done) => {
+gulp.task('lint', () => {
+  var task = gulp.src(PATH_JS + '*.js');
+  return task.pipe(jshint()).pipe(jshint.reporter('default'));
+});
+
+gulp.task('bundle', ['clean', 'lint'], (done) => {
   var f = ff(() => {
     getFilesWithPath(PATH_JS, f());
     getFilesWithPath(PATH_LIB, f());

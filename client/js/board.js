@@ -14,7 +14,9 @@ window.Board = (function() {
     // Add sqaures to the board.
     for (var r = 0; r < this.rows; r++) {
       for (var c = 0; c < this.cols; c++) {
-        this.squares[c] || this.squares.push([]);
+        if (!this.squares[c]) {
+          this.squares.push([]);
+        }
         var square = document.createElement('span');
         this.squares[c].push(square);
         this.el.appendChild(square);

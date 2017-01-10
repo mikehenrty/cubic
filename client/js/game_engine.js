@@ -181,7 +181,9 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.addPendingMove = function(id, moveInfo) {
     this.pendingMoves[id] = moveInfo;
-    DEBUG && this.logPendingMove(id, 'adding');
+    if (DEBUG) {
+      this.logPendingMove(id, 'adding');
+    }
   };
 
   GameEngine.prototype.getPendingMove = function(id) {
@@ -189,7 +191,9 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.checkPendingMove = function(id) {
-    DEBUG && this.logPendingMove(id, 'checking');
+    if (DEBUG) {
+      this.logPendingMove(id, 'checking');
+    }
     var moveInfo = this.getPendingMove(id);
     if (moveInfo.acked && moveInfo.animated) {
       this.finishPendingMove(id);
@@ -203,7 +207,10 @@ window.GameEngine = (function() {
         return;
       }
 
-      DEBUG && this.logPendingMove(id, '--------------finishing-delete');
+      if (DEBUG) {
+        this.logPendingMove(id, '--------------finishing-delete');
+      }
+
       delete this.pendingMoves[id];
       if (this.me.nextMove) {
         var key = this.me.nextMove;
@@ -217,7 +224,9 @@ window.GameEngine = (function() {
     var moveInfo = this.getPendingMove(id);
     var move = this.pendingMoves[id];
     this.me.setPosition(move.position.x, move.position.y);
-    DEBUG && this.logPendingMove(id, '--------------finishing-rollingback');
+    if (DEBUG) {
+      this.logPendingMove(id, '--------------finishing-rollingback');
+    }
     delete this.pendingMoves[id];
     this.endMoveForPlayer(player, true);
   };
@@ -243,7 +252,9 @@ window.GameEngine = (function() {
     var key, id, timestamp;
     [id, key, timestamp] = payload.split(' ');
 
-    DEBUG && console.log('handling opponent key', id, key);
+    if (DEBUG) {
+      console.log('handling opponent key', id, key);
+    }
 
     var move = this.getMove(key);
     if (!move) {

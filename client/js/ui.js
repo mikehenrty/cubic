@@ -130,7 +130,10 @@ window.UI = (function() {
   UI.prototype.setStatus = function(text) {
     this.status.textContent = text;
     this.status.classList.add('fade-in-out');
-    this.statusTimeout && clearTimeout(this.statusTimeout);
+    if (this.statusTimeout) {
+      clearTimeout(this.statusTimeout);
+    }
+
     this.statusTimeout = setTimeout(() => {
       this.status.textContent = '';
       this.status.classList.remove('fade-in-out');
