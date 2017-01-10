@@ -54,6 +54,6 @@ gulp.task('listen', () => {
   });
 });
 
-gulp.task('develop', ['watch', 'listen']);
+gulp.task('develop', ['watch', 'listen', 'bundle']);
 
 gulp.task('default', ['develop']);
