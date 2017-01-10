@@ -11,7 +11,7 @@ window.CONST = (function() {
 
     COLS: 10,
     ROWS: 10,
-    STARTING_TILES: 1,
+    STARTING_TILES: 11,
 
     CUBE_SIDES: {
       TOP   : 0,
