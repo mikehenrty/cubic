@@ -123,6 +123,10 @@ body > div {
 #ui {
   z-index: 1;
   transition: opacity 0.3s ease-in, transform 0.4s ease-out;
+  transform: rotateZ(-1.5deg);
+}
+
+#ui.active {
   animation: twist 2.2s infinite;
 }
 
@@ -166,7 +170,6 @@ body > div {
 }
 
 .title-letter {
-  animation: roll var(--board-roll-duration) infinite;
   line-height: calc(var(--font-very-large) * 1.4);
   height: calc(var(--font-very-large) * 1.4);
   width: calc(var(--font-very-large) * 1.4);
@@ -178,20 +181,24 @@ body > div {
   vertical-align: middle;
 }
 
+.active .title-letter {
+  animation: roll var(--board-roll-duration) infinite;
+}
+
 #title .title-letter:nth-child(1) {
-  animation-delay: calc(var(--board-roll-duration) / 6 * 1);
+  animation-delay: calc((var(--board-roll-duration) / 6) * 1);
 }
 #title .title-letter:nth-child(2) {
-  animation-delay: calc(var(--board-roll-duration) / 6 * 2);
+  animation-delay: calc((var(--board-roll-duration) / 6) * 2);
 }
 #title .title-letter:nth-child(3) {
-  animation-delay: calc(var(--board-roll-duration) / 6 * 3);
+  animation-delay: calc((var(--board-roll-duration) / 6) * 3);
 }
 #title .title-letter:nth-child(4) {
-  animation-delay: calc(var(--board-roll-duration) / 6 * 4);
+  animation-delay: calc((var(--board-roll-duration) / 6) * 4);
 }
 #title .title-letter:nth-child(5) {
-  animation-delay: calc(var(--board-roll-duration) / 6 * 5);
+  animation-delay: calc((var(--board-roll-duration) / 6) * 5);
 }
 
 #welcome {
@@ -234,6 +241,7 @@ body > div {
 
 #list-container {
   font-size: var(--font-small);
+  text-align: center;
 }
 
 /* Hide the link input. */

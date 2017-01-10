@@ -92,8 +92,6 @@ window.Controller = (function() {
       this.game.loadAssets(),
     ]).then(() => {
       this.ui.setStatus('READY!!!');
-      // TODO: this should be inside engine.
-      this.game.engine.startIntroMusic();
       Utility.storeName(this.game.getClientName());
 
       var peerId = Utility.getPeerId();

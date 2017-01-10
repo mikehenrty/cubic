@@ -352,6 +352,13 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.startIntroMusic = function() {
     this.sound.playBackground(SND_INTRO_BG);
+
+    // TODO(polish): make ths bg layered effect work on chrome.
+    // this.sound.playBackground(SND_INTRO_BG, {
+    //   delay: 11.3,
+    //   double: true,
+    //   volume: 0.01,
+    // });
   };
 
   GameEngine.prototype.startMainMusic = function() {
