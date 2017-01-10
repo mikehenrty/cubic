@@ -152,6 +152,7 @@ body > div {
   text-transform: uppercase;
   cursor: pointer;
   font-size: var(--font-small);
+  color: unset;
 }
 
 #welcome {
