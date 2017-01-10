@@ -186,19 +186,19 @@ body > div {
 }
 
 #title .title-letter:nth-child(1) {
-  animation-delay: calc((var(--board-roll-duration) / 6) * 1);
+  animation-delay: 0.8s;
 }
 #title .title-letter:nth-child(2) {
-  animation-delay: calc((var(--board-roll-duration) / 6) * 2);
+  animation-delay: 1.6s;
 }
 #title .title-letter:nth-child(3) {
-  animation-delay: calc((var(--board-roll-duration) / 6) * 3);
+  animation-delay: 2.4s;
 }
 #title .title-letter:nth-child(4) {
-  animation-delay: calc((var(--board-roll-duration) / 6) * 4);
+  animation-delay: 3.2s;
 }
 #title .title-letter:nth-child(5) {
-  animation-delay: calc((var(--board-roll-duration) / 6) * 5);
+  animation-delay: 4s;
 }
 
 #welcome {

@@ -34,14 +34,12 @@ window.Sound = (() => {
   };
 
   Sound.prototype.loadSound = function(name, url) {
-    console.log('loading sound', name, url);
     return new Promise((res, rej) => {
       var req = new XMLHttpRequest();
       req.open('GET', url, true);
       req.responseType = 'arraybuffer';
       req.onload = () => {
         this.context.decodeAudioData(req.response, buffer => {
-          console.log('decoded sound', name);
           this.sounds[name] = {
             buffer: buffer,
           };
