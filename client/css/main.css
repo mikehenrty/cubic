@@ -351,6 +351,10 @@ body:not(.active) #welcome {
   border: 0.5vmin solid green;
 }
 
+.score.animate {
+  animation: expand-bounce 1s 1;
+}
+
 #player-1.score {
   top: calc(0vmin - var(--score-dimension));
   left: calc(0vmin - var(--score-dimension));
@@ -573,4 +577,13 @@ body:not(.active) #welcome {
   0% { color: salmon; }
   50% { color: magenta; }
   100% { color: salmon; }
+}
+
+@keyframes expand-bounce {
+  0% { transform: rotateX(-80deg); }
+  20% { transform: rotateX(-80deg) scale(1.5); }
+  40% { transform: rotateX(-80deg) scale(0.5); }
+  60% { transform: rotateX(-80deg) scale(1.2); }
+  80% { transform: rotateX(-80deg) scale(0.8); }
+  100% { transform: rotateX(-80deg) }
 }

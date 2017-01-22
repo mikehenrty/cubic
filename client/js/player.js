@@ -82,6 +82,13 @@ window.Player = (function() {
       if (cubeColor === tileColor) {
         this.board.pickUpTile(x, y);
         this.addPoint();
+        this.scoreEl.classList.add('animate');
+        this.scoreEl.addEventListener('animationend', function onend(evt) {
+          var el = evt.target;
+          el.removeEventListener('animationend', onend);
+          el.classList.remove('animate');
+        });
+
         return true;
       }
       return false;
