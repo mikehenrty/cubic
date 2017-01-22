@@ -14,7 +14,7 @@ window.CONST = (function() {
 
     COLS: 10,
     ROWS: 10,
-    STARTING_TILES: 1,
+    STARTING_TILES: 11,
 
     CUBE_SIDES: {
       TOP   : 0,
@@ -39,7 +39,7 @@ window.CONST = (function() {
     SOUND_FILES: {
       'bg-pump': '/sound/pumpup.ogg',
       'bg-mellow': '/sound/mellow.ogg',
-      'ef-beat': '/sound/beat.ogg',
+      'ef-bump': '/sound/bump.ogg',
       'ef-powerup': '/sound/powerup.ogg',
     }
   };
