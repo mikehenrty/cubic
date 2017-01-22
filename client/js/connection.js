@@ -18,8 +18,8 @@ window.Connection = (function() {
     return this.webRTC && this.webRTC.isConnected();
   };
 
-  Connection.prototype.register = function(name) {
-    return this.socket.sendCommand('register', null, name).then(payload => {
+  Connection.prototype.register = function(id) {
+    return this.socket.sendCommand('register', null, id).then(payload => {
       var parts = payload.split(' ');
       return {
         clientId: parts[0],

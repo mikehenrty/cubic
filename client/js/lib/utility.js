@@ -139,12 +139,12 @@ window.Utility = (function() {
       return window.getComputedStyle(document.body).getPropertyValue(prop);
     },
 
-    storeName: function(name) {
-      localStorage.name = name;
+    storeId: function(id) {
+      localStorage.id = id;
     },
 
-    fetchName: function() {
-      return localStorage.name;
+    fetchId: function() {
+      return localStorage.id;
     },
 
     nextFrame: function() {

@@ -88,12 +88,12 @@ window.Controller = (function() {
   Controller.prototype.start = function() {
     this.ui.setStatus('Loading...');
     Promise.all([
-      this.game.register(Utility.fetchName()),
+      this.game.register(Utility.fetchId()),
       this.game.loadAssets(),
     ]).then(() => {
       this.ui.activate();
       this.ui.setStatus('READY!!!');
-      Utility.storeName(this.game.getClientName());
+      Utility.storeId(this.game.getClientId());
 
       var peerId = Utility.getPeerId();
       if (peerId) {
@@ -137,7 +137,6 @@ window.Controller = (function() {
 
       this.ui.show({ clientName: '...' }); // Temporarily display elipses
       this.game.setName(name).then(() => {
-        Utility.storeName(name);
         this.ui.setStatus('Name changed');
         this.showUI();
       }).catch((err) => {

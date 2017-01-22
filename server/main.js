@@ -53,10 +53,9 @@ function handleMessage(socket, message) {
 
   // Register is the only message handled by the server.
   if (type === 'register') {
-    var clientId = clients.add(socket, payload);
-    var clientName = clients.getName(clientId);
-    socket.clientId = clientId;
-    socket.send(`register_ack ${sender} ${clientId} ${clientName}`);
+    var client = clients.add(socket, payload);
+    socket.clientId = client.id;
+    socket.send(`register_ack ${sender} ${client.id} ${client.name}`);
     return;
   }
 

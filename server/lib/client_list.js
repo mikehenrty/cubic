@@ -4,8 +4,8 @@ var Utility = require('./utility.js');
 
 var clientCount = 0;
 
-function Client(name) {
-  this.id = Utility.guid();
+function Client(id, name) {
+  this.id = id;
   this.name = name;
 }
 
@@ -19,17 +19,16 @@ ClientList.prototype.exists = function(clientId) {
   return !!this.clientInfo[clientId];
 };
 
-ClientList.prototype.add = function(socket, name) {
-  var newName = this.isEligibleName(name) ?
-    name : this.generateName();
-  var newClient = new Client(newName);
+ClientList.prototype.add = function(socket, id) {
+  id = this.isEligibleId(id) ? id : Utility.guid();
+  var newClient = new Client(id, this.generateName());
 
   this.clientInfo[newClient.id] = {
-    name: newName,
+    name: newClient.name,
     socket: socket,
   };
-  this.clientIds[newName] = newClient.id;
-  return newClient.id;
+  this.clientIds[newClient.name] = newClient.id;
+  return newClient;
 };
 
 ClientList.prototype.remove = function(guid) {
@@ -56,8 +55,8 @@ ClientList.prototype.generateName = function() {
   return `Player_${++this.clientCount}`;
 };
 
-ClientList.prototype.isEligibleName = function(name) {
-  return name && !this.clientIds[name];
+ClientList.prototype.isEligibleId = function(id) {
+  return id && !this.clientInfo[id];
 };
 
 ClientList.prototype.getName = function(guid) {

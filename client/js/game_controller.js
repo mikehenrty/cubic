@@ -57,8 +57,8 @@ window.GameController = (function() {
     return this.connection.getList();
   };
 
-  GameController.prototype.register = function(name) {
-    return this.connection.register(name).then(clientInfo => {
+  GameController.prototype.register = function(id) {
+    return this.connection.register(id).then(clientInfo => {
       console.log('registered', clientInfo);
       this.clientId = clientInfo.clientId;
       this.clientName = clientInfo.clientName;
