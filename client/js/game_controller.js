@@ -48,6 +48,10 @@ window.GameController = (function() {
     this.el.classList.remove('hide');
   };
 
+  GameController.prototype.isBoardShowing = function() {
+    return !this.el.classList.contains('hide');
+  };
+
   GameController.prototype.setName = function(name) {
     return this.connection.setName(name).then(name => {
       this.clientName = name;

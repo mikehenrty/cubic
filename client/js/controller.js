@@ -32,6 +32,10 @@ window.Controller = (function() {
 
   Controller.prototype.updatePeerList = function(list) {
     this.createClientList(list);
+    if (this.game.isBoardShowing()) {
+      return;
+    }
+
     this.ui.show({
       clientId: this.game.getClientId(),
       clientName: this.game.getClientName(),
