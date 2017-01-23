@@ -83,6 +83,21 @@ ClientList.prototype.getIdList = function() {
   return Object.keys(this.clientInfo);
 };
 
+ClientList.prototype.getSocketList = function() {
+  return this.getIdList().map(id => {
+    return this.clientInfo[id].socket;
+  });
+};
+
+ClientList.prototype.getListAsString = function() {
+  return JSON.stringify(this.getIdList().map((clientId) => {
+    return {
+      clientId: clientId,
+      clientName: this.getName(clientId),
+    };
+  }));
+};
+
 ClientList.prototype.printList = function() {
   console.log('LIST:');
   Object.keys(this.clientIds).forEach(name => {

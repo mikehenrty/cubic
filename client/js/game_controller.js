@@ -22,6 +22,7 @@ window.GameController = (function() {
 
     this.forward('ask', this.connection);
     this.forward('disconnect', this.connection);
+    this.forward('list_update', this.connection);
 
     this.connection.on('again', this.handleAgainPeer.bind(this));
     this.connection.on('readyPlayerOne', this.handleReadyPlayerOne.bind(this));

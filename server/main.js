@@ -15,6 +15,11 @@ const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;
 const BASE_PATH = path.resolve(__dirname, '../');
 const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
+const SERVER_COMMANDS = [
+  'register', 'list', 'setname'
+];
+
+
 var server, staticFile, websockets;
 var clients = new ClientList();
 console.setDebug(DEBUG);
@@ -37,6 +42,7 @@ websockets.on('connection', socket => {
   socket.on('close', () => {
     console.debug(`disconnect ${clients.getName(socket.clientId)}`);
     clients.remove(socket.clientId);
+    broadcastListUpdate(socket);
     DEBUG && clients.printList();
   });
 });
@@ -51,33 +57,9 @@ function handleMessage(socket, message) {
   console.debug(type, clients.getName(sender),
     clients.getName(recipient), payload);
 
-  // Register is the only message handled by the server.
-  if (type === 'register') {
-    var client = clients.add(socket, payload);
-    socket.clientId = client.id;
-    socket.send(`register_ack ${sender} ${client.id} ${client.name}`);
-    return;
-  }
-
-  if (type === 'list') {
-    var listInfo = clients.getIdList().map((clientId) => {
-      return {
-        clientId: clientId,
-        clientName: clients.getName(clientId),
-      };
-    });
-    socket.send(`list_ack ${sender} ${JSON.stringify(listInfo)}`);
-    return;
-  }
-
-  if (type === 'setname') {
-    if (!clients.setName(sender, payload)) {
-      console.debug(`name ${sender} ${payload}`);
-      socket.send(`error setname_ack ${recipient} ${payload}`);
-      return;
-    }
-
-    socket.send(`setname_ack ${sender} ${recipient} ${payload}`);
+  // First, process messages meant for the server rather than peers.
+  if (SERVER_COMMANDS.indexOf(type) !== -1) {
+    handleServerCommand(type, payload, socket);
     return;
   }
 
@@ -97,4 +79,45 @@ function handleMessage(socket, message) {
   var message = `${type} ${sender} ${payload}`;
   console.debug(`sending ${message}`);
   clients.send(recipient, message);
+}
+
+function handleServerCommand(type, payload, socket) {
+  var sender = socket.clientId || '';
+  var response = '';
+
+  switch (type) {
+    case 'register':
+      var client = clients.add(socket, payload);
+      socket.clientId = client.id;
+      response = `${client.id} ${client.name}`;
+      break;
+
+    case 'list':
+      response = clients.getListAsString();
+      break;
+
+    case 'setname':
+      if (!clients.setName(sender, payload)) {
+        console.debug(`name ${sender} ${payload}`);
+        socket.send(`error setname_ack ${null} ${payload}`);
+        return;
+      }
+      response = `${null} ${payload}`;
+      break;
+  }
+
+  socket.send(`${type}_ack ${sender} ${response}`);
+
+  if (type !== 'list') {
+    broadcastListUpdate(socket);
+  }
+}
+
+function broadcastListUpdate(excludedSocket) {
+  var list = clients.getListAsString();
+  clients.getSocketList().forEach(socket => {
+    if (socket !== excludedSocket) {
+      socket.send(`list_update ${null} ${list}`);
+    }
+  });
 }

@@ -20,6 +20,7 @@ window.Controller = (function() {
     this.game.on('reject', this.showRejection.bind(this));
     this.game.on('disconnect', this.showDisconnect.bind(this));
     this.game.on('gameover', this.showPlayAgain.bind(this));
+    this.game.on('list_update', this.updatePeerList.bind(this));
   }
 
   Controller.prototype.createClientList = function(list) {
@@ -29,16 +30,20 @@ window.Controller = (function() {
     });
   };
 
+  Controller.prototype.updatePeerList = function(list) {
+    this.createClientList(list);
+    this.ui.show({
+      clientId: this.game.getClientId(),
+      clientName: this.game.getClientName(),
+      clientList: list,
+    });
+  };
+
   Controller.prototype.showUI = function() {
     this.dialog.hide();
+    this.game.hideBoard();
     this.game.getList().then(list => {
-      this.createClientList(list);
-      this.game.hideBoard();
-      this.ui.show({
-        clientId: this.game.getClientId(),
-        clientName: this.game.getClientName(),
-        clientList: list,
-      });
+      this.updatePeerList(list);
       this.game.engine.startIntroMusic();
     });
   };

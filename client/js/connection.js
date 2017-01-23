@@ -4,12 +4,15 @@ window.Connection = (function() {
   const FAKE_LATENCY = CONST.FAKE_LATENCY;
 
   // List of events that happen on socket rather than rtc connection.
-  const SOCKET_EVENTS = ['ask', 'confirm', 'reject'];
+  const SOCKET_EVENTS = ['ask', 'list_update'];
 
   function Connection() {
     this.socket = new Socket();
     this.webRTC = new WebRTC(this.socket);
-    this.socket.on('ask', this.handleAsk.bind(this));
+
+    SOCKET_EVENTS.forEach(type => {
+      this.socket.on(type, this.handleSocketEvent.bind(this, type));
+    });
   }
 
   Connection.prototype = new Eventer();
@@ -38,12 +41,22 @@ window.Connection = (function() {
     });
   };
 
-  Connection.prototype.handleAsk = function(err, peerId, name) {
+  Connection.prototype.handleSocketEvent = function(type, err, sender, payload) {
     if (err) {
-      console.log('ask error', err, peerId);
+      console.log('socket message error', type, err, sender, payload);
       return;
     }
-    this.trigger('ask', peerId, name);
+
+    switch (type) {
+      case 'list_update':
+        this.trigger(type, JSON.parse(payload));
+        break;
+
+      case 'ask':
+      default:
+        this.trigger(type, sender, payload);
+        break;
+    }
   };
 
   Connection.prototype.allowPeer = function(peerId) {
