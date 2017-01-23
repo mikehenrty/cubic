@@ -53,7 +53,6 @@ window.Connection = (function() {
         break;
 
       case 'ask':
-      default:
         this.trigger(type, sender, payload);
         break;
     }
