@@ -6,7 +6,7 @@ window.Controller = (function() {
     this.game = new GameController(container);
     this.ui = new UI(container);
     this.dialog = new Dialog(container);
-    this.clientList = null;
+    this.clientList = {};
 
     this.ui.on('offline', this.startOfflineGame.bind(this));
     this.ui.on('rename', this.renamePlayer.bind(this));
