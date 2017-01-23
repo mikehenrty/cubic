@@ -248,9 +248,18 @@ body:not(.active) #welcome {
 #list-header {
   text-align: center;
 }
+
 #list-container {
   font-size: var(--font-small);
   text-align: center;
+}
+
+#list-container .peer-name {
+  float: left;
+}
+
+#list-container .peer-status {
+  float: right;
 }
 
 /* Hide the link input. */

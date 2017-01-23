@@ -4,15 +4,9 @@ var Utility = require('./utility.js');
 
 var clientCount = 0;
 
-function Client(id, name) {
-  this.id = id;
-  this.name = name;
-}
-
 function ClientList() {
   this.clientCount = 0;
   this.clientInfo = {};
-  this.clientIds = {};
 }
 
 ClientList.prototype.exists = function(clientId) {
@@ -21,14 +15,14 @@ ClientList.prototype.exists = function(clientId) {
 
 ClientList.prototype.add = function(socket, id) {
   id = this.isEligibleId(id) ? id : Utility.guid();
-  var newClient = new Client(id, this.generateName());
-
-  this.clientInfo[newClient.id] = {
-    name: newClient.name,
+  var info = {
+    id: id,
+    name: this.generateName(), // TODO: get this from storage
+    status: '',
     socket: socket,
   };
-  this.clientIds[newClient.name] = newClient.id;
-  return newClient;
+  this.clientInfo[id] = info;
+  return info;
 };
 
 ClientList.prototype.remove = function(guid) {
@@ -37,7 +31,6 @@ ClientList.prototype.remove = function(guid) {
     return;
   }
 
-  delete this.clientIds[this.clientInfo[guid].name];
   delete this.clientInfo[guid];
 };
 
@@ -68,14 +61,23 @@ ClientList.prototype.getName = function(guid) {
 };
 
 ClientList.prototype.setName = function(guid, name) {
-  if (!this.clientInfo[guid] || this.clientIds[name]) {
+  if (!this.clientInfo[guid]) {
     return false;
   }
 
+  // TODO: Check that name doesn't already exists.
+
   // Remove old name.
-  delete this.clientIds[this.clientInfo[guid].name];
   this.clientInfo[guid].name = name;
-  this.clientIds[name] = guid;
+  return true;
+};
+
+ClientList.prototype.setStatus = function(guid, status) {
+  if (!this.clientInfo[guid]) {
+    return false;
+  }
+
+  this.clientInfo[guid].status = status;
   return true;
 };
 
@@ -91,18 +93,19 @@ ClientList.prototype.getSocketList = function() {
 
 ClientList.prototype.getListAsString = function() {
   return JSON.stringify(this.getIdList().map((clientId) => {
+    var info = this.clientInfo[clientId];
     return {
-      clientId: clientId,
-      clientName: this.getName(clientId),
+      clientId: info.id,
+      clientName: info.name,
+      clientStatus: info.status,
     };
   }));
 };
 
 ClientList.prototype.printList = function() {
   console.log('LIST:');
-  Object.keys(this.clientIds).forEach(name => {
-    var id = this.clientIds[name];
-    console.log('--', name, id.substr(0, id.indexOf('-')));
+  this.getIdList().forEach(id => {
+    console.log('--', this.clientInfo[id].name, id.substr(0, id.indexOf('-')));
   });
   console.log('');
 };

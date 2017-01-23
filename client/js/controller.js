@@ -18,7 +18,7 @@ window.Controller = (function() {
     this.game.on('ready', this.showGame.bind(this));
     this.game.on('confirm', this.showConfirmation.bind(this));
     this.game.on('reject', this.showRejection.bind(this));
-    this.game.on('disconnect', this.showDisconnect.bind(this));
+    this.game.on('disconnect', this.handleDisconnect.bind(this));
     this.game.on('gameover', this.showPlayAgain.bind(this));
     this.game.on('list_update', this.updatePeerList.bind(this));
   }
@@ -93,9 +93,10 @@ window.Controller = (function() {
     this.showUI();
   };
 
-  Controller.prototype.showDisconnect = function(peerId) {
+  Controller.prototype.handleDisconnect = function(peerId) {
     var peer = this.clientList[peerId] || peerId;
     this.ui.setStatus(`${peer} disconnected`);
+    this.game.teardownGame();
     this.showUI();
   };
 

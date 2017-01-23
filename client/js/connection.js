@@ -91,6 +91,11 @@ window.Connection = (function() {
     return this.socket.sendCommand('setname', null, name);
   };
 
+  // Tell server when we are in game, and when we leave game.
+  Connection.prototype.setClientStatus = function(status) {
+    return this.socket.sendCommand('setstatus', null, status);
+  };
+
   Connection.prototype.send = function(type, payload) {
     if (!this.webRTC.isConnected()) {
       console.log('cannot send message, p2p not connected');

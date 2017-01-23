@@ -16,7 +16,7 @@ const BASE_PATH = path.resolve(__dirname, '../');
 const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
 const SERVER_COMMANDS = [
-  'register', 'list', 'setname'
+  'register', 'list', 'setname', 'setstatus'
 ];
 
 
@@ -101,6 +101,13 @@ function handleServerCommand(type, payload, socket) {
         console.debug(`name ${sender} ${payload}`);
         socket.send(`error setname_ack ${null} ${payload}`);
         return;
+      }
+      response = `${null} ${payload}`;
+      break;
+
+    case 'setstatus':
+      if (!clients.setStatus(sender, payload)) {
+
       }
       response = `${null} ${payload}`;
       break;

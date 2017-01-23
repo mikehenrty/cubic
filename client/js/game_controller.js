@@ -3,6 +3,9 @@ window.GameController = (function() {
 
   const START_DELAY = 1000;
 
+  const STATUS_PLAYING = 'playing';
+  const STATUS_WAITING = 'waiting';
+
   function GameController(container) {
     this.container = container;
     this.el = document.createElement('div');
@@ -32,6 +35,9 @@ window.GameController = (function() {
     this.engine.on('ping', this.displayPing.bind(this));
     this.hideBoard();
   }
+
+  GameController.STATUS_PLAYING = STATUS_PLAYING;
+  GameController.STATUS_WAITING = STATUS_WAITING;
 
   GameController.prototype = new Eventer();
 
@@ -128,15 +134,25 @@ window.GameController = (function() {
     setTimeout(this.startOnline.bind(this, tiles), startTime - this.time.now());
   };
 
-  GameController.prototype.startOnline = function(tiles) {
+  GameController.prototype.prepareGame = function() {
     this.readyAgain = false;
     this.peerReadyAgain = false;
     this.status.setStatus('Go!!!');
+    this.connection.setClientStatus(STATUS_PLAYING);
+  };
+
+  GameController.prototype.teardownGame = function() {
+    this.reset();
+    this.connection.setClientStatus(STATUS_WAITING);
+  };
+
+  GameController.prototype.startOnline = function(tiles) {
+    this.prepareGame();
     this.engine.startGame(tiles);
   };
 
   GameController.prototype.startOffline = function() {
-    this.status.setStatus('Go!!!');
+    this.prepareGame();
     this.engine.startOffline();
   };
 

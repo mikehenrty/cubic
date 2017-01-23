@@ -99,18 +99,28 @@ window.UI = (function() {
           }
           var clientRow = document.createElement('p');
           var clientName = document.createElement('span');
-          clientName.className = 'color-change';
+          clientName.className = 'color-change peer-name';
           clientName.textContent = clientInfo.clientName;
           clientRow.appendChild(clientName);
-          var joinButton = document.createElement('a');
-          joinButton.textContent = 'Join';
-          joinButton.href = Utility.getPeerLink(clientInfo.clientId);
-          joinButton.onclick = evt => {
-            evt.preventDefault();
-            this.trigger('join', clientInfo.clientId);
-          };
 
-          clientRow.appendChild(joinButton);
+          if (clientInfo.clientStatus === GameController.STATUS_PLAYING) {
+            var clientStatus = document.createElement('span');
+            clientStatus.className = 'peer-status';
+            clientStatus.textContent = 'Currently in a game.';
+            clientRow.appendChild(clientStatus);
+          } else {
+
+            var joinButton = document.createElement('a');
+            joinButton.textContent = 'Join';
+            joinButton.href = Utility.getPeerLink(clientInfo.clientId);
+            joinButton.onclick = evt => {
+              evt.preventDefault();
+              this.trigger('join', clientInfo.clientId);
+            };
+
+            clientRow.appendChild(joinButton);
+          }
+
           this.listContainer.appendChild(clientRow);
         });
       } else {
