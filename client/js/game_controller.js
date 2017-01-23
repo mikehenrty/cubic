@@ -21,6 +21,7 @@ window.GameController = (function() {
     this.connection = new Connection();
     this.time = new TimeSync(this.connection);
     this.engine = new GameEngine(this.el, this.connection, this.time);
+    this.engine.setPlayer(1);
     this.status = new Status(this.el);
 
     this.forward('ask', this.connection);
@@ -142,6 +143,7 @@ window.GameController = (function() {
   };
 
   GameController.prototype.teardownGame = function() {
+    this.engine.setPlayer(1);
     this.reset();
     this.connection.setClientStatus(STATUS_WAITING);
   };

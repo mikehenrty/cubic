@@ -24,15 +24,12 @@ window.GameEngine = (function() {
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
     this.sound = new Sound();
-    this.pendingMoves = {};
-    this.lastMoveInfo = null;
-    this.offlineMode = null;
-    this.startTime = null;
-    this.setPlayer(1);
 
     this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
     this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
     document.addEventListener('keydown', this.handleKeydown.bind(this));
+
+    this.reset();
   }
 
   GameEngine.prototype = new Eventer();
@@ -74,6 +71,8 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.reset = function() {
+    this.lastMoveInfo = null;
+    this.offlineMode = null;
     this.startTime = null;
     this.pendingMoves = {};
     this.board.reset();
