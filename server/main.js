@@ -102,7 +102,7 @@ function handleServerCommand(type, payload, socket) {
         socket.send(`error setname_ack ${null} ${payload}`);
         return;
       }
-      response = `${null} ${payload}`;
+      response = `${clients.getName(sender)}`;
       break;
 
     case 'setstatus':
