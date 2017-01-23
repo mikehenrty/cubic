@@ -122,9 +122,9 @@ function handleServerCommand(type, payload, socket) {
 
 function broadcastListUpdate(excludedSocket) {
   var list = clients.getListAsString();
-  clients.getSocketList().forEach(socket => {
-    if (socket !== excludedSocket) {
-      socket.send(`list_update ${null} ${list}`);
+  clients.getInfoList().forEach(info => {
+    if (info.status !== 'playing' && info.socket !== excludedSocket) {
+      info.socket.send(`list_update ${null} ${list}`);
     }
   });
 }
