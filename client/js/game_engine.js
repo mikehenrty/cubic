@@ -24,6 +24,7 @@ window.GameEngine = (function() {
     this.player1 = new Player(1, this.board);
     this.player2 = new Player(2, this.board);
     this.sound = new Sound();
+    this.offlineMode = null;
 
     this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
     this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
@@ -59,11 +60,11 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.startOffline = function() {
-    this.offlineMode = true;
-    this.startGame(this.board.generateTiles());
+    this.startGame(this.board.generateTiles(), true);
   };
 
-  GameEngine.prototype.startGame = function(tiles) {
+  GameEngine.prototype.startGame = function(tiles, offline) {
+    this.offlineMode = !!offline;
     this.reset();
     this.startTime = this.time.now();
     this.board.displayTiles(tiles);
@@ -72,7 +73,6 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.reset = function() {
     this.lastMoveInfo = null;
-    this.offlineMode = null;
     this.startTime = null;
     this.pendingMoves = {};
     this.board.reset();

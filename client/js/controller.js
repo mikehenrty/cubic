@@ -138,7 +138,7 @@ window.Controller = (function() {
         // restart game
         this.game.playAgain();
       } else {
-        this.game.reset();
+        this.game.teardownGame();
         this.showUI();
       }
     });
