@@ -66,6 +66,11 @@ window.Controller = (function() {
   };
 
   Controller.prototype.confirmConnection = function(peerId, name) {
+    if (this.game.isBoardShowing()) {
+      this.game.rejectPeer(peerId);
+      return;
+    }
+
     this.dialog.showConfirm(`${name} is asking to play you`).then(result => {
       if (result) {
         this.game.allowPeer(peerId);
