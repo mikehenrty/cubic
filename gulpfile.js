@@ -50,7 +50,8 @@ gulp.task('watch', () => {
 gulp.task('listen', () => {
   nodemon({
     script: 'server/main.js',
-    watch: 'server',
+    // Use [l] here to workaround nodemon bug #951
+    watch: ['server', '[l]ocal_config.json'],
   });
 });
 

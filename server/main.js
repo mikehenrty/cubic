@@ -5,14 +5,19 @@ var path = require('path');
 var ws = require('ws');
 var http = require('http');
 var nodeStatic = require('node-static')
+var jsonfile = require('jsonfile');
 var console = require('./lib/console_debug.js');
 var ClientList = require('./lib/client_list.js');
 
-const DEBUG = false;  // set to true for debug logging.
-const PORT = 8021;
-const WS_PORT = 8022;
-const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;
+
 const BASE_PATH = path.resolve(__dirname, '../');
+const CONFIG = jsonfile.readFileSync(
+  path.resolve(BASE_PATH, 'local_config.json'));
+
+const DEBUG = CONFIG.DEBUG || false;  // set to true for debug logging.
+const PORT = CONFIG.PORT || 8021;
+const WS_PORT = CONFIG.WS_PORT || 8022;
+const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;
 const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
 const SERVER_COMMANDS = [

@@ -1,3 +1,4 @@
 node_modules
 client/dist
+local_config.json
 
