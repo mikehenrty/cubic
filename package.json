@@ -9,10 +9,12 @@
     "gulp": "3.9.1",
     "gulp-jshint": "2.0.4",
     "gulp-nodemon": "2.2.x",
+    "gulp-shell": "0.5.2",
     "jshint": "2.9.4",
     "jsonfile": "2.4.0",
     "mkdirp": "0.5.1",
     "node-static": "0.7.x",
+    "run-sequence": "1.2.2",
     "utf-8-validate": "1.2.x",
     "ws": "1.1.0"
   }

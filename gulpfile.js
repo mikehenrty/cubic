@@ -14,9 +14,11 @@ var fs = require('fs');
 var glob = require('glob');
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
+var shell = require('gulp-shell');
 var mkdirp = require('mkdirp');
 var nodemon = require('gulp-nodemon');
 var path = require('path');
+var sequence = require('run-sequence');
 
 function getFilesWithPath(dir, cb) {
   glob(path.join(dir, '*.js'), cb);
@@ -30,6 +32,8 @@ gulp.task('lint', () => {
   var task = gulp.src(path.join(PATH_JS, '/**/*.js'));
   return task.pipe(jshint()).pipe(jshint.reporter('default'));
 });
+
+gulp.task('npm-install', shell.task(['npm install']));
 
 gulp.task('bundle', ['clean', 'lint'], (done) => {
   var f = ff(() => {
@@ -55,6 +59,8 @@ gulp.task('listen', () => {
   });
 });
 
-gulp.task('develop', ['watch', 'listen', 'bundle']);
+gulp.task('develop', (done) => {
+  sequence(['npm-install', 'watch', 'bundle'], 'listen', done);
+});
 
 gulp.task('default', ['develop']);
