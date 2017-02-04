@@ -2,6 +2,7 @@
   "name": "cubic",
   "dependencies": {
     "bufferutil": "1.2.x",
+    "bson-ext": "1.0.5",
     "concat-files": "0.1.1",
     "del": "2.2.2",
     "ff": "0.2.1",
@@ -13,6 +14,7 @@
     "jshint": "2.9.4",
     "jsonfile": "2.4.0",
     "mkdirp": "0.5.1",
+    "mongodb": "2.2.22",
     "node-static": "0.7.x",
     "pm2": "2.3.0",
     "run-sequence": "1.2.2",

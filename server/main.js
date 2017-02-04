@@ -1,25 +1,13 @@
 'use strict';
 
-var os = require('os');
-var path = require('path');
 var ws = require('ws');
 var http = require('http');
 var nodeStatic = require('node-static')
-var jsonfile = require('jsonfile');
+
 var console = require('./lib/console_debug.js');
 var ClientList = require('./lib/client_list.js');
 
-
-const BASE_PATH = path.resolve(__dirname, '../');
-const CONFIG = jsonfile.readFileSync(
-  path.resolve(BASE_PATH, 'local_config.json'));
-
-const DEBUG = CONFIG.DEBUG || false;  // set to true for debug logging.
-const PORT = CONFIG.PORT || 8021;
-const WS_PORT = CONFIG.WS_PORT || 8022;
-const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;
-const SITE_PATH = path.resolve(BASE_PATH, 'client');
-
+const CONST = require('./const');
 const SERVER_COMMANDS = [
   'register', 'list', 'setname', 'setstatus'
 ];
@@ -27,28 +15,28 @@ const SERVER_COMMANDS = [
 
 var server, staticFile, websockets;
 var clients = new ClientList();
-console.setDebug(DEBUG);
+console.setDebug(CONST.DEBUG);
 
 // Web Server.
-staticFile = new nodeStatic.Server(SITE_PATH, { cache: false});
+staticFile = new nodeStatic.Server(CONST.SITE_PATH, { cache: false});
 server = http.createServer((req, res) => {
   req.addListener('end', staticFile.serve.bind(staticFile, req, res)).resume();
-}).listen(PORT);
-console.log(`Listening on ${BASE_URL}`);
+}).listen(CONST.PORT);
+console.log(`Listening on ${CONST.BASE_URL}`);
 
 // WebSocket Server.
-websockets = new ws.Server({ server: server, port: WS_PORT });
+websockets = new ws.Server({ server: server, port: CONST.WS_PORT });
 websockets.on('connection', socket => {
   socket.on('message', message => {
     handleMessage(socket, message);
-    DEBUG && clients.printList();
+    CONST.DEBUG && clients.printList();
   });
 
   socket.on('close', () => {
     console.debug(`disconnect ${clients.getName(socket.clientId)}`);
     clients.remove(socket.clientId);
     broadcastListUpdate(socket);
-    DEBUG && clients.printList();
+    CONST.DEBUG && clients.printList();
   });
 });
 

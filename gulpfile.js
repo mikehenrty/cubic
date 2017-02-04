@@ -66,6 +66,20 @@ gulp.task('watch', () => {
   gulp.watch('package.json', ['npm-install']);
 });
 
+gulp.task('db-start', shell.task(['systemctl start mongodb.service']));
+
+gulp.task('db-create', done => {
+  var createDB = require('./server/create_db');
+  createDB(err => {
+    if (err) {
+      console.error('unable to create database', err);
+    } else {
+      console.log('database created');
+    }
+    done();
+  });
+});
+
 gulp.task('listen', () => {
   nodemon({
     script: 'server/main.js',
@@ -75,7 +89,7 @@ gulp.task('listen', () => {
 });
 
 gulp.task('develop', (done) => {
-  sequence(['npm-install', 'watch', 'bundle'], 'listen', done);
+  sequence('npm-install', ['watch', 'bundle', 'db-start'], 'listen', done);
 });
 
 gulp.task('prod', ['npm-install', 'bundle'], (done) => {
