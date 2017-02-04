@@ -14,6 +14,7 @@ var fs = require('fs');
 var glob = require('glob');
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
+var jsonfile = require('jsonfile');
 var shell = require('gulp-shell');
 var mkdirp = require('mkdirp');
 var nodemon = require('gulp-nodemon');
@@ -36,20 +37,29 @@ gulp.task('lint', () => {
 gulp.task('npm-install', shell.task(['npm install']));
 
 gulp.task('bundle', ['clean', 'lint'], (done) => {
+  var bootstrap_file = path.join(PATH_DIST, BOOTSTRAP_FILE);
+  var bundle_file = path.join(PATH_DIST, BUNDLE_FILE);
+
   var f = ff(() => {
     getFilesWithPath(PATH_JS, f());
     getFilesWithPath(PATH_LIB, f());
     mkdirp(PATH_DIST, f());
 
   }, (jsFiles, libFiles) => {
-    concat(libFiles, path.join(PATH_DIST, BOOTSTRAP_FILE), f());
-    concat(jsFiles, path.join(PATH_DIST, BUNDLE_FILE), f());
+    jsonfile.readFile('local_config.json', f());
+    concat(libFiles, bootstrap_file, f());
+    concat(jsFiles, bundle_file, f());
+  }, (config) => {
+
+    // Merge local config values with client CONST.
+    var config_str = `CONST.override(${JSON.stringify(config)})`;
+    fs.appendFile(bootstrap_file, config_str, f());
   }).onComplete(done);
 });
 
 gulp.task('watch', () => {
-  gulp.watch(path.join(PATH_JS + '/**/*.js'), ['bundle']);
-  gulp.watch(path.join('package.json'), ['npm-install']);
+  gulp.watch(['local_config.json', PATH_JS + '/**/*.js'], ['bundle']);
+  gulp.watch('package.json', ['npm-install']);
 });
 
 gulp.task('listen', () => {

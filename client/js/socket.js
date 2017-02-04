@@ -1,9 +1,9 @@
 window.Socket = (function() {
   'use strict';
 
-  // TODO: configure this for local, dev, and prod somehow.
-  const WS_PORT = 8022;
-  const WS_HOST = 'ws://' + window.location.hostname + ':' + WS_PORT;
+  const WS_PORT = CONST.WS_PORT || 8022;
+  const WS_HOST = CONST.WS_HOST ||
+    'ws://' + window.location.hostname + ':' + WS_PORT;
 
   function Socket() {
     this.ws = null;

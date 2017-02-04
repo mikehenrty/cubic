@@ -41,6 +41,13 @@ window.CONST = (function() {
       'bg-mellow': '/sound/mellow.ogg',
       'ef-bump': '/sound/bump.ogg',
       'ef-powerup': '/sound/powerup.ogg',
-    }
+    },
+
+    // Merge obj with CONST, overriding any existing keys.
+    override: function(obj) {
+      Object.getOwnPropertyNames(obj).forEach(key => {
+        this[key] = obj[key];
+      });
+    },
   };
 })();
