@@ -49,6 +49,7 @@ gulp.task('bundle', ['clean', 'lint'], (done) => {
 
 gulp.task('watch', () => {
   gulp.watch(path.join(PATH_JS + '/**/*.js'), ['bundle']);
+  gulp.watch(path.join('package.json'), ['npm-install']);
 });
 
 gulp.task('listen', () => {
