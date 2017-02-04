@@ -1,11 +1,14 @@
 'use strict';
 
+const APP_NAME = 'cubic';
+
 const PATH_JS = __dirname + '/client/js/';
 const PATH_LIB = __dirname + '/client/js/lib/';
 const PATH_DIST = __dirname + '/client/dist/';
 
 const BOOTSTRAP_FILE = 'bootstrap.js';
 const BUNDLE_FILE = 'bundle.js';
+const CONFIG_FILE = 'local_config.json';
 
 var concat = require('concat-files');
 var del = require('del');
@@ -13,6 +16,7 @@ var ff = require('ff');
 var fs = require('fs');
 var glob = require('glob');
 var gulp = require('gulp');
+var pm2 = require('pm2');
 var jshint = require('gulp-jshint');
 var jsonfile = require('jsonfile');
 var shell = require('gulp-shell');
@@ -46,7 +50,7 @@ gulp.task('bundle', ['clean', 'lint'], (done) => {
     mkdirp(PATH_DIST, f());
 
   }, (jsFiles, libFiles) => {
-    jsonfile.readFile('local_config.json', f());
+    jsonfile.readFile(CONFIG_FILE, f());
     concat(libFiles, bootstrap_file, f());
     concat(jsFiles, bundle_file, f());
   }, (config) => {
@@ -58,7 +62,7 @@ gulp.task('bundle', ['clean', 'lint'], (done) => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(['local_config.json', PATH_JS + '/**/*.js'], ['bundle']);
+  gulp.watch([CONFIG_FILE, PATH_JS + '/**/*.js'], ['bundle']);
   gulp.watch('package.json', ['npm-install']);
 });
 
@@ -72,6 +76,26 @@ gulp.task('listen', () => {
 
 gulp.task('develop', (done) => {
   sequence(['npm-install', 'watch', 'bundle'], 'listen', done);
+});
+
+gulp.task('prod', ['npm-install', 'bundle'], (done) => {
+  var f = ff(() => {
+    pm2.connect(true, f.wait());
+  }, () => {
+    jsonfile.readFile(CONFIG_FILE, f());
+    pm2.stop(APP_NAME, f.waitPlain());
+  }, (config) => {
+    pm2.start({
+      name: APP_NAME,
+      script: "server/main.js",
+      output: config.logfile,
+      error: config.logfile,
+    }, f());
+  }).onComplete((err) => {
+    err && console.log('prod error', err);
+    pm2.disconnect();
+    done();
+  });
 });
 
 gulp.task('default', ['develop']);
