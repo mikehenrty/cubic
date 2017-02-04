@@ -12,7 +12,6 @@ const SERVER_COMMANDS = [
   'register', 'list', 'setname', 'setstatus'
 ];
 
-
 var server, staticFile, websockets;
 var clients = new ClientList();
 console.setDebug(CONST.DEBUG);

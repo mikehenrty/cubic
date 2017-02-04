@@ -1,6 +1,7 @@
 'use strict';
 
 const CONST = require('../../const');
+const MONGO_URL = `mongodb://localhost:${CONST.MONGO_PORT}/${CONST.DB_NAME}`;
 
 var client = require('mongodb').MongoClient;
 var db = null;
@@ -12,9 +13,8 @@ module.exports = {
       return;
     }
 
-    client.connect(CONST.MONGO_URL, (err, mongodb) => {
+    client.connect(MONGO_URL, (err, mongodb) => {
       if (err) {
-        console.error('could not connect to db', err)
         cb(err);
         return;
       }

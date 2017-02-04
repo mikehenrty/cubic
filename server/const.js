@@ -14,7 +14,6 @@ const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
 const DB_NAME = 'cubic';
 const MONGO_PORT = 27017;
-const MONGO_URL = `mongodb://localhost:${MONGO_PORT}/${DB_NAME}`;
 
 var CONST = {
   DEBUG: DEBUG,
@@ -23,8 +22,8 @@ var CONST = {
   BASE_PATH: BASE_PATH,
   BASE_URL: BASE_URL,
   SITE_PATH: SITE_PATH,
+  DB_NAME: DB_NAME,
   MONGO_PORT: MONGO_PORT,
-  MONGO_URL: MONGO_URL,
 };
 
 var config = jsonfile.readFileSync(
