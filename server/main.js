@@ -1,5 +1,6 @@
 'use strict';
 
+var os = require('os');
 var ws = require('ws');
 var http = require('http');
 var nodeStatic = require('node-static');
@@ -8,6 +9,7 @@ var console = require('./lib/console_debug.js');
 var ClientList = require('./lib/client_list.js');
 
 const CONST = require('./const');
+const BASE_URL = `http:\/\/${os.hostname()}:${CONST.PORT}\/`;
 const SERVER_COMMANDS = [
   'register', 'list', 'setname', 'setstatus'
 ];
@@ -21,7 +23,7 @@ staticFile = new nodeStatic.Server(CONST.SITE_PATH, { cache: false});
 server = http.createServer((req, res) => {
   req.addListener('end', staticFile.serve.bind(staticFile, req, res)).resume();
 }).listen(CONST.PORT);
-console.log(`Listening on ${CONST.BASE_URL}`);
+console.log(`Listening on ${BASE_URL}`);
 
 // WebSocket Server.
 websockets = new ws.Server({ server: server, port: CONST.WS_PORT });
