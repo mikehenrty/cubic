@@ -1,7 +1,13 @@
 'use strict';
 
 const CONST = require('../../const');
-const MONGO_URL = `mongodb://localhost:${CONST.MONGO_PORT}/${CONST.DB_NAME}`;
+
+const USER = CONST.DB_USER;
+const PASS = CONST.DB_PASSWORD;
+const PORT = CONST.MONGO_PORT;
+const NAME = CONST.DB_NAME;
+
+const MONGO_URL = `mongodb://${USER}:${PASS}@localhost:${PORT}/${NAME}`;
 
 var client = require('mongodb').MongoClient;
 var db = null;

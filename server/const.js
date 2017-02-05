@@ -12,6 +12,8 @@ const WS_PORT = 8022;
 const BASE_URL = `http:\/\/${os.hostname()}:${PORT}\/`;
 const SITE_PATH = path.resolve(BASE_PATH, 'client');
 
+const DB_USER = 'cubic';
+const DB_PASSWORD = 'default';
 const DB_NAME = 'cubic';
 const MONGO_PORT = 27017;
 
@@ -22,6 +24,8 @@ var CONST = {
   BASE_PATH: BASE_PATH,
   BASE_URL: BASE_URL,
   SITE_PATH: SITE_PATH,
+  DB_USER: DB_USER,
+  DB_PASSWORD: DB_PASSWORD,
   DB_NAME: DB_NAME,
   MONGO_PORT: MONGO_PORT,
 };
