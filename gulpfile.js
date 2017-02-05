@@ -5,6 +5,7 @@ const APP_NAME = 'cubic';
 const PATH_JS = __dirname + '/client/js/';
 const PATH_LIB = __dirname + '/client/js/lib/';
 const PATH_DIST = __dirname + '/client/dist/';
+const PATH_SERVER = __dirname + '/server/';
 
 const BOOTSTRAP_FILE = 'bootstrap.js';
 const BUNDLE_FILE = 'bundle.js';
@@ -34,7 +35,8 @@ gulp.task('clean', () => {
 });
 
 gulp.task('lint', () => {
-  var task = gulp.src(path.join(PATH_JS, '/**/*.js'));
+  var task = gulp.src([path.join(PATH_JS, '/**/*.js'),
+                       path.join(PATH_SERVER, '**/*.js')]);
   return task.pipe(jshint()).pipe(jshint.reporter('default'));
 });
 
@@ -63,6 +65,7 @@ gulp.task('bundle', ['clean', 'lint'], (done) => {
 
 gulp.task('watch', () => {
   gulp.watch([CONFIG_FILE, PATH_JS + '/**/*.js'], ['bundle']);
+  gulp.watch([CONFIG_FILE, PATH_SERVER + '/**/*.js'], ['lint']);
   gulp.watch('package.json', ['npm-install']);
 });
 
@@ -89,7 +92,7 @@ gulp.task('listen', () => {
 });
 
 gulp.task('develop', (done) => {
-  sequence('npm-install', ['watch', 'bundle', 'db-start'], 'listen', done);
+  sequence('npm-install', ['watch', 'bundle'], 'listen', done);
 });
 
 gulp.task('prod', ['npm-install', 'bundle'], (done) => {
