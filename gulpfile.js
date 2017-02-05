@@ -66,9 +66,7 @@ gulp.task('watch', () => {
   gulp.watch('package.json', ['npm-install']);
 });
 
-gulp.task('db-start', (process.env.NODE_ENV === 'production') ?
-  shell.task(['sudo service mongod restart']) :
-  shell.task(['systemctl start mongodb.service']));
+gulp.task('db-start', shell.task(['systemctl start mongodb.service']));
 
 gulp.task('db-create', ['db-start', 'npm-install'], done => {
   var createDB = require('./server/create_db');
