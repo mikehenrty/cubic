@@ -2,7 +2,7 @@
 
 var ws = require('ws');
 var http = require('http');
-var nodeStatic = require('node-static')
+var nodeStatic = require('node-static');
 
 var console = require('./lib/console_debug.js');
 var ClientList = require('./lib/client_list.js');
@@ -28,14 +28,14 @@ websockets = new ws.Server({ server: server, port: CONST.WS_PORT });
 websockets.on('connection', socket => {
   socket.on('message', message => {
     handleMessage(socket, message);
-    CONST.DEBUG && clients.printList();
+    if (CONST.DEBUG) { clients.printList(); }
   });
 
   socket.on('close', () => {
     console.debug(`disconnect ${clients.getName(socket.clientId)}`);
     clients.remove(socket.clientId);
     broadcastListUpdate(socket);
-    CONST.DEBUG && clients.printList();
+    if (CONST.DEBUG) { clients.printList(); }
   });
 });
 
@@ -68,9 +68,9 @@ function handleMessage(socket, message) {
   }
 
   // Pass message on to recipient, whatever it may mean.
-  var message = `${type} ${sender} ${payload}`;
-  console.debug(`sending ${message}`);
-  clients.send(recipient, message);
+  var response = `${type} ${sender} ${payload}`;
+  console.debug(`sending ${response}`);
+  clients.send(recipient, response);
 }
 
 function handleServerCommand(type, payload, socket) {

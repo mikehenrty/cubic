@@ -95,7 +95,7 @@ ClientList.prototype.getInfoList = function() {
   return this.getIdList().map(id => {
     return this.clientInfo[id];
   });
-}
+};
 
 ClientList.prototype.getListAsString = function() {
   return JSON.stringify(this.getIdList().map((clientId) => {

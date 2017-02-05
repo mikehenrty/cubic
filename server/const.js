@@ -37,5 +37,4 @@ Object.getOwnPropertyNames(config).forEach(key => {
   CONST[key] = config[key];
 });
 
-module.exports = CONST
-
+module.exports = CONST;

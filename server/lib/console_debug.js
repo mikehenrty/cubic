@@ -10,6 +10,6 @@ console.debug = function() {
 
 console.setDebug = function(debug) {
   DEBUG = !!debug;
-}
+};
 
 module.exports = console;

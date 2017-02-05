@@ -25,6 +25,7 @@ module.exports = {
           { 'clientId': { '$type': 'string' } },
           { 'name': { '$type': 'string' } },
           { 'joined': { '$type': 'date' } },
+          { 'updated': { '$type': 'date' } },
           { 'played': { '$type': 'int' } },
           { 'won': { '$type': 'int' } },
           { 'moves': { '$type': 'int' } },

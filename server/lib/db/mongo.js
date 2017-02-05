@@ -31,6 +31,6 @@ module.exports = {
   },
 
   disconnect: function() {
-    db && db.close();
+    if (db) { db.close(); }
   },
-}
+};
