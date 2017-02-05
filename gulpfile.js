@@ -96,7 +96,7 @@ gulp.task('develop', (done) => {
 
 gulp.task('prod', ['npm-install', 'bundle'], (done) => {
   var f = ff(() => {
-    pm2.connect(true, f.wait());
+    pm2.connect(f.wait());
   }, () => {
     jsonfile.readFile(CONFIG_FILE, f());
     pm2.stop(APP_NAME, f.waitPlain());
