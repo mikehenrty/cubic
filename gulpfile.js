@@ -68,7 +68,7 @@ gulp.task('watch', () => {
 
 gulp.task('db-start', shell.task(['systemctl start mongodb.service']));
 
-gulp.task('db-create', ['db-start', 'npm-install'], done => {
+gulp.task('db-create', ['npm-install'], done => {
   var createDB = require('./server/create_db');
   createDB(err => {
     if (err) {
