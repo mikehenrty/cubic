@@ -34,21 +34,20 @@ websockets.on('connection', socket => {
   });
 
   socket.on('close', () => {
-    console.debug(`disconnect ${clients.getName(socket.clientId)}`);
-    clients.remove(socket.clientId);
+    console.debug(`disconnect ${clients.getName(socket)}`);
+    clients.remove(socket);
     broadcastListUpdate(socket);
     if (CONST.DEBUG) { clients.printList(); }
   });
 });
 
 function handleMessage(socket, message) {
-  var sender = socket.clientId || '';
   var parts = message.split(' ');
   var type = parts.shift();
   var recipient = parts.shift();
   var payload = parts.join(' ');
 
-  console.debug(type, clients.getName(sender),
+  console.debug(type, clients.getName(socket),
     clients.getName(recipient), payload);
 
   // First, process messages meant for the server rather than peers.
@@ -66,24 +65,22 @@ function handleMessage(socket, message) {
 
   // Append client's name to ask requests.
   if (type === 'ask') {
-    payload = clients.getName(sender);
+    payload = clients.getName(socket);
   }
 
   // Pass message on to recipient, whatever it may mean.
-  var response = `${type} ${sender} ${payload}`;
+  var response = `${type} ${clients.getId(socket)} ${payload}`;
   console.debug(`sending ${response}`);
   clients.send(recipient, response);
 }
 
 function handleServerCommand(type, payload, socket) {
-  var sender = socket.clientId || '';
   var response = '';
 
   switch (type) {
     case 'register':
       var client = clients.add(socket, payload);
-      socket.clientId = client.id;
-      response = `${client.id} ${client.name}`;
+      response = `${client.clientId} ${client.name}`;
       break;
 
     case 'list':
@@ -91,23 +88,24 @@ function handleServerCommand(type, payload, socket) {
       break;
 
     case 'setname':
-      if (!clients.setName(sender, payload)) {
-        console.debug(`name ${sender} ${payload}`);
+      if (!clients.setName(socket, payload)) {
+        console.debug(`name ${clients.getId(socket)} ${payload}`);
         socket.send(`error setname_ack ${null} ${payload}`);
         return;
       }
-      response = `${clients.getName(sender)}`;
+
+      response = `${clients.getName(socket)}`;
       break;
 
     case 'setstatus':
-      if (!clients.setStatus(sender, payload)) {
+      if (!clients.setStatus(socket, payload)) {
 
       }
       response = `${null} ${payload}`;
       break;
   }
 
-  socket.send(`${type}_ack ${sender} ${response}`);
+  socket.send(`${type}_ack ${clients.getId(socket)} ${response}`);
 
   if (type !== 'list') {
     broadcastListUpdate(socket);
@@ -116,9 +114,9 @@ function handleServerCommand(type, payload, socket) {
 
 function broadcastListUpdate(excludedSocket) {
   var list = clients.getListAsString();
-  clients.getInfoList().forEach(info => {
-    if (info.status !== 'playing' && info.socket !== excludedSocket) {
-      info.socket.send(`list_update ${null} ${list}`);
+  clients.getInfoList().forEach(client => {
+    if (client.status !== 'playing' && client.socket !== excludedSocket) {
+      client.socket.send(`list_update ${null} ${list}`);
     }
   });
 }
