@@ -12,11 +12,6 @@ ClientList.prototype.isId = function(thing) {
   return typeof thing === 'string';
 };
 
-// TODO: Fix this function or remove it in favor of get.
-ClientList.prototype.exists = function(socketOrId) {
-  return this.bySocket.has(socketOrId) || !!this.byId[socketOrId];
-};
-
 ClientList.prototype.get = function(socketOrId) {
   return this.byId[socketOrId] || this.bySocket.get(socketOrId);
 };
@@ -26,13 +21,14 @@ ClientList.prototype.getId = function(socket) {
 };
 
 ClientList.prototype.add = function(socket, clientId) {
-  if (this.exists(socket)) {
+  var client = this.get(socket);
+  if (client) {
     console.log('trying to add socket that already exists', clientId);
-    return this.get(socket);
+    return client;
   }
 
   var socketId = Utility.guid();
-  var client = {
+  client = {
     socket: socket,
     socketId: socketId,
     clientId: clientId || Utility.guid(),
@@ -46,23 +42,24 @@ ClientList.prototype.add = function(socket, clientId) {
 };
 
 ClientList.prototype.remove = function(socket) {
-  if (!this.exists(socket)) {
+  var client = this.bySocket.get(socket);
+  if (!client) {
     console.log('could not remove unreconized socket');
     return;
   }
 
-  var client = this.bySocket.get(socket);
   this.bySocket.delete(socket);
   delete this.byId[client.socketId];
 };
 
 ClientList.prototype.send = function(recipient, message) {
-  if (!this.exists(recipient)) {
+  var client = this.get(recipient);
+  if (!client) {
     console.log('unable to send to unrecognized recipient', recipient);
     return;
   }
 
-  this.get(recipient).socket.send(message);
+  client.socket.send(message);
 };
 
 ClientList.prototype.generateName = function() {
@@ -79,13 +76,14 @@ ClientList.prototype.getName = function(socketOrId) {
 };
 
 ClientList.prototype.setName = function(socketOrId, name) {
-  if (!this.exists(socketOrId)) {
+  var client = this.get(socketOrId);
+  if (!client) {
     console.log('unable to set name of unreconized client', socketOrId);
     return false;
   }
 
   // TODO: Check that name doesn't already exist in database.
-  this.get(socketOrId).name = name;
+  client.name = name;
   return true;
 };
 

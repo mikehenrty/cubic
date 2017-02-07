@@ -57,7 +57,8 @@ function handleMessage(socket, message) {
   }
 
   // Make sure the recipienct exists.
-  if (!clients.exists(recipient)) {
+  var client = clients.get(recipient);
+  if (!client) {
     console.debug(`unrecognized ${recipient} ${clients.getIdList()}`);
     socket.send(`error ${type}_ack ${recipient} ${payload}`);
     return;
@@ -71,7 +72,7 @@ function handleMessage(socket, message) {
   // Pass message on to recipient, whatever it may mean.
   var response = `${type} ${clients.getId(socket)} ${payload}`;
   console.debug(`sending ${response}`);
-  clients.send(recipient, response);
+  client.socket.send(recipient, response);
 }
 
 function handleServerCommand(type, payload, socket) {
