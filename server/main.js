@@ -72,7 +72,7 @@ function handleMessage(socket, message) {
   // Pass message on to recipient, whatever it may mean.
   var response = `${type} ${clients.getId(socket)} ${payload}`;
   console.debug(`sending ${response}`);
-  client.socket.send(recipient, response);
+  client.socket.send(response);
 }
 
 function handleServerCommand(type, payload, socket) {

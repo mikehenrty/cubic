@@ -52,16 +52,6 @@ ClientList.prototype.remove = function(socket) {
   delete this.byId[client.socketId];
 };
 
-ClientList.prototype.send = function(recipient, message) {
-  var client = this.get(recipient);
-  if (!client) {
-    console.log('unable to send to unrecognized recipient', recipient);
-    return;
-  }
-
-  client.socket.send(message);
-};
-
 ClientList.prototype.generateName = function() {
   return `Player_${++this.clientCount}`;
 };
