@@ -26,7 +26,8 @@ window.Connection = (function() {
       var parts = payload.split(' ');
       return {
         clientId: parts[0],
-        clientName: parts[1]
+        clientName: parts[1],
+        socketId: parts[2],
       };
     });
   };

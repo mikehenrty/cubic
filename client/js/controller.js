@@ -39,6 +39,7 @@ window.Controller = (function() {
     this.ui.show({
       clientId: this.game.getClientId(),
       clientName: this.game.getClientName(),
+      socketId: this.game.getSocketId(),
       clientList: list,
     });
   };

@@ -74,6 +74,7 @@ window.GameController = (function() {
       console.log('registered', clientInfo);
       this.clientId = clientInfo.clientId;
       this.clientName = clientInfo.clientName;
+      this.socketId = clientInfo.socketId;
     });
   };
 
@@ -185,6 +186,10 @@ window.GameController = (function() {
 
   GameController.prototype.getClientName = function() {
     return this.clientName;
+  };
+
+  GameController.prototype.getSocketId = function() {
+    return this.socketId;
   };
 
   GameController.prototype.displayGameOverStatus = function(winner) {

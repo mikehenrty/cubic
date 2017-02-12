@@ -83,8 +83,8 @@ window.UI = (function() {
   };
 
   UI.prototype.show = function(options) {
-    if (options.clientId) {
-      this.linkInput.value = Utility.getPeerLink(options.clientId);
+    if (options.socketId) {
+      this.linkInput.value = Utility.getPeerLink(options.socketId);
     }
     if (options.clientName) {
       this.nameContainer.textContent = options.clientName;

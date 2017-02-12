@@ -79,7 +79,7 @@ function handleServerCommand(type, payload, socket) {
   switch (type) {
     case 'register':
       clients.add(socket, payload, (err, client) => {
-        var response = `${client.clientId} ${client.name}`;
+        var response = `${client.clientId} ${client.name} ${client.socketId}`;
         respondToServerCommand(type, socket, response);
       });
       break;

@@ -68,21 +68,5 @@ window.Socket = (function() {
     });
   };
 
-  Socket.prototype.connectToServer = function(name) {
-    if (this.initialized) {
-      return Promise.resolve();
-    }
-
-    return this.sendCommand('register', null, name).then(
-      (payload) => {
-        this.initialized = true;
-        var parts = payload.split(' ');
-        return {
-          clientId: parts[0],
-          clientName: parts[1]
-        };
-      });
-  };
-
   return Socket;
 })();
