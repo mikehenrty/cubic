@@ -1,0 +1,6 @@
+﻿{
+  "DEBUG": true,
+  "MUTE": true,
+  "PORT": 8008,
+  "WS_PORT": 8030
+}
