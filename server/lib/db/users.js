@@ -39,6 +39,19 @@ module.exports = {
     f.onComplete(cb);
   },
 
+  setName: function(clientId, name, cb) {
+    var f = ff(() => {
+      mongo.getDB(f());
+    },
+
+    db => {
+      db.collection(USERS).findOneAndUpdate(
+        { clientId: clientId },
+        { $set : { name: name } },
+        { returnOriginal: false}, f());
+    }).onComplete(cb);
+  },
+
   create: function(cb) {
     var db;
 

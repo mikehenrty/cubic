@@ -76,38 +76,38 @@ function handleMessage(socket, message) {
 }
 
 function handleServerCommand(type, payload, socket) {
-  var response = '';
-
   switch (type) {
     case 'register':
       clients.add(socket, payload, (err, client) => {
-        response = `${client.clientId} ${client.name}`;
+        var response = `${client.clientId} ${client.name}`;
         respondToServerCommand(type, socket, response);
       });
       break;
 
     case 'list':
-      response = clients.getListAsString();
-      respondToServerCommand(type, socket, response);
+      respondToServerCommand(type, socket, clients.getListAsString());
       break;
 
     case 'setname':
+      // Note: setName is asyncronous, so right now we ignore if
+      // setName caused DB errors. Player can always setName for this session.
       if (!clients.setName(socket, payload)) {
         console.debug(`name ${clients.getId(socket)} ${payload}`);
         socket.send(`error setname_ack ${null} ${payload}`);
         return;
       }
 
-      response = `${clients.getName(socket)}`;
-      respondToServerCommand(type, socket, response);
+      respondToServerCommand(type, socket, `${clients.getName(socket)}`);
       break;
 
     case 'setstatus':
       if (!clients.setStatus(socket, payload)) {
-
+        console.debug(`name ${clients.getId(socket)} ${payload}`);
+        socket.send(`error setstatus_ack ${null} ${payload}`);
+        return;
       }
-      response = `${null} ${payload}`;
-      respondToServerCommand(type, socket, response);
+
+      respondToServerCommand(type, socket, `${null} ${payload}`);
       break;
   }
 }

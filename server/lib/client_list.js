@@ -80,15 +80,27 @@ ClientList.prototype.getName = function(socketOrId) {
   return client.name;
 };
 
-ClientList.prototype.setName = function(socketOrId, name) {
+ClientList.prototype.setName = function(socketOrId, name, cb) {
   var client = this.get(socketOrId);
   if (!client) {
-    console.log('unable to set name of unreconized client', socketOrId);
+    var msg = `unable to set name of unreconized client: ${socketOrId}`;
+    console.error(msg);
+    if (cb) { cb(new Error(msg)); }
     return false;
   }
 
-  // TODO: Check that name doesn't already exist in database.
   client.name = name;
+
+  // Send DB update after we respond to request.
+  Users.setName(client.clientId, name, (err) => {
+    if (err) {
+      console.error('db setname fail', err);
+      if (cb) { cb(new Error('could not set name')); }
+      return;
+    }
+    if (cb) { cb(null, client); }
+  });
+
   return true;
 };
 
