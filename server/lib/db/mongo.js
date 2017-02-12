@@ -9,10 +9,13 @@ const NAME = CONST.DB_NAME;
 
 const MONGO_URL = `mongodb://${USER}:${PASS}@localhost:${PORT}/${NAME}`;
 
-var client = require('mongodb').MongoClient;
+var mongo = require('mongodb');
+var client = mongo.MongoClient;
 var db = null;
 
 module.exports = {
+  Double: mongo.Double,
+
   getDB: function(cb) {
     if (db) {
       cb(null, db);

@@ -6,6 +6,39 @@ var ff = require('ff');
 var mongo = require('./mongo');
 
 module.exports = {
+  get: function(clientId, ip, cb) {
+    var db;
+
+    var f = ff(() => {
+      mongo.getDB(f());
+    },
+
+    _db => {
+      db = _db;
+      db.collection(USERS).findOneAndUpdate(
+        { clientId: clientId },
+        {
+          $setOnInsert: {
+            clientId: clientId,
+            name: '',
+            joined: new Date(),
+            plays: 0,
+            wins: 0,
+            moves: 0,
+            avgLatency: mongo.Double(0),
+          },
+          $set: {
+            updated: new Date(),
+          },
+          $inc: { registers: 1 },
+          $addToSet: { ips: ip },
+        },
+        { upsert: true, returnOriginal: false}, f());
+    });
+
+    f.onComplete(cb);
+  },
+
   create: function(cb) {
     var db;
 
@@ -26,11 +59,14 @@ module.exports = {
           { 'name': { '$type': 'string' } },
           { 'joined': { '$type': 'date' } },
           { 'updated': { '$type': 'date' } },
-          { 'played': { '$type': 'int' } },
-          { 'won': { '$type': 'int' } },
+          { 'registers': { '$type': 'int' } },
+          { 'plays': { '$type': 'int' } },
+          { 'wins': { '$type': 'int' } },
           { 'moves': { '$type': 'int' } },
-          { 'avgLatency': { '$type': 'int' } },
-          { 'ips': { '$type': 'array' } },
+          { 'avgLatency': { '$type': 'double' } },
+          // Validate that ips is an array (workaround).
+          // See: https://jira.mongodb.org/browse/SERVER-23912
+          { 'ips.0': { '$exists': true } },
         ]}
       }, f.wait());
       f.pass(db);
@@ -40,6 +76,18 @@ module.exports = {
       db.collection(USERS).createIndex(
         { clientId: 'text', name: 'text' },
         { unique: true }, f.wait());
+    });
+
+    f.onComplete(cb);
+  },
+
+  destroy: function(cb) {
+    var f = ff(() => {
+      mongo.getDB(f());
+    },
+
+    db => {
+      db.collection(USERS).drop(f());
     });
 
     f.onComplete(cb);

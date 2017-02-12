@@ -1,6 +1,7 @@
 'use strict';
 
 var Utility = require('./utility.js');
+var Users = require('./db/users.js');
 
 function ClientList() {
   this.clientCount = 0;
@@ -20,31 +21,45 @@ ClientList.prototype.getId = function(socket) {
   return this.get(socket).socketId;
 };
 
-ClientList.prototype.add = function(socket, clientId) {
+ClientList.prototype.add = function(socket, clientId, cb) {
   var client = this.get(socket);
   if (client) {
     console.log('trying to add socket that already exists', clientId);
-    return client;
+    if (cb) { cb(null, client); }
+    return;
   }
 
-  var socketId = Utility.guid();
-  client = {
-    socket: socket,
-    socketId: socketId,
-    clientId: clientId || Utility.guid(),
-    name: this.generateName(), // TODO: get this from storage
-    status: '',
-  };
-  this.byId[socketId] = client;
-  this.bySocket.set(socket, client);
+  clientId = clientId || Utility.guid();
+  var ip = socket.upgradeReq.headers['x-forwarded-for'] ||
+           socket.upgradeReq.connection.remoteAddress;
 
-  return client;
+  Users.get(clientId, ip, (err, result) => {
+    if (err || !result) {
+      console.error('could not fetch client', clientId, err);
+    }
+
+    result = result || {};
+    var info = result.value;
+    var client = {
+      socket: socket,
+      socketId: Utility.guid(),
+      clientId: clientId,
+      name: info.name || this.generateName(),
+      status: '',
+    };
+
+    this.byId[client.socketId] = client;
+    this.bySocket.set(socket, client);
+
+    if (cb) { cb(err, client); }
+  });
+
 };
 
 ClientList.prototype.remove = function(socket) {
   var client = this.bySocket.get(socket);
   if (!client) {
-    console.log('could not remove unreconized socket');
+    console.log('could not remove unrecognized socket');
     return;
   }
 

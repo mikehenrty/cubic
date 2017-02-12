@@ -1,12 +1,14 @@
 'use strict';
 
 var mongo = require('./lib/db/mongo');
-var users = require('./lib/db/users');
+var Users = require('./lib/db/users');
 
 function run(cb) {
-  users.create(err => {
-    mongo.disconnect();
-    if (cb) { cb(err); }
+  Users.destroy(() => {
+    Users.create(err => {
+      mongo.disconnect();
+      if (cb) { cb(err); }
+    });
   });
 }
 

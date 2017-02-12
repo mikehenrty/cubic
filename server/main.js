@@ -80,12 +80,15 @@ function handleServerCommand(type, payload, socket) {
 
   switch (type) {
     case 'register':
-      var client = clients.add(socket, payload);
-      response = `${client.clientId} ${client.name}`;
+      clients.add(socket, payload, (err, client) => {
+        response = `${client.clientId} ${client.name}`;
+        respondToServerCommand(type, socket, response);
+      });
       break;
 
     case 'list':
       response = clients.getListAsString();
+      respondToServerCommand(type, socket, response);
       break;
 
     case 'setname':
@@ -96,6 +99,7 @@ function handleServerCommand(type, payload, socket) {
       }
 
       response = `${clients.getName(socket)}`;
+      respondToServerCommand(type, socket, response);
       break;
 
     case 'setstatus':
@@ -103,11 +107,13 @@ function handleServerCommand(type, payload, socket) {
 
       }
       response = `${null} ${payload}`;
+      respondToServerCommand(type, socket, response);
       break;
   }
+}
 
+function respondToServerCommand(type, socket, response) {
   socket.send(`${type}_ack ${clients.getId(socket)} ${response}`);
-
   if (type !== 'list') {
     broadcastListUpdate(socket);
   }
