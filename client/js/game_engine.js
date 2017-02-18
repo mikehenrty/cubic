@@ -74,6 +74,7 @@ window.GameEngine = (function() {
   GameEngine.prototype.reset = function() {
     this.lastMoveInfo = null;
     this.startTime = null;
+    this.moves = [];
     this.pendingMoves = {};
     this.board.reset();
     this.player1.reset();
@@ -116,7 +117,7 @@ window.GameEngine = (function() {
     }
 
     player.startMove(move).then(() => {
-      return this.endMoveForPlayer(player);
+      return this.endMoveForPlayer(player, move);
     }).then(() => {
 
       if (player.nextMove) {
@@ -153,6 +154,7 @@ window.GameEngine = (function() {
     this.lastMoveInfo = {
       id: id,
       timestamp: now,
+      move: move,
       position: this.me.getPosition(),
       acked: false,
       animated: false,
@@ -195,7 +197,8 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.finishPendingMove = function(id) {
-    this.endMoveForPlayer(this.me).then(() => {
+    var move = this.getPendingMove(id).move;
+    this.endMoveForPlayer(this.me, move).then(() => {
 
       if (DEBUG) {
         this.logPendingMove(id, '--------------finishing-delete');
@@ -212,14 +215,15 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.rollbackPendingMove = function(id) {
     var moveInfo = this.getPendingMove(id);
-    var move = this.pendingMoves[id];
-    console.log('rolling back move', move);
-    this.me.setPosition(move.position.x, move.position.y);
+    var position = moveInfo.position;
+    var move = moveInfo.move;
+    console.log('rolling back move', moveInfo);
+    this.me.setPosition(position.x, position.y);
     if (DEBUG) {
       this.logPendingMove(id, '--------------finishing-rollingback');
     }
     delete this.pendingMoves[id];
-    this.endMoveForPlayer(this.me, true);
+    this.endMoveForPlayer(this.me, move, true);
   };
 
   GameEngine.prototype.logPendingMove = function(id, message) {
@@ -292,11 +296,19 @@ window.GameEngine = (function() {
     // If we got here, we can ack the move and run it locally.
     this.ackOpponentMove(true, id, timestamp);
     this.opponent.startMove(move, duration).then(() => {
-      return this.endMoveForPlayer(this.opponent);
+      return this.endMoveForPlayer(this.opponent, move);
     });
   };
 
-  GameEngine.prototype.endMoveForPlayer = function(player, isRollback) {
+  GameEngine.prototype.endMoveForPlayer = function(player, move, isRollback) {
+    if (!isRollback) {
+      this.moves.push({
+        player: player.playerNumber,
+        move,
+      });
+    }
+
+
     return player.endMove(isRollback).then(scored => {
       if (isRollback || !scored) {
         return null;
@@ -304,7 +316,6 @@ window.GameEngine = (function() {
 
       if (scored) {
         this.sound.play(SND_SCORE);
-
         if (this.board.isGameOver()) {
           this.endGame();
         }
@@ -353,6 +364,10 @@ window.GameEngine = (function() {
     }
     this.sound.play(SND_WIN);
     this.trigger('gameover', winner);
+
+    if (DEBUG) {
+      console.log('game over', JSON.stringify(this.moves));
+    }
   };
 
   GameEngine.prototype.startIntroMusic = function() {
