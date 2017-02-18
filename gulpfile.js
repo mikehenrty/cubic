@@ -92,7 +92,7 @@ gulp.task('listen', () => {
 });
 
 gulp.task('develop', (done) => {
-  sequence('npm-install', ['watch', 'bundle'], 'listen', done);
+  sequence('npm-install', ['db-start', 'watch', 'bundle'], 'listen', done);
 });
 
 gulp.task('prod', ['npm-install', 'bundle'], (done) => {
