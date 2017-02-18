@@ -117,7 +117,7 @@ window.GameEngine = (function() {
     }
 
     player.startMove(move).then(() => {
-      return this.endMoveForPlayer(player, move);
+      return this.endMoveForPlayer(player, move, this.time.now());
     }).then(() => {
 
       if (player.nextMove) {
@@ -197,8 +197,10 @@ window.GameEngine = (function() {
   };
 
   GameEngine.prototype.finishPendingMove = function(id) {
-    var move = this.getPendingMove(id).move;
-    this.endMoveForPlayer(this.me, move).then(() => {
+    var moveInfo = this.getPendingMove(id);
+    var move = moveInfo.move;
+    var timestamp = moveInfo.timestamp;
+    this.endMoveForPlayer(this.me, move, timestamp).then(() => {
 
       if (DEBUG) {
         this.logPendingMove(id, '--------------finishing-delete');
@@ -215,15 +217,13 @@ window.GameEngine = (function() {
 
   GameEngine.prototype.rollbackPendingMove = function(id) {
     var moveInfo = this.getPendingMove(id);
-    var position = moveInfo.position;
-    var move = moveInfo.move;
     console.log('rolling back move', moveInfo);
-    this.me.setPosition(position.x, position.y);
+    this.me.setPosition(moveInfo.position.x, moveInfo.position.y);
     if (DEBUG) {
       this.logPendingMove(id, '--------------finishing-rollingback');
     }
     delete this.pendingMoves[id];
-    this.endMoveForPlayer(this.me, move, true);
+    this.endMoveForPlayer(this.me, moveInfo.move, moveInfo.timestamp, true);
   };
 
   GameEngine.prototype.logPendingMove = function(id, message) {
@@ -296,18 +296,19 @@ window.GameEngine = (function() {
     // If we got here, we can ack the move and run it locally.
     this.ackOpponentMove(true, id, timestamp);
     this.opponent.startMove(move, duration).then(() => {
-      return this.endMoveForPlayer(this.opponent, move);
+      return this.endMoveForPlayer(this.opponent, move, timestamp);
     });
   };
 
-  GameEngine.prototype.endMoveForPlayer = function(player, move, isRollback) {
+  GameEngine.prototype.endMoveForPlayer = function(player, move,
+                                                   timestamp, isRollback) {
     if (!isRollback) {
       this.moves.push({
         player: player.playerNumber,
         move,
+        timestamp,
       });
     }
-
 
     return player.endMove(isRollback).then(scored => {
       if (isRollback || !scored) {
