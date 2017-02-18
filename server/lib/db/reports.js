@@ -9,6 +9,7 @@ module.exports = {
 
   add: function(clientId, report, cb) {
     report.clientId = clientId;
+    report.timestamp = new Date();
 
     var f = ff(() => {
       mongo.getDB(f());
@@ -38,11 +39,11 @@ module.exports = {
           { 'clientId': { '$type': 'string' } },
           { 'gameId': { '$type': 'string' } },
           { 'playerOne': { '$type': 'string' } },
-          // { 'playerTwo': { '$type': 'string' } },
-          // { 'playerNumer': { '$type': 'int' } },
-          // { 'moves': { '$type': 'int' } },
-          // { 'log': { '$type': 'object' } },
-          // { 'timestamp': { '$type': 'date' } },
+          { 'playerTwo': { '$type': 'string' } },
+          { 'playerNumber': { '$type': 'int' } },
+          { 'moves': { '$type': 'int' } },
+          { 'log': { '$type': 'object' } },
+          { 'timestamp': { '$type': 'date' } },
         ]}
       }, f.wait());
       f.pass(db);
