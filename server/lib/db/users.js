@@ -53,8 +53,6 @@ module.exports = {
   },
 
   create: function(cb) {
-    var db;
-
     var f = ff(() => {
       mongo.getDB(f());
     },

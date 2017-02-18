@@ -2,6 +2,7 @@
 
 var Utility = require('./utility.js');
 var Users = require('./db/users.js');
+var Reports = require('./db/reports.js');
 
 function ClientList() {
   this.clientCount = 0;
@@ -129,6 +130,11 @@ ClientList.prototype.getInfoList = function() {
   return this.getIdList().map(id => {
     return this.byId[id];
   });
+};
+
+ClientList.prototype.saveReport = function(socketOrId, report, cb) {
+  var client = this.get(socketOrId);
+  Reports.add(client.clientId, report, cb);
 };
 
 ClientList.prototype.getListAsString = function() {

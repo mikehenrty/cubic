@@ -11,7 +11,7 @@ var ClientList = require('./lib/client_list.js');
 const CONST = require('./const');
 const BASE_URL = `http:\/\/${os.hostname()}:${CONST.PORT}\/`;
 const SERVER_COMMANDS = [
-  'register', 'list', 'setname', 'setstatus'
+  'register', 'list', 'setname', 'setstatus', 'report'
 ];
 
 var server, staticFile, websockets;
@@ -108,6 +108,19 @@ function handleServerCommand(type, payload, socket) {
       }
 
       respondToServerCommand(type, socket, `${null} ${payload}`);
+      break;
+
+    case 'report':
+      try {
+        var report = JSON.parse(payload);
+        clients.saveReport(socket, report, (err) => {
+          if (err) {
+            console.error('could not save report', err);
+          }
+        });
+      } catch (e) {
+        console.error('could no parse game report', e);
+      }
       break;
   }
 }

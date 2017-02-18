@@ -1,6 +1,8 @@
 window.GameController = (function() {
   'use strict';
 
+  const DEBUG = CONST.DEBUG;
+
   const START_DELAY = 1000;
 
   const STATUS_PLAYING = 'playing';
@@ -15,6 +17,8 @@ window.GameController = (function() {
 
     this.clientId = null;
     this.clientName = null;
+    this.peerId = null;
+    this.gameId = null;
     this.readyAgain = false;
     this.peerReadyAgain = false;
 
@@ -80,6 +84,7 @@ window.GameController = (function() {
 
   GameController.prototype.askToConnect = function(peerId) {
     this.connection.askToConnect(peerId).then(() => {
+      this.peerId = peerId;
       this.trigger('confirm', peerId);
     }).catch(err => {
       console.log('unable to connect', err, peerId);
@@ -88,6 +93,7 @@ window.GameController = (function() {
   };
 
   GameController.prototype.allowPeer = function(peerId) {
+    this.peerId = peerId;
     this.connection.allowPeer(peerId);
   };
 
@@ -117,11 +123,13 @@ window.GameController = (function() {
   };
 
   GameController.prototype.handleReadyPlayerOne = function() {
+    this.gameId = Utility.guid();
     this.setReadyStatus();
     this.trigger('ready');
     var tiles = this.engine.generateTiles();
     var startTime = this.time.now() + START_DELAY;
-    this.connection.send('start', `${startTime} ${JSON.stringify(tiles)}`);
+    var msg = `${startTime} ${JSON.stringify(tiles)} ${this.gameId}`;
+    this.connection.send('start', msg);
     setTimeout(this.startOnline.bind(this, tiles), START_DELAY);
   };
 
@@ -130,8 +138,9 @@ window.GameController = (function() {
   };
 
   GameController.prototype.handleStart = function(payload) {
-    var startTime, tiles;
-    [startTime, tiles] = payload.split(' ');
+    var startTime, tiles, gameId;
+    [startTime, tiles, gameId] = payload.split(' ');
+    this.gameId = gameId;
     tiles = JSON.parse(tiles);
     setTimeout(this.startOnline.bind(this, tiles), startTime - this.time.now());
   };
@@ -205,6 +214,7 @@ window.GameController = (function() {
       }
     }
     this.status.setGameOverStatus(status);
+    this.sendGameReport();
     this.trigger('gameover', status);
   };
 
@@ -215,6 +225,31 @@ window.GameController = (function() {
   GameController.prototype.handleAgainPeer = function() {
     this.peerReadyAgain = true;
     this.attemptToStartAgain();
+  };
+
+  GameController.prototype.sendGameReport = function() {
+    var playerOne, playerTwo;
+
+    if (this.engine.playerNumber === 1) {
+      playerOne = this.clientId;
+      playerTwo = this.peerId;
+    } else {
+      playerOne = this.peerId;
+      playerTwo = this.clientId;
+    }
+
+    var report = {
+      gameId: this.gameId,
+      playerOne,
+      playerTwo,
+      playerNumber: this.engine.playerNumber,
+      moves: this.engine.moves.length,
+      log: this.engine.moves,
+    };
+
+    if (DEBUG) { console.log('reporting game', JSON.stringify(report)); }
+
+    this.connection.sendReport(report);
   };
 
   GameController.prototype.reset = function() {

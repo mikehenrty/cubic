@@ -92,6 +92,10 @@ window.Connection = (function() {
     return this.socket.sendCommand('setname', null, name);
   };
 
+  Connection.prototype.sendReport = function(report) {
+    return this.socket.send('report', null, JSON.stringify(report));
+  };
+
   // Tell server when we are in game, and when we leave game.
   Connection.prototype.setClientStatus = function(status) {
     return this.socket.sendCommand('setstatus', null, status);
