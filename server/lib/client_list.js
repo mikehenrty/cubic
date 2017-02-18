@@ -8,6 +8,7 @@ function ClientList() {
   this.clientCount = 0;
   this.byId = {};
   this.bySocket = new WeakMap();
+  this.reports = [];
 }
 
 ClientList.prototype.isId = function(thing) {
@@ -134,7 +135,27 @@ ClientList.prototype.getInfoList = function() {
 
 ClientList.prototype.saveReport = function(socketOrId, report, cb) {
   var client = this.get(socketOrId);
+  var matchingReport = this.reports[report.gameId];
+  if (!matchingReport) {
+    this.reports[report.gameId] = report;
+  } else {
+    delete this.reports[report.gameId];
+    this.analyzeReport(report, matchingReport);
+  }
   Reports.add(client.clientId, report, cb);
+};
+
+ClientList.prototype.analyzeReport = function(reportOne, reportTwo) {
+  var matching = reportOne.log.every((itemOne, index) => {
+    var itemTwo = reportTwo.log[index];
+    return Object.keys(itemOne).every(key => {
+      return itemOne[key] === itemTwo[key];
+    });
+  });
+
+  if (!matching) {
+    console.error('unmatching game reports', reportOne.log, reportTwo.log);
+  }
 };
 
 ClientList.prototype.getListAsString = function() {
