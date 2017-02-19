@@ -19,6 +19,8 @@ window.GameController = (function() {
     this.clientName = null;
     this.peerId = null;
     this.gameId = null;
+    this.gameReport = {};
+    this.peerGameReport = {};
     this.readyAgain = false;
     this.peerReadyAgain = false;
 
@@ -36,6 +38,7 @@ window.GameController = (function() {
     this.connection.on('readyPlayerOne', this.handleReadyPlayerOne.bind(this));
     this.connection.on('start', this.handleStart.bind(this));
     this.connection.on('peer', this.handlePeerConnection.bind(this));
+    this.connection.on('report', this.handleGameReport.bind(this));
     this.engine.on('gameover', this.displayGameOverStatus.bind(this));
     this.engine.on('ping', this.displayPing.bind(this));
     this.hideBoard();
@@ -238,7 +241,7 @@ window.GameController = (function() {
       playerTwo = this.clientId;
     }
 
-    var report = {
+    this.gameReport = {
       gameId: this.gameId,
       playerOne,
       playerTwo,
@@ -247,9 +250,45 @@ window.GameController = (function() {
       log: this.engine.moves,
     };
 
-    if (DEBUG) { console.log('reporting game', JSON.stringify(report)); }
+    if (DEBUG) {
+      console.log('reporting game', this.gameReport.gameId);
+    }
 
-    this.connection.sendReport(report);
+    if (this.peerGameReport.gameId === this.gameReport.gameId) {
+      this.compareReports(this.gameReport, this.peerGameReport);
+    }
+
+    this.connection.sendReport(this.gameReport);
+  };
+
+  GameController.prototype.handleGameReport = function(report) {
+    try {
+      this.peerGameReport = JSON.parse(report);
+    } catch (err) {
+      console.error('unable to parse game report', err);
+      this.peerGameReport = {};
+    }
+
+    if (this.peerGameReport.gameId === this.gameReport.gameId) {
+      this.compareReports(this.gameReport, this.peerGameReport);
+    }
+  };
+
+  GameController.prototype.compareReports = function(reportOne, reportTwo) {
+    var matching = reportOne.log.every((itemOne, index) => {
+      var itemTwo = reportTwo.log[index];
+      return Object.keys(itemOne).every(key => {
+        return itemOne[key] === itemTwo[key];
+      });
+    });
+
+    if (DEBUG) {
+      console.log('reports compares, matching?', matching);
+    }
+
+    if (!matching) {
+      console.error('unmatching game reports', reportOne.log, reportTwo.log);
+    }
   };
 
   GameController.prototype.reset = function() {

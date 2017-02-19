@@ -140,12 +140,12 @@ ClientList.prototype.saveReport = function(socketOrId, report, cb) {
     this.reports[report.gameId] = report;
   } else {
     delete this.reports[report.gameId];
-    this.analyzeReport(report, matchingReport);
+    this.compareReports(report, matchingReport);
   }
   Reports.add(client.clientId, report, cb);
 };
 
-ClientList.prototype.analyzeReport = function(reportOne, reportTwo) {
+ClientList.prototype.compareReports = function(reportOne, reportTwo) {
   var matching = reportOne.log.every((itemOne, index) => {
     var itemTwo = reportTwo.log[index];
     return Object.keys(itemOne).every(key => {

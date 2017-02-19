@@ -93,7 +93,11 @@ window.Connection = (function() {
   };
 
   Connection.prototype.sendReport = function(report) {
-    return this.socket.send('report', null, JSON.stringify(report));
+    var msg = JSON.stringify(report);
+    return Promise.all([
+      this.socket.send('report', null, msg),
+      this.webRTC.send('report', msg),
+    ]);
   };
 
   // Tell server when we are in game, and when we leave game.
