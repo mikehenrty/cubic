@@ -66,7 +66,7 @@ window.WebRTC = (function() {
       console.log('error, tried to call send when data channel null');
       return;
     }
-    this.dataChannel.send(`${type} ${payload}`);
+    this.dataChannel.send(`${type} ${payload || ''}`);
   };
 
   WebRTC.prototype.onMessage = function(evt) {
