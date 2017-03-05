@@ -210,7 +210,9 @@ window.GameEngine = (function() {
       if (this.me.nextMove) {
         var key = this.me.nextMove;
         this.me.nextMove = null;
-        this.handleKeyForMe(key);
+        Utility.nextFrame().then(() => {
+          this.handleKeyForMe(key);
+        });
       }
     });
   };
