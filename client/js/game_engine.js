@@ -116,7 +116,7 @@ window.GameEngine = (function() {
       return;
     }
 
-    player.startMove(move).then(() => {
+    player.startMove(move, Player.MoveDuration).then(() => {
       return this.endMoveForPlayer(player, move, this.time.now());
     }).then(() => {
 

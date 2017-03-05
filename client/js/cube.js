@@ -2,7 +2,6 @@ window.Cube = (function() {
   'use strict';
 
   const DEBUG = CONST.DEBUG;
-  const MOVE_DURATION = CONST.MOVE_DURATION;
 
   // Positions on the cube.
   const TOP    = CONST.CUBE_SIDES.TOP;
@@ -54,7 +53,7 @@ window.Cube = (function() {
   Cube.prototype.startMoving = function(move, duration) {
     return new Promise((res, rej) => {
 
-      duration = (typeof duration !== 'undefined' ? duration : MOVE_DURATION);
+      duration = (typeof duration !== 'undefined' ? duration : 0);
       this.el.style.transitionDuration = duration + 'ms';
       if (duration === 0) {
         res();
@@ -71,8 +70,8 @@ window.Cube = (function() {
         evt.currentTarget.removeEventListener('transitionend', onEnd);
         res();
       });
-      this.el.classList.add('moving', move);
 
+      this.el.classList.add('moving', move);
     });
   };
 
