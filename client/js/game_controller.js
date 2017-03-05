@@ -113,8 +113,9 @@ window.GameController = (function() {
     // Only player 1 needs to sync timestamps.
     if (this.engine.playerNumber === 1) {
       this.time.sync().then(ping => {
+        this.engine.setMoveDuration(ping);
         this.setReadyStatus();
-        this.connection.send('readyPlayerOne');
+        this.connection.send('readyPlayerOne', ping);
         // For fairness, delay triggering ready for half a ping.
         setTimeout(this.trigger.bind(this, 'ready'), ping / 2);
       }).catch(err => {
@@ -125,8 +126,12 @@ window.GameController = (function() {
     }
   };
 
-  GameController.prototype.handleReadyPlayerOne = function() {
+  GameController.prototype.handleReadyPlayerOne = function(ping) {
     this.gameId = Utility.guid();
+    // If ping was not passed, keep current setting.
+    if (ping) {
+      this.engine.setMoveDuration(ping);
+    }
     this.setReadyStatus();
     this.trigger('ready');
     var tiles = this.engine.generateTiles();

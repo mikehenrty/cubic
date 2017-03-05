@@ -3,6 +3,8 @@ window.GameEngine = (function() {
 
   const DEBUG = CONST.DEBUG;
 
+  const MOVE_DURATION = CONST.MOVE_DURATION;
+
   const COLS = CONST.COLS;
   const ROWS = CONST.ROWS;
 
@@ -25,6 +27,7 @@ window.GameEngine = (function() {
     this.player2 = new Player(2, this.board);
     this.sound = new Sound();
     this.offlineMode = null;
+    this.moveDuration = MOVE_DURATION;
 
     this.connection.on('keydown', this.handleKeyForOpponent.bind(this));
     this.connection.on('keydown_ack', this.handleKeyAck.bind(this));
@@ -53,6 +56,10 @@ window.GameEngine = (function() {
       this.opponentNumber = 1;
       this.opponent = this.player1;
     }
+  };
+
+  GameEngine.prototype.setMoveDuration = function(moveDuration) {
+    this.moveDuration = Math.max(MOVE_DURATION, moveDuration);
   };
 
   GameEngine.prototype.generateTiles = function() {
@@ -116,7 +123,7 @@ window.GameEngine = (function() {
       return;
     }
 
-    player.startMove(move, Player.MoveDuration).then(() => {
+    player.startMove(move, this.moveDuration).then(() => {
       return this.endMoveForPlayer(player, move, this.time.now());
     }).then(() => {
 
@@ -163,7 +170,7 @@ window.GameEngine = (function() {
     this.addPendingMove(id, this.lastMoveInfo);
 
     this.connection.send('keydown', `${id} ${key} ${now}`);
-    this.me.startMove(move, Player.MoveDuration).then(() => {
+    this.me.startMove(move, this.moveDuration).then(() => {
       var moveInfo = this.getPendingMove(id);
       if (!moveInfo) {
         console.log('timeout, pending move not found');
@@ -260,7 +267,7 @@ window.GameEngine = (function() {
 
     timestamp = parseInt(timestamp, 10);
     var now = this.time.now();
-    var duration = (timestamp + Player.MoveDuration) - now;
+    var duration = (timestamp + this.moveDuration) - now;
 
     // Make sure we have enough time for animation to complete,
     // otherwise we reject the move.

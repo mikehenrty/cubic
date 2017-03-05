@@ -1,8 +1,6 @@
 window.Player = (function() {
   'use strict';
 
-  const MOVE_DURATION = CONST.MOVE_DURATION;
-
   const CUBE_SIDES = CONST.CUBE_SIDES;
 
   const KEY_MAP = {
@@ -40,8 +38,6 @@ window.Player = (function() {
     this.nextMove = null;
     this.reset();
   }
-
-  Player.MoveDuration = MOVE_DURATION;
 
   Player.KEY_MAP = KEY_MAP;
 
