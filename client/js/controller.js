@@ -59,11 +59,10 @@ window.Controller = (function() {
     this.game.showBoard();
   };
 
-  Controller.prototype.askToConnect = function(peerId) {
-    console.log('asking to connect to peer', peerId);
-    var peer = this.clientList[peerId] || peerId;
-    this.dialog.showAlert(`Asking ${peer} to connect...`);
-    this.game.askToConnect(peerId);
+  Controller.prototype.askToConnect = function(peer) {
+    console.log('asking to connect to peer', peer);
+    this.dialog.showAlert(`Asking ${peer.clientName} to connect...`);
+    this.game.askToConnect(peer.socketId);
   };
 
   Controller.prototype.confirmConnection = function(peerId, name) {

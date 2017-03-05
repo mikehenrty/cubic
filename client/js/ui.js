@@ -115,7 +115,7 @@ window.UI = (function() {
             joinButton.href = Utility.getPeerLink(clientInfo.clientId);
             joinButton.onclick = evt => {
               evt.preventDefault();
-              this.trigger('join', clientInfo.socketId);
+              this.trigger('join', clientInfo);
             };
 
             clientRow.appendChild(joinButton);
