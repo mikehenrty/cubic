@@ -26,7 +26,7 @@ window.Controller = (function() {
   Controller.prototype.createClientList = function(list) {
     this.clientList = {};
     list.forEach(info => {
-      this.clientList[info.clientId] = info.clientName;
+      this.clientList[info.socketId] = info.clientName;
     });
   };
 
