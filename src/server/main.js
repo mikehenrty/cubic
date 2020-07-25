@@ -27,7 +27,9 @@ console.log(`Listening on ${BASE_URL}`);
 
 // WebSocket Server.
 websockets = new ws.Server({ server: server, port: CONST.WS_PORT });
-websockets.on('connection', socket => {
+websockets.on('connection', (socket, request) => {
+  console.log('anything?', socket.request)
+  socket.request = request
   socket.on('message', message => {
     handleMessage(socket, message);
     if (CONST.DEBUG) { clients.printList(); }

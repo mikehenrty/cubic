@@ -5,10 +5,10 @@ var path = require('path');
 
 // Defaults are defined here, but can be overridden in local config.
 const DEBUG = false;  // set to true for debug logging.
-const BASE_PATH = path.resolve(__dirname, '../');
+const BASE_PATH = path.resolve(__dirname, '../../');
 const PORT = 8021;
 const WS_PORT = 8022;
-const SITE_PATH = path.resolve(BASE_PATH, 'client');
+const SITE_PATH = path.resolve(BASE_PATH, 'src/browser');
 
 const DB_USER = 'cubic';
 const DB_PASSWORD = 'default';

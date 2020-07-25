@@ -10,7 +10,7 @@ window.CONST = (function() {
     FAKE_LATENCY: 0,
 
     // miliseconds of piece movement.
-    MOVE_DURATION: 175,
+    MOVE_DURATION: 100,
 
     COLS: 10,
     ROWS: 10,

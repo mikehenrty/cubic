@@ -16,19 +16,19 @@
   "dependencies": {
     "bson-ext": "1.0.5",
     "bufferutil": "^4.0.1",
-    "concat-files": "0.1.1",
     "del": "2.2.2",
     "ff": "0.2.1",
     "jshint": "2.9.4",
-    "jsonfile": "2.4.0",
-    "mkdirp": "0.5.1",
+    "jsonfile": "^5.0.0",
     "mongodb": "2.2.22",
     "node-static": "0.7.x",
-    "run-sequence": "1.2.2",
     "utf-8-validate": "^5.0.2",
-    "ws": "1.1.0"
+    "ws": "^7.2.1"
   },
   "devDependencies": {
     "parcel": "^2.0.0-alpha.3.2"
+  },
+  "scripts": {
+    "serve": "parcel serve src/browser/index.html"
   }
 }

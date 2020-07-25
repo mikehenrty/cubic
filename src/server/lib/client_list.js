@@ -32,8 +32,9 @@ ClientList.prototype.add = function(socket, clientId, cb) {
   }
 
   clientId = clientId || Utility.guid();
-  var ip = socket.upgradeReq.headers['x-forwarded-for'] ||
-           socket.upgradeReq.connection.remoteAddress;
+  console.log('same?', socket);
+  var ip = socket.request.headers['x-forwarded-for'] ||
+           socket.request.connection.remoteAddress;
 
   Users.get(clientId, ip, (err, result) => {
     if (err || !result) {
@@ -46,7 +47,7 @@ ClientList.prototype.add = function(socket, clientId, cb) {
       socket: socket,
       socketId: Utility.guid(),
       clientId: clientId,
-      name: info.name || this.generateName(),
+      name: (info && info.name) || this.generateName(),
       status: '',
     };
 
